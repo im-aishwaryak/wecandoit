@@ -111,6 +111,21 @@ h2,
     background-color: rgba(235, 114, 34, 0.1);
 }
 
+#nav-current {
+    color: var(--blue-900);
+    background-color: rgba(12, 50, 107, 0.1);
+}
+
+#nav-current:hover {
+    color: var(--orange-600);
+    background-color: rgba(235, 114, 34, 0.1);
+}
+
+.nav-link:hover {
+    color: var(--orange-600);
+    background-color: rgba(235, 114, 34, 0.1);
+}
+
 .nav-pill {
     background: var(--light-orange);
     color: var(--blue-900)

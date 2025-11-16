@@ -37,36 +37,17 @@
             </button>
 
             <nav class="main-nav" aria-label="Main navigation">
-                <a class="nav-link" id="nav-current" href="browse-items.html">Browse items</a>
+                <a class="nav-link" href="browse-items.html">Browse items</a>
                 <a class="nav-link" href="#">Report found item</a>
                 <a class="nav-link" href="#">Report lost item</a>
-                <a class="nav-link nav-pill" href="dashboard.html">My dashboard</a>
+                <a class="nav-link nav-pill" id="nav-current" href="dashboard.html">My dashboard</a>
                 <a class="nav-link nav-cta" href="#">Log out ></a>
             </nav>
         </div>
     </header>
 
     <main>
-
-        <div id="browse-page" class="page hidden">
-            <div class="container">
-                <h2 style="font-size: 1.875rem; font-weight: bold; margin-bottom: 1.5rem;">Browse Found Items</h2>
-
-                <div class="search-filter">
-                    <input type="text" id="search-input" placeholder="Search items..." onkeyup="filterItems()">
-                    <select id="category-filter" onchange="filterItems()">
-                        <option value="all">All Categories</option>
-                    </select>
-                </div>
-
-                <div id="items-container" class="items-grid"></div>
-                <div id="empty-state" class="empty-state hidden">
-                    <i data-feather="package" width="64" height="64"></i>
-                    <p>No items found matching your search</p>
-                </div>
-            </div>
-        </div>
-
+        
     </main>
 
     <footer class="site-footer">
