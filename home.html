@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Boomerang - Lost & Found</title>
+
+    <!-- Figtree font (used in your design) -->
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="icon" href="assets/icons/logo-icon.png" type="image/x-icon">
+</head>
+
+<script>
+    const toggle = document.querySelector(".nav-toggle");
+    const nav = document.querySelector(".main-nav");
+
+    toggle.addEventListener("click", () => {
+        nav.classList.toggle("open");
+        toggle.classList.toggle("open");
+    });
+</script>
+
+
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="home.html" class="logo" aria-label="Boomerang home">
+                <!-- Inline SVG logo placeholder (replace with exported logo.svg if you have it) -->
+                <img src="assets/icons/logo.svg" alt="Boomerang logo" width="138" height="26">
+            </a>
+
+            <button class="nav-toggle" aria-label="Toggle menu">
+                <a class="nav-link" href="home.html">Home</a>
+                <a class="nav-link" href="home.html#how-it-works">How it works</a>
+                <a class="nav-link nav-pill" href="log-in.html">Log in</a>
+                <a class="nav-link nav-cta" href="sign-up.html">Sign up</a>
+            </button>
+
+            <nav class="main-nav" aria-label="Main navigation">
+                <a class="nav-link" href="home.html">Home</a>
+                <a class="nav-link" href="home.html#how-it-works">How it works</a>
+                <a class="nav-link nav-pill" href="log-in.html">Log in</a>
+                <a class="nav-link nav-cta" href="sign-up.html">Sign up</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- HERO -->
+        <section class="hero section">
+            <div class="container hero-inner">
+                <div class="hero-copy">
+                    <h1 class="hero-title">
+                        <span>Where lost things </span>
+                        <em>always</em>
+                        <span> have a way of getting back to you</span>
+                    </h1>
+                    <p class="hero-sub">Join Boomerang, a dashboard to keep track of lost items in your community</p>
+
+                    <div class="hero-actions">
+                        <a class="btn btn-primary" href="sign-up.html">Sign up today!</a>
+                    </div>
+                </div>
+
+                <!-- This single image replaces your complex Figma cluster -->
+                <div class="hero-visual-wrap" aria-hidden="true">
+                    <!-- Replace the src with your exported image (PNG/SVG) -->
+                    <img class="hero-visual" src="assets/hero/hero-visual-placeholder.svg"
+                        alt="Boomerang dashboard preview">
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURES / cards -->
+        <section class="section features">
+            <div class="container">
+                <h2 class="section-title" id="how-it-works">Lost <img src="assets/icons/logo-arrow.svg"> Found, Made Easy</h2>
+
+                <div class="feature-grid">
+                    <article class="feature-card">
+                        <div class="feature-icon">
+                            <img src="assets/icons/folder-icon.png" alt="" aria-hidden="true">
+                        </div>
+                        <h3>Browse Items</h3>
+                        <p>Search found items by category, date, or location. Filter results and view detailed listings.
+                        </p>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-icon">
+                            <img src="assets/icons/info-icon.png" alt="" aria-hidden="true">
+                        </div>
+                        <h3>Report Lost Items</h3>
+                        <p>Submit a quick report with photos and details. We’ll match it with found items instantly.</p>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-icon">
+                            <img src="assets/icons/suitcase-icon.png" alt="" aria-hidden="true">
+                        </div>
+                        <h3>Report Found Items</h3>
+                        <p>Found something? Upload a description and photo. We’ll alert anyone who’s reported it
+                            missing.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- For students -->
+        <section class="section info-panels">
+            <div class="container panels-grid">
+                <div class="panel">
+                    <h2 class="section-title">For Students</h2>
+                    <div class="panel-grid">
+                        <div class="panel-card">
+                            <h4>Never Lose Track Again</h4>
+                            <p>Get instant notifications when items matching your description are found, and claim them
+                                securely with student ID verification.</p>
+                        </div>
+                        <div class="panel-card">
+                            <h4>Be a Hero</h4>
+                            <p>Found something? You can make someone's day by reporting it in under 2 minutes and earn
+                                recognition badges.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <br><br><br>
+
+                <div class="panel">
+                    <h2 class="section-title">For Staff &amp; Administration</h2>
+                    <div class="panel-grid">
+                        <div class="panel-card">
+                            <h4>Streamline Lost-and-Found Management</h4>
+                            <p>Organizes everything automatically, sends notifications, and tracks items from discovery
+                                to return.</p>
+                        </div>
+                        <div class="panel-card">
+                            <h4>Reduce Administrative Burden</h4>
+                            <p>Automatically archive items, generate donation lists with one click, and reduce front
+                                desk inquiries.</p>
+                        </div>
+                        <div class="panel-card">
+                            <h4>Data-Driven Insights</h4>
+                            <p>See where items are most commonly lost, identify peak times, and make informed decisions
+                                about campus storage solutions.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <img src="assets/icons/logo-light.svg" alt="Boomerang mark" width="174" height="33">
+            </div>
+            <div class="copyright">© 2025 Boomerang. All rights reserved.</div>
+        </div>
+    </footer>
+</body>
+
+</html>

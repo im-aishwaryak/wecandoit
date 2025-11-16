@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Log In - Boomerang</title>
+
+    <!-- Figtree font (used in your design) -->
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="icon" href="assets/icons/logo-icon.png" type="image/x-icon">
+</head>
+
+<script>
+    const toggle = document.querySelector(".nav-toggle");
+    const nav = document.querySelector(".main-nav");
+
+    toggle.addEventListener("click", () => {
+        nav.classList.toggle("open");
+        toggle.classList.toggle("open");
+    });
+</script>
+
+
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="home.html" class="logo" aria-label="Boomerang home">
+                <!-- Inline SVG logo placeholder (replace with exported logo.svg if you have it) -->
+                <img src="assets/icons/logo.svg" alt="Boomerang logo" width="138" height="26">
+            </a>
+
+            <button class="nav-toggle" aria-label="Toggle menu">
+                <a class="nav-link" href="home.html">Home</a>
+                <a class="nav-link" href="home.html#how-it-works">How it works</a>
+                <a class="nav-link nav-pill" href="log-in.html">Log in</a>
+                <a class="nav-link nav-cta" href="sign-up.html">Sign up</a>
+            </button>
+
+            <nav class="main-nav" aria-label="Main navigation">
+                <a class="nav-link" href="home.html">Home</a>
+                <a class="nav-link" href="home.html#how-it-works">How it works</a>
+                <a class="nav-link nav-pill" href="log-in.html">Log in</a>
+                <a class="nav-link nav-cta" href="sign-up.html">Sign up</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="auth-hero">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h1>Log In</h1>
+                    <p>
+                        If you don’t have an account, sign up
+                        <a href="#" class="underline-link">here</a>. Or,
+                        <a href="#" class="underline-link">forgot password</a>?
+                    </p>
+                </div>
+
+                <div class="auth-inputs">
+                    <div class="input-field">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" placeholder="Enter your email">
+                    </div>
+                    <div class="input-field">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="Enter your password">
+                    </div>
+                </div>
+
+                <button class="btn auth-btn">Log in</button>
+
+                <div class="auth-divider">
+                    <div class="line"></div>
+                    <span>or continue with</span>
+                    <div class="line"></div>
+                </div>
+
+                <button class="btn social-btn google-btn" style="justify-content: space-between;">
+                    <img src="assets/icons/google-icon.svg" alt="Google logo">
+                    <span>Google</span>
+                    <img src="assets/icons/google-icon.svg" alt="" style="opacity: 0;">
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <img src="assets/icons/logo-light.svg" alt="Boomerang mark" width="174" height="33">
+            </div>
+            <div class="copyright">© 2025 Boomerang. All rights reserved.</div>
+        </div>
+    </footer>
+</body>
+
+</html>
