@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Browse Items - Boomerang</title>
+
+    <!-- Figtree font (used in your design) -->
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="icon" href="assets/icons/logo-icon.png" type="image/x-icon">
+</head>
+
+<script>
+    const toggle = document.querySelector(".nav-toggle");
+    const nav = document.querySelector(".main-nav");
+
+    toggle.addEventListener("click", () => {
+        nav.classList.toggle("open");
+        toggle.classList.toggle("open");
+    });
+</script>
+
+
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="home.html" class="logo" aria-label="Boomerang home">
+                <!-- Inline SVG logo placeholder (replace with exported logo.svg if you have it) -->
+                <img src="assets/icons/logo.svg" alt="Boomerang logo" width="138" height="26">
+            </a>
+
+            <button class="nav-toggle" aria-label="Toggle menu">
+            </button>
+
+            <nav class="main-nav" aria-label="Main navigation">
+                <a class="nav-link" id="nav-current" href="browse-items.html">Browse items</a>
+                <a class="nav-link" href="report-found-item.html">Report found item</a>
+                <a class="nav-link" href="report-lost-item.html">Report lost item</a>
+                <a class="nav-link nav-pill" href="dashboard.html">My dashboard</a>
+                <a class="nav-link nav-cta" href="log-in.html">Log out ></a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+
+        <h1>Browse Found Items</h1>
+
+        <div class="search-filter">
+            <input class="form-input search-input" type="text" id="search-input" placeholder="Search" onkeyup="filterItems()"/>
+            <select class="form-input category-select" id="category-filter" onchange="filterItems()">
+                <option value="all">All Categories</option>
+            </select>
+        </div>
+
+        <div id="items-container" class="items-grid"></div>
+        <div id="empty-state" class="empty-state hidden">
+            <i data-feather="package" width="64" height="64"></i>
+            <p>No items found matching your search</p>
+        </div>
+
+        <div class="item-grid">
+
+            <!-- Item Card -->
+            <div class="item-card">
+                <img class="item-img" src="https://placehold.co/166x159" alt="Item image">
+
+                <div class="item-info">
+                    <div class="item-tags">
+                        <span class="tag tag-available">Available</span>
+                        <span class="tag">Electronics</span>
+                        <span class="tag">Lower Library</span>
+                        <span class="tag">11/14/2025 12:02:14 PM</span>
+                    </div>
+
+                    <div class="item-text">
+                        <h3 class="item-name">Item Name</h3>
+                        <p class="item-desc">Description of the item in detail ...</p>
+                    </div>
+
+                    <button class="claim-btn">Claim this item</button>
+                </div>
+            </div>
+
+            <!-- duplicate item-card again (you had three) -->
+            <div class="item-card">
+                <img class="item-img" src="https://placehold.co/166x159" alt="Item image">
+
+                <div class="item-info">
+                    <div class="item-tags">
+                        <span class="tag tag-available">Available</span>
+                        <span class="tag">Electronics</span>
+                        <span class="tag">Lower Library</span>
+                        <span class="tag">11/14/2025 12:02:14 PM</span>
+                    </div>
+
+                    <div class="item-text">
+                        <h3 class="item-name">Item Name</h3>
+                        <p class="item-desc">Description of the item in detail ...</p>
+                    </div>
+
+                    <button class="claim-btn">Claim this item</button>
+                </div>
+            </div>
+
+            <div class="item-card">
+                <img class="item-img" src="https://placehold.co/166x159" alt="Item image">
+
+                <div class="item-info">
+                    <div class="item-tags">
+                        <span class="tag tag-available">Available</span>
+                        <span class="tag">Electronics</span>
+                        <span class="tag">Lower Library</span>
+                        <span class="tag">11/14/2025 12:02:14 PM</span>
+                    </div>
+
+                    <div class="item-text">
+                        <h3 class="item-name">Item Name</h3>
+                        <p class="item-desc">Description of the item in detail ...</p>
+                    </div>
+
+                    <button class="claim-btn">Claim this item</button>
+                </div>
+            </div>
+
+        </div>
+
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <img src="assets/icons/logo-light.svg" alt="Boomerang mark" width="174" height="33">
+            </div>
+            <div class="copyright">© 2025 Boomerang. All rights reserved.</div>
+        </div>
+    </footer>
+</body>
+
+</html>

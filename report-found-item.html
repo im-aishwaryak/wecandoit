@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Report Found Item - Boomerang</title>
+
+    <!-- Figtree font (used in your design) -->
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="icon" href="assets/icons/logo-icon.png" type="image/x-icon">
+</head>
+
+<script>
+    const toggle = document.querySelector(".nav-toggle");
+    const nav = document.querySelector(".main-nav");
+
+    toggle.addEventListener("click", () => {
+        nav.classList.toggle("open");
+        toggle.classList.toggle("open");
+    });
+</script>
+
+
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="home.html" class="logo" aria-label="Boomerang home">
+                <!-- Inline SVG logo placeholder (replace with exported logo.svg if you have it) -->
+                <img src="assets/icons/logo.svg" alt="Boomerang logo" width="138" height="26">
+            </a>
+
+            <button class="nav-toggle" aria-label="Toggle menu">
+            </button>
+
+            <nav class="main-nav" aria-label="Main navigation">
+                <a class="nav-link" href="browse-items.html">Browse items</a>
+                <a class="nav-link" id="nav-current" href="report-found-item.html">Report found item</a>
+                <a class="nav-link" href="report-lost-item.html">Report lost item</a>
+                <a class="nav-link nav-pill" href="dashboard.html">My dashboard</a>
+                <a class="nav-link nav-cta" href="log-in.html">Log out ></a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="form-container">
+
+            <div class="form-header">
+                <h1>Report a found item &nbsp;<img src="assets/icons/suitcase-icon.png" height="45px"></h1>
+                <p class="subtitle">
+                    Fill out this form to report an item you found. It will be reviewed by an administrator before being
+                    posted.
+                    <span class="required">*</span>&nbsp;<b>Indicates required response.</b>
+                </p>
+            </div>
+
+            <form class="report-form">
+
+                <!-- Category -->
+                <div class="form-group">
+                    <label class="form-label">Category <span class="required">*</span></label>
+                    <select class="form-input">
+                        <option disabled selected>Select a category</option>
+                        <option>Backpack</option>
+                        <option>Electronics</option>
+                        <option>Clothing</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+
+                <!-- Public description -->
+                <div class="form-group">
+                    <label class="form-label">Public description <span class="required">*</span></label>
+                    <p class="form-hint">
+                        Keep it <u>vague</u>. Don’t include specific brands or identifying details.
+                    </p>
+                    <input class="form-input" placeholder="Example: Dark colored backpack" />
+                </div>
+
+                <!-- Private description -->
+                <div class="form-group">
+                    <label class="form-label">Private description <span class="required">*</span></label>
+                    <p class="form-hint">Keep it <u>specific</u>. Include all details.</p>
+                    <textarea class="form-textarea" placeholder="Example: Gray North Face backpack..."></textarea>
+                </div>
+
+                <!-- Location -->
+                <div class="form-group">
+                    <label class="form-label">Where did you find it? <span class="required">*</span></label>
+                    <input class="form-input" placeholder="Example: Library 2nd floor near computers" />
+                </div>
+
+                <!-- When -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Date <span class="required">*</span></label>
+                        <input type="date" class="form-input" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Time</label>
+                        <input type="time" class="form-input" />
+                    </div>
+                </div>
+
+                <!-- Upload -->
+                <div class="form-group">
+                    <label class="form-label">Upload photo <span class="required">*</span></label>
+                    <input type="file" class="form-input file-input" />
+                </div>
+
+                <!-- Verification -->
+                <div class="form-group">
+                    <label class="form-label">Verification Questions <span class="required">*</span></label>
+                    <p class="form-hint">Create 2–3 questions only the owner would know.</p>
+
+                    <!-- Question 1 -->
+                    <div class="verification-section">
+                        <div class="input-field">
+                            <label for="question1">Question 1 <span class="required">*</span></label>
+                            <input type="text" id="question1" placeholder="Example: What color is the inside lining?"
+                                required>
+                        </div>
+                        <br>
+                        <div class="input-field">
+                            <label for="answer1">Answer 1 <span class="required">*</span></label>
+                            <input type="text" id="answer1" placeholder="Example: blue" required>
+                        </div>
+                    </div>
+
+                    <!-- Question 2 -->
+                    <div class="verification-section">
+                        <div class="input-field">
+                            <label for="question2">Question 2 <span class="required">*</span></label>
+                            <input type="text" id="question2" placeholder="Example: What brand is it?" required>
+                        </div>
+                        <br>
+                        <div class="input-field">
+                            <label for="answer2">Answer 2 <span class="required">*</span></label>
+                            <input type="text" id="answer2" placeholder="Example: north face" required>
+                        </div>
+                    </div>
+
+                    <!-- Question 3 -->
+                    <div class="verification-section">
+                        <div class="input-field">
+                            <label for="question3">Question 3</label>
+                            <input type="text" id="question3" placeholder="Example: What's in the front pocket?">
+                        </div>
+                        <br>
+                        <div class="input-field">
+                            <label for="answer3">Answer 3</label>
+                            <input type="text" id="answer3" placeholder="Example: kpop photocards">
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <button class="btn-secondary full-width">Submit for review</button>
+            </form>
+
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <img src="assets/icons/logo-light.svg" alt="Boomerang mark" width="174" height="33">
+            </div>
+            <div class="copyright">© 2025 Boomerang. All rights reserved.</div>
+        </div>
+    </footer>
+</body>
+
+</html>
