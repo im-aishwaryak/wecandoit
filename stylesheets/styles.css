@@ -49,6 +49,9 @@ body {
 
 main {
     min-height: 100vh; /* ensures body fills viewport */
+    max-width: var(--container-max);
+    margin: auto;
+    padding: 40px 20px;
 }
 
 h1,
@@ -530,7 +533,7 @@ h2,
 }
 
 /* header */
-.auth-header h1 {
+h1 {
     font-size: 45px;
     font-weight: 600;
     line-height: 45px;
@@ -637,15 +640,9 @@ h2,
 
 
 
-.main-wrapper {
-  display: flex;
-  justify-content: center;
-  padding: 40px 20px;
-}
-
 .form-container {
   width: 100%;
-  max-width: 1165px;
+  max-width: var(--container-max);
   display: flex;
   flex-direction: column;
   gap: 30px;
@@ -703,6 +700,7 @@ h2,
   font-family: 'Figtree';
 }
 
+
 .form-textarea {
   height: 110px;
   resize: vertical;
@@ -718,7 +716,7 @@ h2,
 }
 
 /* Button */
-.btn-primary {
+.btn-secondary {
   background: #EB7222;
   border-radius: 12px;
   color: white;
@@ -727,6 +725,7 @@ h2,
   border: none;
   cursor: pointer;
   font-size: 14px;
+  font-family: 'Figtree';
 }
 
 .verification-section {
@@ -744,4 +743,167 @@ h2,
 
 input {
     font-family: 'Figtree';
+}
+
+
+
+
+.search-filter {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* spacing between search + dropdown */
+    width: 100%;
+}
+
+.search-input {
+    flex: 1; /* makes it grow and fill all remaining space */
+}
+
+.category-select {
+    flex-shrink: 0; /* don’t collapse the dropdown */
+    color: #CB5100;
+    background-color: rgba(203, 81, 0, 0.1);
+}
+
+.browse-section {
+    width: 100%;
+    max-width: 1165px;
+    padding: 10px 30px 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.browse-title {
+    font-size: 45px;
+    font-family: Figtree, sans-serif;
+    font-weight: 600;
+    color: #000;
+}
+
+.browse-controls {
+    display: flex;
+    gap: 5px;
+}
+
+.search-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(12, 50, 107, 0.05);
+    padding: 11px 15px;
+    border-radius: 15px;
+}
+
+.search-dot {
+    width: 12px;
+    height: 12px;
+    background: #363636;
+    border-radius: 3px;
+}
+
+.control-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 15px;
+    background: rgba(255, 130, 48, 0.4);
+    border-radius: 15px;
+    color: #CB5100;
+    font-family: Figtree, sans-serif;
+    font-weight: 600;
+    font-size: 13.5px;
+}
+
+.chevron {
+    width: 10px;
+    height: 5px;
+    border: 2px solid #CB5100;
+    border-top: none;
+    border-right: none;
+    transform: rotate(-45deg);
+    margin-top: 3px;
+}
+
+.item-grid {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.item-card {
+    flex: 1;
+    background: #F3F4F7;
+    height: 169px;
+    padding: 5px;
+    display: flex;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.item-img {
+    width: 166px;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 15px;
+    padding: 10px;
+}
+
+.item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+    flex: 1;
+}
+
+.item-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.tag {
+    background: rgba(255, 130, 48, 0.4);
+    padding: 3px 4px;
+    border-radius: 4px;
+    font-size: 7px;
+    font-family: Figtree;
+}
+
+.tag-available {
+    background: rgba(102, 176, 240, 0.5);
+    color: #125997;
+}
+
+.item-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.item-name {
+    font-size: 13px;
+    font-weight: 600;
+    font-family: Figtree;
+}
+
+.item-desc {
+    font-size: 10px;
+    line-height: 10px;
+    font-weight: 300;
+    font-family: Figtree;
+}
+
+.claim-btn {
+    background: #0C326B;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    font-size: 10.5px;
+    border-radius: 9px;
+    cursor: pointer;
+    font-family: Figtree;
+    font-weight: 600;
 }
