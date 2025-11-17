@@ -205,13 +205,16 @@ h2,
     transition: 0.25s ease;
 }
 
-.btn:hover {
+.btn:hover,
+.btn-primary:hover {
     opacity: 0.8;
 }
 
 .btn-primary {
     background: var(--blue-900);
-    color: #fff
+    color: #fff;
+    font-family: 'Figtree';
+    transition: 0.25s ease;
 }
 
 /* right visual */
@@ -516,7 +519,7 @@ h2,
 }
 
 .auth-card {
-    background: var(--bg);
+    background: #F3F4F7;
     padding: 30px;
     border-radius: var(--radius-lg);
     width: 100%;
@@ -524,7 +527,6 @@ h2,
     display: flex;
     flex-direction: column;
     gap: var(--space-lg);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
 }
 
 /* header */
@@ -557,7 +559,7 @@ h2,
 }
 
 .input-field {
-    background: rgba(12,50,107,0.05);
+    background: rgba(12,50,107,0.07);
     padding: 11px 15px;
     border-radius: var(--radius-lg);
     display: flex;
@@ -628,4 +630,118 @@ h2,
 .google-btn img {
     width: 26px;
     height: 25px;
+}
+
+
+
+
+
+
+.main-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.form-container {
+  width: 100%;
+  max-width: 1165px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.form-header h1 {
+  font-size: 45px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #363636;
+}
+
+.required {
+  color: #CB3D00;
+  font-weight: 700;
+}
+
+/* Form structure */
+.report-form {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* Reuse your existing auth styles: */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-label {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.form-hint {
+  font-size: 13px;
+  color: #363636;
+  line-height: 0px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  background: #F3F4F7;
+  border-radius: 15px;
+  padding: 12px 15px;
+  border: none;
+  font-size: 14px;
+  font-family: 'Figtree';
+}
+
+.form-textarea {
+  height: 110px;
+  resize: vertical;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* Button */
+.btn-primary {
+  background: #EB7222;
+  border-radius: 12px;
+  color: white;
+  padding: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.verification-section {
+  padding: 15px;
+  border: 2px solid rgba(255, 130, 48, 0.4);
+  border-radius: 15px;
+  gap: 100px;
+}
+
+.verification-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+input {
+    font-family: 'Figtree';
 }
