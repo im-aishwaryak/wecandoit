@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Items - Lost & Found</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/items.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <h1>📦 Lost & Found</h1>
+                <div class="user-info">
+                    <span class="user-email" id="userEmail"></span>
+                    <button class="btn btn-secondary" id="signOutBtn">Sign Out</button>
+                </div>
+            </div>
+            <nav>
+                <a href="dashboard.html" class="nav-btn">🏠 Home</a>
+                <a href="post-item.html" class="nav-btn">➕ Post Found Item</a>
+                <a href="browse-items.html" class="nav-btn active">🔍 Search Items</a>
+                <a href="admin.html" class="nav-btn" id="adminNavBtn" style="display: none;">⚙️ Admin</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="content-section">
+            <h2>Search for Lost Items</h2>
+            
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="🔍 Search by keyword, category, or location...">
+            </div>
+
+            <div class="filter-group">
+                <button class="filter-btn active" data-category="all">All Items</button>
+                <button class="filter-btn" data-category="electronics">Electronics</button>
+                <button class="filter-btn" data-category="clothing">Clothing</button>
+                <button class="filter-btn" data-category="accessories">Accessories</button>
+                <button class="filter-btn" data-category="bags">Bags</button>
+                <button class="filter-btn" data-category="books">Books</button>
+                <button class="filter-btn" data-category="jewelry">Jewelry</button>
+                <button class="filter-btn" data-category="keys">Keys & ID</button>
+                <button class="filter-btn" data-category="other">Other</button>
+            </div>
+
+            <div id="itemsGrid" class="items-grid">
+                <div class="loading">Loading items...</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Claim Modal -->
+    <div id="claimModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Claim This Item</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div id="claimModalContent"></div>
+        </div>
+    </div>
+
+    <script type="module" src="js/firebase.js"></script>
+    <script type="module" src="js/items.js"></script>
+    <script type="module" src="js/ui.js"></script>
+</body>
+</html>
