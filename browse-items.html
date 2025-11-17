@@ -12,6 +12,8 @@
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="icon" href="assets/icons/logo-icon.png" type="image/x-icon">
+    <script src="scripts/search.js"></script>
+ 
 </head>
 
 <script>
@@ -51,16 +53,19 @@
         <h1>Browse Found Items</h1>
 
         <div class="search-filter">
-            <input class="form-input search-input" type="text" id="search-input" placeholder="Search" onkeyup="filterItems()"/>
-            <select class="form-input category-select" id="category-filter" onchange="filterItems()">
+            <!--      👇👇this removes the popup autocomplete that saves my test words -->
+            <input autocomplete="off" class="form-input search-input" type="text" id="search-input" placeholder="Search" onkeyup="search()"/>
+            <select class="form-input category-select" id="category-filter" onchange="search()">
                 <option value="all">All Categories</option>
             </select>
+            <!-- <button onclick = "search()">Search</button> -->
+
         </div>
 
         <div id="items-container" class="items-grid"></div>
         <div id="empty-state" class="empty-state hidden">
             <i data-feather="package" width="64" height="64"></i>
-            <p>No items found matching your search</p>
+            <p id = "searchOutputMSG">No items found matching your search</p>
         </div>
 
         <div class="item-grid">
