@@ -22,6 +22,16 @@
         nav.classList.toggle("open");
         toggle.classList.toggle("open");
     });
+
+    function openImageModal(src) {
+        document.getElementById("modal-img").src = src;
+        document.getElementById("image-modal").classList.remove("hidden");
+    }
+
+    function closeImageModal() {
+        document.getElementById("image-modal").classList.add("hidden");
+    }
+
 </script>
 
 
@@ -51,10 +61,21 @@
         <h1>Browse Found Items</h1>
 
         <div class="search-filter">
-            <input class="form-input search-input" type="text" id="search-input" placeholder="Search" onkeyup="filterItems()"/>
+            <input class="form-input search-input" type="text" id="search-input" placeholder="Search ..."
+                onkeyup="filterItems()" />
             <select class="form-input category-select" id="category-filter" onchange="filterItems()">
                 <option value="all">All Categories</option>
             </select>
+        </div>
+        
+        <br>
+
+        <div class="filtered-tags">
+            <span class="tag tag-category">Electronics 
+                <button class="filter-x" onclick="">
+                    <img src="assets/icons/x.svg">
+                </button>
+            </span>
         </div>
 
         <div id="items-container" class="items-grid"></div>
@@ -65,68 +86,137 @@
 
         <div class="item-grid">
 
-            <!-- Item Card -->
+            <!-- 1. Water Bottle -->
             <div class="item-card">
-                <img class="item-img" src="https://placehold.co/166x159" alt="Item image">
+                <div class="image-wrapper">
+                    <img class="item-img" src="assets/placeholders/lost-item1.jpg" alt="Water bottle">
+                    <button class="img-expand-btn" onclick="openImageModal('assets/placeholders/lost-item1.jpg')">
+                        <img src="assets/icons/expand.svg" alt="expand">
+                    </button>
+                </div>
 
                 <div class="item-info">
                     <div class="item-tags">
                         <span class="tag tag-available">Available</span>
-                        <span class="tag">Electronics</span>
-                        <span class="tag">Lower Library</span>
-                        <span class="tag">11/14/2025 12:02:14 PM</span>
+                        <span class="tag tag-category"><img src="assets/icons/tag-right.svg">Drinkware</span>
                     </div>
 
                     <div class="item-text">
-                        <h3 class="item-name">Item Name</h3>
-                        <p class="item-desc">Description of the item in detail ...</p>
+                        <h3 class="item-name">Water Bottle</h3>
+                        <p class="item-desc">Black and navy blue plastic bottle, 24 oz, with a flip-top lid and a small dent near the base.</p>
+                    </div>
+
+                    <div class="item-tags">
+                        <span class="tag"><img src="assets/icons/location.svg">Gym Hallway</span>
+                        <span class="tag"><img src="assets/icons/clock.svg">11/15/2025 9:20 AM</span>
                     </div>
 
                     <button class="claim-btn">Claim this item</button>
                 </div>
             </div>
 
-            <!-- duplicate item-card again (you had three) -->
+            <!-- 2. Placeholder (unchanged) -->
             <div class="item-card">
-                <img class="item-img" src="https://placehold.co/166x159" alt="Item image">
+
+                <div class="image-wrapper">
+                    <img class="item-img" src="assets/placeholders/lost-item2.jpg" alt="Item image">
+                    <button class="img-expand-btn" onclick="openImageModal('assets/placeholders/lost-item2.jpg')">
+                        <img src="assets/icons/expand.svg" alt="expand">
+                    </button>
+                </div>
 
                 <div class="item-info">
                     <div class="item-tags">
                         <span class="tag tag-available">Available</span>
-                        <span class="tag">Electronics</span>
-                        <span class="tag">Lower Library</span>
-                        <span class="tag">11/14/2025 12:02:14 PM</span>
+                        <span class="tag tag-category"><img src="assets/icons/tag-right.svg">Electronics</span>
                     </div>
 
                     <div class="item-text">
-                        <h3 class="item-name">Item Name</h3>
-                        <p class="item-desc">Description of the item in detail ...</p>
+                        <h3 class="item-name">Presentation Clicker</h3>
+                        <p class="item-desc">Wireless presenter with a built-in laser pointer and forward and backward
+                            slide buttons. Slight scuff on the side, battery still intact. </p>
+                    </div>
+
+                    <div class="item-tags">
+                        <span class="tag"><img src="assets/icons/location.svg">Lower Library</span><br>
+                        <span class="tag"><img src="assets/icons/clock.svg">11/14/2025 12:02 PM</span>
+                    </div>
+
+
+
+                    <button class="claim-btn">Claim this item</button>
+                </div>
+            </div>
+
+            <!-- 3. Chromebook Charger -->
+            <div class="item-card">
+                <div class="image-wrapper">
+                    <img class="item-img" src="assets/placeholders/lost-item3.jpg" alt="Chromebook charger">
+                    <button class="img-expand-btn" onclick="openImageModal('assets/placeholders/lost-item3.jpg')">
+                        <img src="assets/icons/expand.svg" alt="expand">
+                    </button>
+                </div>
+
+                <div class="item-info">
+                    <div class="item-tags">
+                        <span class="tag tag-available">Available</span>
+                        <span class="tag tag-category"><img src="assets/icons/tag-right.svg">Electronics</span>
+                    </div>
+
+                    <div class="item-text">
+                        <h3 class="item-name">Chromebook Charger</h3>
+                        <p class="item-desc">USB-C charger for school-issued Chromebook. Slight cable fray near the
+                            brick.</p>
+                    </div>
+
+                    <div class="item-tags">
+                        <span class="tag"><img src="assets/icons/location.svg">Room B213</span>
+                        <span class="tag"><img src="assets/icons/clock.svg">11/13/2025 2:47 PM</span>
                     </div>
 
                     <button class="claim-btn">Claim this item</button>
                 </div>
             </div>
 
+            <!-- 4. Chromebook Computer -->
             <div class="item-card">
-                <img class="item-img" src="https://placehold.co/166x159" alt="Item image">
+                <div class="image-wrapper">
+                    <img class="item-img" src="assets/placeholders/lost-item4.jpg" alt="Chromebook">
+                    <button class="img-expand-btn" onclick="openImageModal('assets/placeholders/lost-item4.jpg')">
+                        <img src="assets/icons/expand.svg" alt="expand">
+                    </button>
+                </div>
 
                 <div class="item-info">
                     <div class="item-tags">
                         <span class="tag tag-available">Available</span>
-                        <span class="tag">Electronics</span>
-                        <span class="tag">Lower Library</span>
-                        <span class="tag">11/14/2025 12:02:14 PM</span>
+                        <span class="tag tag-category"><img src="assets/icons/tag-right.svg">Electronics</span>
                     </div>
 
                     <div class="item-text">
-                        <h3 class="item-name">Item Name</h3>
-                        <p class="item-desc">Description of the item in detail ...</p>
+                        <h3 class="item-name">School Chromebook</h3>
+                        <p class="item-desc">Standard-issue Chromebook, name label scratched off, login still active.
+                        </p>
+                    </div>
+
+                    <div class="item-tags">
+                        <span class="tag"><img src="assets/icons/location.svg">Library Desk</span>
+                        <span class="tag"><img src="assets/icons/clock.svg">11/12/2025 3:10 PM</span>
                     </div>
 
                     <button class="claim-btn">Claim this item</button>
                 </div>
             </div>
+            
 
+        </div>
+
+
+        <div id="image-modal" class="image-modal hidden">
+            <div class="image-modal-content">
+                <button class="image-modal-close" onclick="closeImageModal()">×</button>
+                <img id="modal-img" src="" alt="Expanded item image">
+            </div>
         </div>
 
 
