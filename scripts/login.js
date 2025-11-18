@@ -4,8 +4,6 @@ import {
     deleteField, storage, ref, uploadBytes, getDownloadURL, signInWithEmailAndPassword
 } from './firebaseModule.js';
 
-
-
 let user; 
 const logInGoogleButton = document.getElementById("google-auth btn");
 const logInEmailButton = document.getElementById("email log-in")
@@ -16,8 +14,10 @@ const userGoogleLogIn = async () => {
         .then((result) => {
             console.log("in result")
             user = result.user;
-            console.log(user);
-            //signInButton.style.display = "none";
+            if(auth.currentUser!= null){
+                localStorage.setItem("user_logged_in", true)
+
+            }
             AddUser();
         }).catch((error) => {
             const errorCode = error.code;
@@ -28,11 +28,16 @@ const userGoogleLogIn = async () => {
 const userEmailLogIn = async () => {
     var email = document.getElementById("email").value;
     var password = document.getElementById("password").value; 
+    console.log(email)
+    console.log(password)
     signInWithEmailAndPassword(auth, email, password)
   .then((userCredential) => {
     // Signed in 
     user = userCredential.user;
     console.log(auth.currentUser.email)
+    if(auth.currentUser!= null){
+      localStorage.setItem("user_logged_in", true)
+    }
     // ...
   })
   .catch((error) => {

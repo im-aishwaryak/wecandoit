@@ -14,15 +14,7 @@
     <link rel="icon" href="assets/icons/logo-icon.png" type="image/x-icon">
 </head>
 
-<script>
-    const toggle = document.querySelector(".nav-toggle");
-    const nav = document.querySelector(".main-nav");
 
-    toggle.addEventListener("click", () => {
-        nav.classList.toggle("open");
-        toggle.classList.toggle("open");
-    });
-</script>
 
 
 <body>
@@ -80,8 +72,8 @@
             <div class="container">
                 <h2 class="section-title" id="how-it-works">Lost <img src="assets/icons/logo-arrow.svg"> Found, Made Easy</h2>
 
-                <div class="feature-grid">
-                    <article class="feature-card">
+                <div class="feature-grid" >
+                    <article class="feature-card" id = "browse_items">
                         <div class="feature-icon">
                             <img src="assets/icons/folder-icon.png" alt="" aria-hidden="true">
                         </div>
@@ -90,7 +82,7 @@
                         </p>
                     </article>
 
-                    <article class="feature-card">
+                    <article class="feature-card" id = "report_lost_items">
                         <div class="feature-icon">
                             <img src="assets/icons/info-icon.png" alt="" aria-hidden="true">
                         </div>
@@ -98,7 +90,7 @@
                         <p>Submit a quick report with photos and details. We’ll match it with found items instantly.</p>
                     </article>
 
-                    <article class="feature-card">
+                    <article class="feature-card" id = "report_found_items">
                         <div class="feature-icon">
                             <img src="assets/icons/suitcase-icon.png" alt="" aria-hidden="true">
                         </div>
@@ -164,5 +156,24 @@
         </div>
     </footer>
 </body>
+
+<script>
+    const toggle = document.querySelector(".nav-toggle");
+    const nav = document.querySelector(".main-nav");
+
+    toggle.addEventListener("click", () => {
+        nav.classList.toggle("open");
+        toggle.classList.toggle("open");
+    });
+
+    document.getElementById("report_found_items").addEventListener("click", () => {
+        window.location.href = "report-found-item.html";
+    });
+
+    document.getElementById("browse_items").addEventListener("click", () => {
+        window.location.href = "browse-items.html";
+    });
+
+</script>
 
 </html>

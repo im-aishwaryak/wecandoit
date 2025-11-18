@@ -14,15 +14,7 @@
     <link rel="icon" href="assets/icons/logo-icon.png" type="image/x-icon">
 </head>
 
-<script>
-    const toggle = document.querySelector(".nav-toggle");
-    const nav = document.querySelector(".main-nav");
 
-    toggle.addEventListener("click", () => {
-        nav.classList.toggle("open");
-        toggle.classList.toggle("open");
-    });
-</script>
 
 
 <body>
@@ -63,7 +55,7 @@
                 <!-- Category -->
                 <div class="form-group">
                     <label class="form-label">Category <span class="required">*</span></label>
-                    <select class="form-input">
+                    <select class="form-input" id = "category">
                         <option disabled selected>Select a category</option>
                         <option>Backpack</option>
                         <option>Electronics</option>
@@ -78,31 +70,31 @@
                     <p class="form-hint">
                         Keep it <u>vague</u>. Don’t include specific brands or identifying details.
                     </p>
-                    <input class="form-input" placeholder="Example: Dark colored backpack" />
+                    <input class="form-input" id = "public_desc" placeholder="Example: Dark colored backpack" />
                 </div>
 
                 <!-- Private description -->
                 <div class="form-group">
                     <label class="form-label">Private description <span class="required">*</span></label>
                     <p class="form-hint">Keep it <u>specific</u>. Include all details.</p>
-                    <textarea class="form-textarea" placeholder="Example: Gray North Face backpack..."></textarea>
+                    <textarea class="form-textarea" id = "private_desc" placeholder="Example: Gray North Face backpack..."></textarea>
                 </div>
 
                 <!-- Location -->
                 <div class="form-group">
                     <label class="form-label">Where did you find it? <span class="required">*</span></label>
-                    <input class="form-input" placeholder="Example: Library 2nd floor near computers" />
+                    <input class="form-input" id = "location" placeholder="Example: Library 2nd floor near computers" />
                 </div>
 
                 <!-- When -->
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Date <span class="required">*</span></label>
-                        <input type="date" class="form-input" />
+                        <input type="date" id = "date" class="form-input" />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Time</label>
-                        <input type="time" class="form-input" />
+                        <input type="time" id = "time" class="form-input" />
                     </div>
                 </div>
 
@@ -160,7 +152,7 @@
 
 
 
-                <button class="btn-secondary full-width">Submit for review</button>
+                <button class="btn-secondary full-width" id = "submit-button">Submit for review</button>
             </form>
 
         </section>
@@ -176,4 +168,17 @@
     </footer>
 </body>
 
+<script>
+    const toggle = document.querySelector(".nav-toggle");
+    const nav = document.querySelector(".main-nav");
+
+    toggle.addEventListener("click", () => {
+        nav.classList.toggle("open");
+        toggle.classList.toggle("open");
+    });
+</script>
+
+
 </html>
+
+<script type = "module" src = "scripts/report_found_item.js"></script>

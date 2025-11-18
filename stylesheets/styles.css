@@ -292,7 +292,7 @@ h2,
 .panel-card:hover {
     transform: scale(1.02);
     rotate: 1deg;
-    filter: brightness(1.05)
+    filter: brightness(1.05);
 }
 
 .feature-icon img {
