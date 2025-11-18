@@ -14,16 +14,6 @@
     <link rel="icon" href="assets/icons/logo-icon.png" type="image/x-icon">
 </head>
 
-<script>
-    const toggle = document.querySelector(".nav-toggle");
-    const nav = document.querySelector(".main-nav");
-
-    toggle.addEventListener("click", () => {
-        nav.classList.toggle("open");
-        toggle.classList.toggle("open");
-    });
-</script>
-
 
 <body>
     <header class="site-header">
@@ -81,7 +71,7 @@
                     <div class="line"></div>
                 </div>
 
-                <button class="btn social-btn google-btn" style="justify-content: space-between;">
+                <button class="btn social-btn google-btn" id = "google-auth btn" style="justify-content: space-between;">
                     <img src="assets/icons/google-icon.svg" alt="Google logo">
                     <span>Google</span>
                     <img src="assets/icons/google-icon.svg" alt="" style="opacity: 0;">
@@ -102,4 +92,15 @@
     </footer>
 </body>
 
+<script>
+    const toggle = document.querySelector(".nav-toggle");
+    const nav = document.querySelector(".main-nav");
+
+    toggle.addEventListener("click", () => {
+        nav.classList.toggle("open");
+        toggle.classList.toggle("open");
+    });
+</script>
+
 </html>
+<script type = "module" src = "scripts/login.js"></script>
