@@ -1,16 +1,17 @@
 import {
     db, auth, provider, signInWithPopup, signOut,
     doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc,
-    deleteField, storage, ref, uploadBytes, getDownloadURL
+    deleteField, storage, ref, uploadBytes, getDownloadURL, signInWithEmailAndPassword
 } from './firebaseModule.js';
 
 
 
 let user; 
-const logInButton = document.getElementById("google-auth btn");
+const logInGoogleButton = document.getElementById("google-auth btn");
+const logInEmailButton = document.getElementById("email log-in")
 
 
-const userSignIn = async () => {
+const userGoogleLogIn = async () => {
     signInWithPopup(auth, provider)
         .then((result) => {
             console.log("in result")
@@ -24,9 +25,26 @@ const userSignIn = async () => {
         })
 }
 
+const userEmailLogIn = async () => {
+    var email = document.getElementById("email").value;
+    var password = document.getElementById("password").value; 
+    signInWithEmailAndPassword(auth, email, password)
+  .then((userCredential) => {
+    // Signed in 
+    user = userCredential.user;
+    console.log(auth.currentUser.email)
+    // ...
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+  });
+}
 
 
-logInButton.addEventListener('click', userSignIn)
+
+logInGoogleButton.addEventListener('click', userGoogleLogIn)
+logInEmailButton.addEventListener('click', userEmailLogIn)
 
 
 async function AddUser() {
