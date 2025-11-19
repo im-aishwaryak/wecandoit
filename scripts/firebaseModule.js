@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
 
 
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 
 import {
     getFirestore, doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc, deleteField
@@ -33,9 +33,9 @@ auth.languageCode = 'it';
 const db = getFirestore();
 const storage = getStorage(); 
 
-export{app, db, auth, provider, signInWithPopup, signOut,
+export{app, db, auth, provider, signInWithPopup, signOut,createUserWithEmailAndPassword, signInWithEmailAndPassword, 
      doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc, deleteField,
-    storage, ref, uploadBytes, getDownloadURL }
+    storage, ref, uploadBytes, getDownloadURL}
 
 
 
