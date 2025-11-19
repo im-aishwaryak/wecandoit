@@ -5,9 +5,8 @@ import {
 } from './firebaseModule.js';
 
 const report_button = document.getElementById("submit-button")
-console.log("hello therw!!")
 
-const uploadImage = async() =>{
+const uploadData = async() =>{
     console.log("in function")
     var category = document.getElementById("category").value; 
     var public_desc = document.getElementById("public_desc").value; 
@@ -17,6 +16,7 @@ const uploadImage = async() =>{
     var time = document.getElementById("time").value; 
 
     //IMAGE SAVING CODE GET IT DONE EUHEHUUFWBBUEQUYQYUFEYUUYIE
+    var image_url = await uploadImage()
 
     var q1 = document.getElementById("question1").value
     var a1 = document.getElementById("answer1").value
@@ -36,6 +36,7 @@ const uploadImage = async() =>{
     await addDoc(
         ref, {
             category: category,
+            image_url: image_url,
             public_description: public_desc,
             private_description: private_desc, 
             location_found: location, 
@@ -48,6 +49,24 @@ const uploadImage = async() =>{
 
 report_button.addEventListener("click", async (e) => {
     e.preventDefault();   // 🔥 stops page reload
-    await uploadImage();
+    await uploadData();
     window.location.reload();
 });
+
+const uploadImage = async() =>{
+    const data = new FormData();
+    const file = document.getElementById("image_file").files[0]; 
+    data.append("file", file);
+    data.append("upload_preset", "boomerang_uploads");
+
+    const res = await fetch(
+        "https://api.cloudinary.com/v1_1/dpj2xj3ry/image/upload",
+        {
+            method: "POST",
+            body: data
+        }
+    );
+
+    const json = await res.json();
+    return json.secure_url; // THIS is the image URL we store in Firestore
+}

@@ -20,6 +20,7 @@ const userGoogleSignIn = async () => {
             console.log(user);
             //signInButton.style.display = "none";
             AddUser();
+            window.location.href = "home.html";
         }).catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
@@ -35,6 +36,7 @@ const userEmailSignIn = async () => {
     // Signed up 
     user = userCredential.user;
     AddUser() 
+    window.location.href = "home.html";
     // ...
   })
   .catch((error) => {

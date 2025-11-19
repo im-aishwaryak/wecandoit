@@ -16,7 +16,7 @@ const userGoogleLogIn = async () => {
             user = result.user;
             if(auth.currentUser!= null){
                 localStorage.setItem("user_logged_in", true)
-
+                window.location.href = "home.html";
             }
             AddUser();
         }).catch((error) => {
@@ -28,21 +28,21 @@ const userGoogleLogIn = async () => {
 const userEmailLogIn = async () => {
     var email = document.getElementById("email").value;
     var password = document.getElementById("password").value; 
-    console.log(email)
-    console.log(password)
+  
     signInWithEmailAndPassword(auth, email, password)
   .then((userCredential) => {
     // Signed in 
     user = userCredential.user;
-    console.log(auth.currentUser.email)
-    if(auth.currentUser!= null){
+    if(auth.currentUser.email != null){
       localStorage.setItem("user_logged_in", true)
+      window.location.href = "home.html";
     }
     // ...
   })
   .catch((error) => {
     const errorCode = error.code;
     const errorMessage = error.message;
+    alert(" cooked ")
   });
 }
 
