@@ -14,34 +14,35 @@
     <link rel="icon" href="assets/icons/logo-icon.png" type="image/x-icon">
 </head>
 
-<script>
-    const toggle = document.querySelector(".nav-toggle");
-    const nav = document.querySelector(".main-nav");
-
-    toggle.addEventListener("click", () => {
-        nav.classList.toggle("open");
-        toggle.classList.toggle("open");
-    });
-</script>
-
 
 <body>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const menuIcon = document.getElementById("menu-icon");
+            const nav = document.querySelector(".main-nav");
+
+            menuIcon.addEventListener("click", () => {
+                nav.classList.toggle("show");
+            });
+        });
+    </script>
+
+
     <header class="site-header">
         <div class="container header-inner">
             <a href="home.html" class="logo" aria-label="Boomerang home">
-                <!-- Inline SVG logo placeholder (replace with exported logo.svg if you have it) -->
                 <img src="assets/icons/logo.svg" alt="Boomerang logo" width="138" height="26">
             </a>
 
-            <button class="nav-toggle" aria-label="Toggle menu">
+            <button id="menu-icon" aria-label="Toggle menu">
+                <img src="assets/icons/menu.svg" alt="Menu icon">
             </button>
 
             <nav class="main-nav" aria-label="Main navigation">
                 <a class="nav-link" href="browse-items.html">Browse items</a>
-                <a class="nav-link" id="nav-current" href="report-found-item.html">Report found item</a>
-                <a class="nav-link" href="report-lost-item.html">Report lost item</a>
-                <a class="nav-link nav-pill" href="dashboard.html">My dashboard</a>
-                <a class="nav-link nav-cta" href="log-in.html">Log out ></a>
+                <a class="nav-link" href="report-found-item.html">Report found item</a>
+                <a class="nav-link nav-pill" id="nav-current" href="dashboard.html">Dashboard</a>
+                <a class="nav-link nav-cta" href="log-in.html">Log out</a>
             </nav>
         </div>
     </header>
@@ -50,7 +51,7 @@
         <section class="form-container">
 
             <div class="form-header">
-                <h1>Report a found item &nbsp;<img src="assets/icons/suitcase-icon.png" height="45px"></h1>
+                <h1 class="title-w-icon">Report a found item<img src="assets/icons/suitcase-icon.png" height="43px"></h1>
                 <p class="subtitle">
                     Fill out this form to report an item you found. It will be reviewed by an administrator before being
                     posted.
@@ -63,7 +64,7 @@
                 <!-- Category -->
                 <div class="form-group">
                     <label class="form-label">Category <span class="required">*</span></label>
-                    <select class="form-input">
+                    <select class="input">
                         <option disabled selected>Select a category</option>
                         <option>Backpack</option>
                         <option>Electronics</option>
@@ -76,40 +77,40 @@
                 <div class="form-group">
                     <label class="form-label">Public description <span class="required">*</span></label>
                     <p class="form-hint">
-                        Keep it <u>vague</u>. Don’t include specific brands or identifying details.
+                        Keep it <u>vague</u>. Don't include specific brands or identifying details.
                     </p>
-                    <input class="form-input" placeholder="Example: Dark colored backpack" />
+                    <input class="input" placeholder="Example: Dark colored backpack" />
                 </div>
 
                 <!-- Private description -->
                 <div class="form-group">
                     <label class="form-label">Private description <span class="required">*</span></label>
                     <p class="form-hint">Keep it <u>specific</u>. Include all details.</p>
-                    <textarea class="form-textarea" placeholder="Example: Gray North Face backpack..."></textarea>
+                    <textarea class="input input-textarea" placeholder="Example: Gray North Face backpack..."></textarea>
                 </div>
 
                 <!-- Location -->
                 <div class="form-group">
                     <label class="form-label">Where did you find it? <span class="required">*</span></label>
-                    <input class="form-input" placeholder="Example: Library 2nd floor near computers" />
+                    <input class="input" placeholder="Example: Library 2nd floor near computers" />
                 </div>
 
                 <!-- When -->
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Date <span class="required">*</span></label>
-                        <input type="date" class="form-input" />
+                        <input type="date" class="input" />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Time</label>
-                        <input type="time" class="form-input" />
+                        <input type="time" class="input" />
                     </div>
                 </div>
 
                 <!-- Upload -->
                 <div class="form-group">
                     <label class="form-label">Upload photo <span class="required">*</span></label>
-                    <input type="file" class="form-input file-input" />
+                    <input type="file" class="input" />
                 </div>
 
                 <!-- Verification -->
@@ -160,7 +161,7 @@
 
 
 
-                <button class="btn-secondary full-width">Submit for review</button>
+                <button class="btn btn-orange full-width">Submit for review</button>
             </form>
 
         </section>

@@ -13,77 +13,71 @@
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="icon" href="assets/icons/logo-icon.png" type="image/x-icon">
     <script src="scripts/search.js"></script>
- 
+
 </head>
 
-<script>
-    const toggle = document.querySelector(".nav-toggle");
-    const nav = document.querySelector(".main-nav");
-
-    toggle.addEventListener("click", () => {
-        nav.classList.toggle("open");
-        toggle.classList.toggle("open");
-    });
-
-    function openImageModal(src) {
-        document.getElementById("modal-img").src = src;
-        document.getElementById("image-modal").classList.remove("hidden");
-    }
-
-    function closeImageModal() {
-        document.getElementById("image-modal").classList.add("hidden");
-    }
-
-</script>
 
 
 <body>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const menuIcon = document.getElementById("menu-icon");
+            const nav = document.querySelector(".main-nav");
+
+            menuIcon.addEventListener("click", () => {
+                nav.classList.toggle("show");
+            });
+        });
+    </script>
+
+
     <header class="site-header">
         <div class="container header-inner">
             <a href="home.html" class="logo" aria-label="Boomerang home">
-                <!-- Inline SVG logo placeholder (replace with exported logo.svg if you have it) -->
                 <img src="assets/icons/logo.svg" alt="Boomerang logo" width="138" height="26">
             </a>
 
-            <button class="nav-toggle" aria-label="Toggle menu">
+            <button id="menu-icon" aria-label="Toggle menu">
+                <img src="assets/icons/menu.svg" alt="Menu icon">
             </button>
 
             <nav class="main-nav" aria-label="Main navigation">
-                <a class="nav-link" id="nav-current" href="browse-items.html">Browse items</a>
+                <a class="nav-link" href="browse-items.html">Browse items</a>
                 <a class="nav-link" href="report-found-item.html">Report found item</a>
-                <a class="nav-link" href="report-lost-item.html">Report lost item</a>
-                <a class="nav-link nav-pill" href="dashboard.html">My dashboard</a>
-                <a class="nav-link nav-cta" href="log-in.html">Log out ></a>
+                <a class="nav-link nav-pill" id="nav-current" href="dashboard.html">Dashboard</a>
+                <a class="nav-link nav-cta" href="log-in.html">Log out</a>
             </nav>
         </div>
     </header>
 
-    <main>
+    <main id="browse-items-title">
 
-        <h1>Browse Found Items</h1>
+        <h1 class="title-w-icon">Browse Found Items<img src="assets/icons/folder-icon.png" height="43px"></h1>
 
         <div class="search-filter">
-            <!--      👇👇this removes the popup autocomplete that saves my test words -->
-            <input autocomplete="off" class="form-input search-input" type="text" id="search-input" placeholder="Search" onkeyup="search()"/>
-            <select class="form-input category-select" id="category-filter" onchange="search()">
+            <input autocomplete="off" class="input" type="text" id="search-input" placeholder="Search"
+                onkeyup="search()" />
+            <select class="input" id="category-filter" onchange="search()">
                 <option value="all">All Categories</option>
             </select>
         </div>
-        
+
         <br>
 
         <div class="filtered-tags">
-            <span class="tag tag-category">Electronics 
+            <span class="tag tag-orange">Electronics
                 <button class="filter-x" onclick="">
                     <img src="assets/icons/x.svg">
                 </button>
             </span>
         </div>
 
+        <br>
+
         <div id="items-container" class="items-grid"></div>
         <div id="empty-state" class="empty-state hidden">
             <i data-feather="package" width="64" height="64"></i>
-            <p id = "searchOutputMSG">No items found matching your search</p>
+            <p id="searchOutputMSG">No items found matching your search</p>
         </div>
 
         <div class="item-grid">
@@ -99,25 +93,26 @@
 
                 <div class="item-info">
                     <div class="item-tags">
-                        <span class="tag tag-available">Available</span>
-                        <span class="tag tag-category"><img src="assets/icons/tag-right.svg">Drinkware</span>
+                        <span class="tag tag-blue">Available</span>
+                        <span class="tag tag-orange"><img src="assets/icons/tag-right.svg">Drinkware</span>
                     </div>
 
                     <div class="item-text">
                         <h3 class="item-name">Water Bottle</h3>
-                        <p class="item-desc">Black and navy blue plastic bottle, 24 oz, with a flip-top lid and a small dent near the base.</p>
+                        <p class="item-desc">Black and navy blue plastic bottle, 24 oz, with a flip-top lid and a small
+                            dent near the base.</p>
                     </div>
 
                     <div class="item-tags">
-                        <span class="tag"><img src="assets/icons/location.svg">Gym Hallway</span>
-                        <span class="tag"><img src="assets/icons/clock.svg">11/15/2025 9:20 AM</span>
+                        <span class="tag tag-transparent"><img src="assets/icons/location.svg">Gym Hallway</span>
+                        <span class="tag tag-transparent"><img src="assets/icons/clock.svg">11/15/2025 9:20 AM</span>
                     </div>
 
-                    <button class="claim-btn">Claim this item</button>
+                    <a class="btn btn-blue btn-sm full-width" href="claim-lost-item.html">Claim this item</a>
                 </div>
             </div>
 
-            <!-- 2. Placeholder (unchanged) -->
+            <!-- 2. Presentation Clicker -->
             <div class="item-card">
 
                 <div class="image-wrapper">
@@ -129,8 +124,8 @@
 
                 <div class="item-info">
                     <div class="item-tags">
-                        <span class="tag tag-available">Available</span>
-                        <span class="tag tag-category"><img src="assets/icons/tag-right.svg">Electronics</span>
+                        <span class="tag tag-blue">Available</span>
+                        <span class="tag tag-orange"><img src="assets/icons/tag-right.svg">Electronics</span>
                     </div>
 
                     <div class="item-text">
@@ -140,13 +135,11 @@
                     </div>
 
                     <div class="item-tags">
-                        <span class="tag"><img src="assets/icons/location.svg">Lower Library</span><br>
-                        <span class="tag"><img src="assets/icons/clock.svg">11/14/2025 12:02 PM</span>
+                        <span class="tag tag-transparent"><img src="assets/icons/location.svg">Lower Library</span><br>
+                        <span class="tag tag-transparent"><img src="assets/icons/clock.svg">11/14/2025 12:02 PM</span>
                     </div>
 
-
-
-                    <button class="claim-btn">Claim this item</button>
+                    <a class="btn btn-blue btn-sm full-width" href="claim-lost-item.html">Claim this item</a>
                 </div>
             </div>
 
@@ -161,8 +154,8 @@
 
                 <div class="item-info">
                     <div class="item-tags">
-                        <span class="tag tag-available">Available</span>
-                        <span class="tag tag-category"><img src="assets/icons/tag-right.svg">Electronics</span>
+                        <span class="tag tag-blue">Available</span>
+                        <span class="tag tag-orange"><img src="assets/icons/tag-right.svg">Electronics</span>
                     </div>
 
                     <div class="item-text">
@@ -172,11 +165,11 @@
                     </div>
 
                     <div class="item-tags">
-                        <span class="tag"><img src="assets/icons/location.svg">Room B213</span>
-                        <span class="tag"><img src="assets/icons/clock.svg">11/13/2025 2:47 PM</span>
+                        <span class="tag tag-transparent"><img src="assets/icons/location.svg">Room B213</span>
+                        <span class="tag tag-transparent"><img src="assets/icons/clock.svg">11/13/2025 2:47 PM</span>
                     </div>
 
-                    <button class="claim-btn">Claim this item</button>
+                    <a class="btn btn-blue btn-sm full-width" href="claim-lost-item.html">Claim this item</a>
                 </div>
             </div>
 
@@ -191,8 +184,8 @@
 
                 <div class="item-info">
                     <div class="item-tags">
-                        <span class="tag tag-available">Available</span>
-                        <span class="tag tag-category"><img src="assets/icons/tag-right.svg">Electronics</span>
+                        <span class="tag tag-blue">Available</span>
+                        <span class="tag tag-orange"><img src="assets/icons/tag-right.svg">Electronics</span>
                     </div>
 
                     <div class="item-text">
@@ -202,14 +195,14 @@
                     </div>
 
                     <div class="item-tags">
-                        <span class="tag"><img src="assets/icons/location.svg">Library Desk</span>
-                        <span class="tag"><img src="assets/icons/clock.svg">11/12/2025 3:10 PM</span>
+                        <span class="tag tag-transparent"><img src="assets/icons/location.svg">Library Desk</span>
+                        <span class="tag tag-transparent"><img src="assets/icons/clock.svg">11/12/2025 3:10 PM</span>
                     </div>
 
-                    <button class="claim-btn">Claim this item</button>
+                    <a class="btn btn-blue btn-sm full-width" href="claim-lost-item.html">Claim this item</a>
                 </div>
             </div>
-            
+
 
         </div>
 
@@ -221,8 +214,14 @@
             </div>
         </div>
 
+        <br><br>
+        <a href="#browse-items-title">Back to top</a>
+        <br><br>
+
 
     </main>
+
+
 
     <footer class="site-footer">
         <div class="container footer-inner">
