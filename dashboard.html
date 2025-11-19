@@ -14,42 +14,155 @@
     <link rel="icon" href="assets/icons/logo-icon.png" type="image/x-icon">
 </head>
 
-<script>
-    const toggle = document.querySelector(".nav-toggle");
-    const nav = document.querySelector(".main-nav");
-
-    toggle.addEventListener("click", () => {
-        nav.classList.toggle("open");
-        toggle.classList.toggle("open");
-    });
-</script>
-
 
 <body>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const menuIcon = document.getElementById("menu-icon");
+            const nav = document.querySelector(".main-nav");
+
+            menuIcon.addEventListener("click", () => {
+                nav.classList.toggle("show");
+            });
+        });
+    </script>
+
+
     <header class="site-header">
         <div class="container header-inner">
             <a href="home.html" class="logo" aria-label="Boomerang home">
-                <!-- Inline SVG logo placeholder (replace with exported logo.svg if you have it) -->
                 <img src="assets/icons/logo.svg" alt="Boomerang logo" width="138" height="26">
             </a>
 
-            <button class="nav-toggle" aria-label="Toggle menu">
+            <button id="menu-icon" aria-label="Toggle menu">
+                <img src="assets/icons/menu.svg" alt="Menu icon">
             </button>
 
             <nav class="main-nav" aria-label="Main navigation">
                 <a class="nav-link" href="browse-items.html">Browse items</a>
                 <a class="nav-link" href="report-found-item.html">Report found item</a>
-                <a class="nav-link" href="report-lost-item.html">Report lost item</a>
-                <a class="nav-link nav-pill" id="nav-current" href="dashboard.html">My dashboard</a>
-                <a class="nav-link nav-cta" href="log-in.html">Log out ></a>
+                <a class="nav-link nav-pill" id="nav-current" href="dashboard.html">Dashboard</a>
+                <a class="nav-link nav-cta" href="log-in.html">Log out</a>
             </nav>
         </div>
     </header>
 
-    <main class="main-wrapper">
-        <section class="form-container">
-            <h1>Dashboard</h1>
-        </section>
+    <main>
+        <!-- Welcome Section -->
+        <h1>Student Dashboard</h1>
+        <br>
+
+        <!-- Quick Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <img class="stat-icon" src="assets/icons/suitcase-icon.png">
+                <div class="stat-info">
+                    <h3>3</h3>
+                    <p>Items Found</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <img class="stat-icon" src="assets/icons/menu.png">
+                <div class="stat-info">
+                    <h3>1</h3>
+                    <p>Pending Approval</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <img class="stat-icon" src="assets/icons/check-circle.png">
+                <div class="stat-info">
+                    <h3>2</h3>
+                    <p>Ready to Claim</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <img class="stat-icon" src="assets/icons/bell.png">
+                <div class="stat-info">
+                    <h3>4</h3>
+                    <p>New Notifications</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2>Your Items</h2>
+                <div class="tab-group">
+                    <button class="tab-btn active">Found</button>
+                    <button class="tab-btn">Lost</button>
+                </div>
+            </div>
+
+            <!-- Pending Approval -->
+            <div class="items-section">
+                <h3 class="subsection-title">Pending Approval</h3>
+
+                <div class="dashboard-item-card">
+                    <img src="assets/placeholders/lost-item1.jpg" alt="Item" class="dashboard-item-img">
+                    <div class="dashboard-item-info">
+                        <h4>Gray Backpack</h4>
+                        <div class="item-tags">
+                            <span class="tag tag-orange">Under Review</span>
+                            <span class="tag tag-transparent"><img src="assets/icons/clock.svg">11/17/2025</span>
+                        </div>
+                        <p class="item-location">Found in Library</p>
+                    </div>
+                    <button class="btn btn-orange btn-sm">View Details</button>
+                </div>
+            </div>
+
+            <!-- Ready to Claim -->
+            <div class="items-section">
+                <h3 class="subsection-title">Ready to Claim</h3>
+
+                <div class="dashboard-item-card">
+                    <img src="assets/placeholders/lost-item2.jpg" alt="Item" class="dashboard-item-img">
+                    <div class="dashboard-item-info">
+                        <h4>Presentation Clicker</h4>
+                        <div class="item-tags">
+                            <span class="tag tag-blue">Verified</span>
+                            <span class="tag tag-transparent"><img src="assets/icons/location.svg">Student
+                                Services</span>
+                        </div>
+                        <p class="item-location">Pick up by 11/22/2025</p>
+                    </div>
+                    <button class="btn btn-blue btn-sm">Get Directions</button>
+                </div>
+
+                <div class="dashboard-item-card">
+                    <img src="assets/placeholders/lost-item3.jpg" alt="Item" class="dashboard-item-img">
+                    <div class="dashboard-item-info">
+                        <h4>USB-C Charger</h4>
+                        <div class="item-tags">
+                            <span class="tag tag-blue">Verified</span>
+                            <span class="tag tag-transparent"><img src="assets/icons/location.svg">Room B213</span>
+                        </div>
+                        <p class="item-location">Pick up by 11/20/2025</p>
+                    </div>
+                    <button class="btn btn-blue btn-sm">Get Directions</button>
+                </div>
+            </div>
+
+            <!-- Recently Posted -->
+            <div class="items-section">
+                <h3 class="subsection-title">Your Posted Items</h3>
+
+                <div class="dashboard-item-card">
+                    <img src="assets/placeholders/lost-item4.jpg" alt="Item" class="dashboard-item-img">
+                    <div class="dashboard-item-info">
+                        <h4>Blue Backpack</h4>
+                        <div class="item-tags">
+                            <span class="tag tag-blue">Active</span>
+                            <span class="tag tag-transparent">2 views</span>
+                        </div>
+                        <p class="item-location">Posted 3 days ago</p>
+                    </div>
+                    <button class="btn btn-sm"
+                        style="background: transparent; color: var(--blue-900); padding: 6px 12px; border: 1px solid var(--blue-900);">Edit</button>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <footer class="site-footer">

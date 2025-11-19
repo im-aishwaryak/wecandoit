@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Report Found Item - Boomerang</title>
+
+    <!-- Figtree font (used in your design) -->
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="icon" href="assets/icons/logo-icon.png" type="image/x-icon">
+</head>
+
+
+
+<body>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const menuIcon = document.getElementById("menu-icon");
+            const nav = document.querySelector(".main-nav");
+
+            menuIcon.addEventListener("click", () => {
+                nav.classList.toggle("show");
+            });
+        });
+    </script>
+
+
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="home.html" class="logo" aria-label="Boomerang home">
+                <img src="assets/icons/logo.svg" alt="Boomerang logo" width="138" height="26">
+            </a>
+
+            <button id="menu-icon" aria-label="Toggle menu">
+                <img src="assets/icons/menu.svg" alt="Menu icon">
+            </button>
+
+            <nav class="main-nav" aria-label="Main navigation">
+                <a class="nav-link" href="browse-items.html">Browse items</a>
+                <a class="nav-link" href="report-found-item.html">Report found item</a>
+                <a class="nav-link nav-pill" id="nav-current" href="dashboard.html">Dashboard</a>
+                <a class="nav-link nav-cta" href="log-in.html">Log out</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="form-container">
+
+            <a href="browse-items.html">
+                < Go back</a>
+
+                    <div class="form-header">
+                        <h1 class="title-w-icon">Claim lost item <img src="assets/icons/check-circle.png" height="43px">
+                        </h1>
+                        <p class="subtitle">
+                            Fill out this form to report an item you found. It will be reviewed by an administrator
+                            before being
+                            posted.
+                            <span class="required">*</span>&nbsp;<b>Indicates required response.</b>
+                        </p>
+                    </div>
+
+                    <form class="report-form">
+
+                        <!-- Category -->
+                        <div class="form-group">
+                            <label class="form-label">Item selected <span class="required">*</span></label>
+                            <div class="item-card" style="flex-direction: row;">
+                                <img class="item-img" style="width: 150px; height: 150px"
+                                    src="assets/placeholders/lost-item1.jpg" alt="Water bottle">
+
+                                <div class="item-info">
+                                    <div class="item-tags">
+                                        <span class="tag tag-blue">Available</span>
+                                        <span class="tag tag-orange"><img
+                                                src="assets/icons/tag-right.svg">Drinkware</span>
+                                    </div>
+
+                                    <div class="item-text">
+                                        <h3 class="item-name">Water Bottle</h3>
+                                        <p class="item-desc">Black and navy blue plastic bottle, 24 oz, with a flip-top
+                                            lid and a
+                                            small dent near the base.</p>
+                                    </div>
+
+                                    <div class="item-tags">
+                                        <span class="tag tag-transparent"><img src="assets/icons/location.svg">Gym
+                                            Hallway</span>
+                                        <span class="tag tag-transparent"><img src="assets/icons/clock.svg">11/15/2025
+                                            9:20
+                                            AM</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Your name <span class="required">*</span></label>
+                            <input class="input" placeholder="First and Last Name" />
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">School email <span class="required">*</span></label>
+                            <input class="input" placeholder="0000000@apps.nsd.org" />
+                        </div>
+
+
+
+                        <div class="form-group">
+                            <label class="form-label">When do you remember losing this item? <span
+                                    class="required">*</span></label>
+                            <p class="form-hint">This doesn't need to be exact, but helps for verification.</p>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <input type="date" class="input" />
+                                </div>
+                                <div class="form-group">
+                                    <input type="time" class="input" />
+                                </div>
+                            </div>
+
+                        </div>
+
+
+
+
+
+
+                        <!-- Verification -->
+                        <div class="form-group">
+                            <label class="form-label">Verification Questions <span class="required">*</span></label>
+                            <p class="form-hint">To help ensure items are returned to their rightful owners, we ask a
+                                few
+                                simple verification questions. These are designed to confirm your connection to the item
+                                and protect against false claims. </p>
+
+                            <div class="input-field">
+                                <label for="question1">Question 1 <span class="required">*</span></label>
+                                <input type="text" id="question1"
+                                    placeholder="Your answer ..." required>
+                            </div>
+
+                            <div class="input-field">
+                                <label for="question1">Question 2 <span class="required">*</span></label>
+                                <input type="text" id="question2"
+                                    placeholder="Your answer ..." required>
+                            </div>
+
+                            <div class="input-field">
+                                <label for="question1">Question 3 <span class="required">*</span></label>
+                                <input type="text" id="question3"
+                                    placeholder="Your answer ..." required>
+                            </div>
+
+                        </div>
+
+                        <!-- Private description -->
+                        <div class="form-group">
+                            <label class="form-label">Additional information</label>
+                            <p class="form-hint">List anything else you believe will strengthen your chances of
+                                verifying your claim.
+                                This could include <u>specific</u> details unique to your item.</p>
+                            <textarea class="input input-textarea" placeholder=""></textarea>
+                        </div>
+
+                        <button class="btn btn-orange full-width">Submit for review</button>
+                    </form>
+
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <img src="assets/icons/logo-light.svg" alt="Boomerang mark" width="174" height="33">
+            </div>
+            <div class="copyright">© 2025 Boomerang. All rights reserved.</div>
+        </div>
+    </footer>
+</body>
+
+</html>
