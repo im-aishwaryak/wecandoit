@@ -32,10 +32,10 @@ const userEmailSignIn = async () => {
     var password = document.getElementById("password").value;
 
     createUserWithEmailAndPassword(auth, email, password)
-  .then((userCredential) => {
+  .then(async (userCredential) => {
     // Signed up 
     user = userCredential.user;
-    AddUser() 
+    await AddUser() 
     window.location.href = "home.html";
     // ...
   })
@@ -57,9 +57,20 @@ async function AddUser() {
         return;
     }
     var ref = doc(db, "User_Data", user.email);
-
-      await setDoc(
-        ref, {
-        items_posted: 0,
+    var user_status = ""
+    if (auth.currentUser.email.includes("@apps.nsd.org")){
+      user_status = "Student"
+    }
+    else if (auth.currentUser.email.includes("@nsd.org")){
+      user_status = "Admin"
+    }
+    else{
+      alert("email must be tied to North Creek High School")
+      return; 
+    }
+    await setDoc(
+      ref, {
+      items_posted: 0,
+      status: user_status
     })
 }
