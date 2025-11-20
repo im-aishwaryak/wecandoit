@@ -5,7 +5,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebas
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 
 import {
-    getFirestore, doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc, deleteField
+    getFirestore, doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc, deleteField, getDocs, onSnapshot
 }
     from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
@@ -34,8 +34,39 @@ const db = getFirestore();
 const storage = getStorage(); 
 
 export{app, db, auth, provider, signInWithPopup, signOut,createUserWithEmailAndPassword, signInWithEmailAndPassword, 
-     doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc, deleteField,
+     doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc, deleteField, getDocs, onSnapshot,
     storage, ref, uploadBytes, getDownloadURL}
 
 
+// ---------------------------
+// FUNCTIONS YOU EXPORT
+// ---------------------------
 
+// Get all documents from Item_Data collection
+export async function getAllItems() {
+  // NOTE: use the exact collection name from your console
+  const ref = collection(db, "Item_Data");
+  const snap = await getDocs(ref);
+
+  // Map docs to plain objects
+  return snap.docs.map(d => ({
+    id: d.id,
+    ...d.data()
+  }));
+}
+
+// Real-time listener (optional)
+export function listenToItems(callback) {
+  return onSnapshot(collection(db, "Item_Data"), snap => {
+    const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    callback(items);
+  });
+}
+
+// Get single document by id (optional)
+export async function getItemById(id) {
+  const docRef = doc(db, "Item_Data", id);
+  const docSnap = await getDoc(docRef);
+  if (!docSnap.exists()) return null;
+  return { id: docSnap.id, ...docSnap.data() };
+}
