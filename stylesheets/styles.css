@@ -1,4 +1,4 @@
-/* Changed code at 361 (including these two lines i just added */
+/* Changed code at 369 (including these two lines i just added */
 
 /* ==================== ROOT VARIABLES ==================== */
 :root {
@@ -366,7 +366,7 @@ h1 {
     display: flex;
     flex-direction: column;
     height: 100%;
-    max-width: 22%;    /* responsive */
+    /* width: 350px; */
 }
 
 .item-card .item-img {
@@ -564,7 +564,7 @@ h1 {
 
 .item-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 300px));
     gap: 10px;
     width: 100%;
     align-items: stretch;
