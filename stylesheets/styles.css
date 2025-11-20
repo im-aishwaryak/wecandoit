@@ -1,3 +1,5 @@
+/* Changed code at 361 (including these two lines i just added */
+
 /* ==================== ROOT VARIABLES ==================== */
 :root {
     /* Color Tokens */
@@ -12,7 +14,7 @@
     --gray-bg: #F3F4F7;
     --gray-input: rgba(12, 50, 107, 0.07);
     --gray-text: #363636;
-    
+
     --bg: #ffffff;
     --text: #0B0B0B;
 
@@ -70,6 +72,7 @@ h2,
 .section-title {
     font-weight: 600;
     letter-spacing: -0.05em;
+    margin: 0px;
 }
 
 h1 {
@@ -112,6 +115,7 @@ h1 {
 .subtitle {
     font-size: 14px;
     color: var(--gray-text);
+    margin-top: 5px;
 }
 
 .underline-link {
@@ -245,6 +249,11 @@ h1 {
     color: #0a4477;
 }
 
+.tag-gray {
+    background: var(--gray-bg);
+    color: var(--gray-text);
+}
+
 .tag-orange {
     background: var(--orange-400);
 }
@@ -252,11 +261,13 @@ h1 {
 .tag-transparent {
     background: transparent;
     color: var(--text);
+    padding: 0;
 }
 
 /* ==================== CARD COMPONENT ==================== */
 .card {
     padding: 20px;
+    
     border-radius: var(--radius-lg);
     transition: 0.25s ease;
 }
@@ -355,6 +366,7 @@ h1 {
     display: flex;
     flex-direction: column;
     height: 100%;
+    max-width: 22%;    /* responsive */
 }
 
 .item-card .item-img {
@@ -542,11 +554,11 @@ h1 {
     margin-top: 12px;
 }
 
-.panels-grid > :first-child .panel-grid {
+.panels-grid> :first-child .panel-grid {
     grid-template-columns: repeat(2, 1fr);
 }
 
-.panels-grid > :last-child .panel-grid {
+.panels-grid> :last-child .panel-grid {
     grid-template-columns: repeat(3, 1fr);
 }
 
@@ -743,6 +755,145 @@ h1 {
     display: none;
 }
 
+
+
+
+
+
+
+/* ==================== DETAILS MODAL ==================== */
+.details-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    padding: 20px;
+}
+
+.details-modal.hidden {
+    display: none;
+}
+
+.details-modal-content {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    padding: 25px;
+    width: 100%;
+    max-width: 650px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.details-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    font-size: 26px;
+    cursor: pointer;
+}
+
+.details-item-header {
+    display: flex;
+    gap: 20px;
+}
+
+.details-img {
+    width: 170px;
+    height: 170px;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+}
+
+.details-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.details-info p {
+    margin: 0;
+}
+
+.details-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+
+
+
+
+
+/* Additional style for comparison table */
+.comparison-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.comparison-card {
+    display: flex;
+    flex-wrap: wrap;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1rem;
+    background-color: #fff;
+}
+
+.comparison-card img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-right: 1rem;
+}
+
+.comparison-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.comparison-columns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.comparison-column {
+    flex: 1 1 45%;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    padding: 1rem;
+    background-color: #f9f9f9;
+}
+
+.comparison-column h4 {
+    margin-bottom: 0.5rem;
+}
+
+.comparison-actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+
+
+
+
+
+
+
 /* ==================== DASHBOARD ==================== */
 .dashboard-welcome {
     margin-bottom: 32px;
@@ -923,7 +1074,10 @@ h1 {
 
 /* Dashboard Items */
 .items-section {
-    margin-bottom: 24px;
+    margin-bottom: 15px;
+    background-color: rgba(15, 28, 68, 0.062);
+    padding: 15px;
+    border-radius: var(--radius-lg);
 }
 
 .items-section:last-child {
@@ -931,18 +1085,19 @@ h1 {
 }
 
 .subsection-title {
-    font-size: 16px;
-    font-weight: 600;
-    margin: 0 0 12px 0;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 0 0;
     color: var(--accent);
 }
 
 .dashboard-item-card {
-    background: white;
+    background: #fff;
     padding: 12px;
+    padding-right: 15px;
     border-radius: var(--radius-md);
     display: flex;
-    gap: 12px;
+    gap: 15px;
     align-items: center;
     margin-bottom: 12px;
     transition: 0.25s ease;
@@ -957,8 +1112,8 @@ h1 {
 }
 
 .dashboard-item-img {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     object-fit: cover;
     border-radius: var(--radius-sm);
     flex-shrink: 0;
@@ -980,6 +1135,7 @@ h1 {
     flex-wrap: wrap;
     gap: 4px;
     margin-bottom: 4px;
+    align-items: center;
 }
 
 .dashboard-item-info .item-location {

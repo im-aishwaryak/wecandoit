@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Dashboard - Boomerang</title>
 
-    <!-- Figtree font -->
+    <!-- Figtree font (used in your design) -->
     <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
 
@@ -15,12 +15,8 @@
 </head>
 
 <body>
-
-    <!-- ================== JS ================== -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-
-            /* MOBILE NAV */
             const menuIcon = document.getElementById("menu-icon");
             const nav = document.querySelector(".main-nav");
 
@@ -29,25 +25,23 @@
             });
 
             /* ========= MODAL LOGIC ========= */
-
             const reportedModal = document.getElementById("reported-details-modal");
             const claimedModal = document.getElementById("claimed-details-modal");
 
-            /* Any "View Details" for reported items */
+            // Any "View Details" buttons
             document.querySelectorAll("[data-modal='reported']").forEach(btn => {
                 btn.addEventListener("click", () => {
                     reportedModal.classList.remove("hidden");
                 });
             });
 
-            /* Any "View Details" for claimed items */
             document.querySelectorAll("[data-modal='claimed']").forEach(btn => {
                 btn.addEventListener("click", () => {
                     claimedModal.classList.remove("hidden");
                 });
             });
 
-            /* Close Buttons */
+            // Close Buttons
             document.querySelectorAll(".details-modal-close").forEach(btn => {
                 btn.addEventListener("click", () => {
                     btn.closest(".details-modal").classList.add("hidden");
@@ -56,7 +50,6 @@
         });
     </script>
 
-    <!-- ================= HEADER ================= -->
     <header class="site-header">
         <div class="container header-inner">
             <a href="home.html" class="logo" aria-label="Boomerang home">
@@ -76,36 +69,39 @@
         </div>
     </header>
 
-
-    <!-- ================= MAIN ================= -->
     <main>
-        <h1>Student Dashboard</h1>
+        <h1>Admin Dashboard</h1>
         <br>
 
         <!-- Ready to Claim -->
         <div class="items-section">
             <h2>Ready to Claim</h2>
-            <p class="subtitle">These items have been approved by admin and can be picked up in the <u>NCHS Main
-                    Office</u>.</p>
+            <p class="subtitle">These items have been approved by you and need to be picked up by the student.</p>
 
             <div class="dashboard-item-card">
-                <img src="assets/placeholders/lost-item2.jpg" class="dashboard-item-img">
+                <img src="assets/placeholders/lost-item2.jpg" alt="Item" class="dashboard-item-img">
                 <div class="dashboard-item-info">
                     <h4>Presentation Clicker</h4>
-                    <p class="item-location">Approved on 11/22/2025</p>
-                    <p class="item-location">Pick up by 11/29/2025</p>
+                    <p class="item-location" style="padding-bottom: 5px;">Claimed by <span
+                            class="tag tag-gray">1000000@apps.nsd.org</span></p>
+                    <p class="item-location" style="padding-bottom: 5px;">Approved on 11/22/2025</p>
+                    <p class="item-location" style="padding-bottom: 5px;">Pick up by 11/29/2025</p>
                 </div>
                 <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
+                <button class="btn btn-blue btn-sm">Item Retrieved</button>
             </div>
 
             <div class="dashboard-item-card">
-                <img src="assets/placeholders/lost-item3.jpg" class="dashboard-item-img">
+                <img src="assets/placeholders/lost-item3.jpg" alt="Item" class="dashboard-item-img">
                 <div class="dashboard-item-info">
                     <h4>USB-C Charger</h4>
-                    <p class="item-location">Approved on 11/20/2025</p>
-                    <p class="item-location">Pick up by 11/27/2025</p>
+                    <p class="item-location" style="padding-bottom: 5px;">Claimed by <span
+                            class="tag tag-gray">1000000@apps.nsd.org</span></p>
+                    <p class="item-location" style="padding-bottom: 5px;">Approved on 11/20/2025</p>
+                    <p class="item-location" style="padding-bottom: 5px;">Pick up by 11/27/2025</p>
                 </div>
                 <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
+                <button class="btn btn-blue btn-sm">Item Retrieved</button>
             </div>
         </div>
 
@@ -116,90 +112,136 @@
             <h2>Pending Approval</h2>
             <br>
 
-            <!-- Item Retrieval Requests -->
             <div class="items-section">
-                <h3 class="subsection-title">Item Retrieval Requests</h3>
-                <p class="subtitle">These are items you've requested as yours from the lost items page. Admin approval may take 1–3 days.</p>
-
+                <div>
+                    <h3 class="subsection-title">Item Retrieval Requests</h3>
+                    <p class="subtitle">These are items students are claiming to be theirs.</p>
+                </div>
                 <div class="dashboard-item-card">
-                    <img src="assets/placeholders/lost-item1.jpg" class="dashboard-item-img">
+                    <img src="assets/placeholders/lost-item1.jpg" alt="Item" class="dashboard-item-img">
                     <div class="dashboard-item-info">
                         <h4>Gray Backpack</h4>
-                        <p class="item-location">Submitted on 11/20/2025</p>
+                        <p class="item-location" style="padding-bottom: 5px;">Submitted on 11/20/2025 by <span
+                            class="tag tag-gray">1000000@apps.nsd.org</span></p>
                     </div>
                     <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
+                    <a href="review-claim.html"><button class="btn btn-blue btn-sm">Review</button></a>
                 </div>
             </div>
 
-            <!-- Item Submission Requests -->
             <div class="items-section">
-                <h3 class="subsection-title">Item Submission Requests</h3>
-                <p class="subtitle">These are lost items you've found and are sending to admin.</p>
-
+                <div>
+                    <h3 class="subsection-title">Item Submission Requests</h3>
+                    <p class="subtitle">These are lost items students have found.</p>
+                </div>
                 <div class="dashboard-item-card">
-                    <img src="assets/placeholders/lost-item1.jpg" class="dashboard-item-img">
+                    <img src="assets/placeholders/lost-item1.jpg" alt="Item" class="dashboard-item-img">
                     <div class="dashboard-item-info">
                         <h4>Gray Backpack</h4>
-                        <p class="item-location">Submitted on 11/20/2025</p>
+                        <p class="item-location" style="padding-bottom: 5px;">Submitted on 11/20/2025 by <span
+                            class="tag tag-gray">1000000@apps.nsd.org</span></p>
                         <p class="item-location">Found in Library</p>
                     </div>
                     <button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>
+                    <button class="btn btn-blue btn-sm">Approve</button>
                 </div>
             </div>
         </div>
 
         <br>
 
-        <!-- Your Items -->
         <div class="items-section">
-            <h2>Your Items</h2>
+            <div>
+                <h2>Found Items</h2>
+                <p class="subtitle">These are lost items students have found. Displayed in the <u>Browse items</u> tab.</p>
+            </div>
+            <div class="dashboard-item-card">
+                <img src="assets/placeholders/lost-item1.jpg" alt="Item" class="dashboard-item-img">
+                <div class="dashboard-item-info">
+                    <h4>Gray Backpack</h4>
+                    <p class="item-location" style="padding-bottom: 5px;">Submitted on 11/20/2025 by <span
+                            class="tag tag-gray">1000000@apps.nsd.org</span></p>
+                    <p class="item-location">Found in Library</p>
+                </div>
+                <button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>
+            </div>
+            <div class="dashboard-item-card">
+                <img src="assets/placeholders/lost-item1.jpg" alt="Item" class="dashboard-item-img">
+                <div class="dashboard-item-info">
+                    <h4>Gray Backpack</h4>
+                    <p class="item-location" style="padding-bottom: 5px;">Submitted on 11/20/2025 by <span
+                            class="tag tag-gray">1000000@apps.nsd.org</span></p>
+                    <p class="item-location">Found in Library</p>
+                </div>
+                <button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>
+            </div>
+            <div class="dashboard-item-card">
+                <img src="assets/placeholders/lost-item1.jpg" alt="Item" class="dashboard-item-img">
+                <div class="dashboard-item-info">
+                    <h4>Gray Backpack</h4>
+                    <p class="item-location" style="padding-bottom: 5px;">Submitted on 11/20/2025 by <span
+                            class="tag tag-gray">1000000@apps.nsd.org</span></p>
+                    <p class="item-location">Found in Library</p>
+                </div>
+                <button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>
+            </div>
+        </div>
+
+        <br>
+
+        <!-- Reunited Items -->
+        <div class="items-section">
+            <h2>Reunited Items</h2>
             <br>
 
             <div class="dashboard-item-card">
-                <img src="assets/placeholders/lost-item4.jpg" class="dashboard-item-img">
+                <img src="assets/placeholders/lost-item4.jpg" alt="Item" class="dashboard-item-img">
                 <div class="dashboard-item-info">
                     <h4>Blue Backpack</h4>
-                    <span class="tag tag-orange">Item Retrieval</span>
-                    <p class="item-location">Retrieved 3 days ago</p>
+                    <p class="item-location">Submitted on 11/20/2025 by <span
+                            class="tag tag-gray">1000000@apps.nsd.org</span></p>
+                    <p class="item-location">Retrieved on 11/20/2025 by <span
+                            class="tag tag-gray">0000000@apps.nsd.org</span></p>
                 </div>
                 <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
             </div>
 
             <div class="dashboard-item-card">
-                <img src="assets/placeholders/lost-item4.jpg" class="dashboard-item-img">
+                <img src="assets/placeholders/lost-item4.jpg" alt="Item" class="dashboard-item-img">
                 <div class="dashboard-item-info">
                     <h4>Blue Backpack</h4>
-                    <span class="tag tag-blue">Item Submission</span>
-                    <p class="item-location">Submitted 3 days ago<br>Picked up 2 days ago</p>
+                    <p class="item-location">Submitted on 11/20/2025 by <span
+                            class="tag tag-gray">1000000@apps.nsd.org</span></p>
+                    <p class="item-location">Retrieved on 11/20/2025 by <span
+                            class="tag tag-gray">0000000@apps.nsd.org</span></p>
                 </div>
-                <button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>
+                <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
             </div>
         </div>
+
+
     </main>
 
-
-    <!-- ================ REPORTED DETAILS MODAL ================= -->
+    <!-- REPORTED DETAILS MODAL -->
     <div id="reported-details-modal" class="details-modal hidden">
         <div class="details-modal-content">
             <button class="details-modal-close">&times;</button>
-
             <div class="details-item-header">
                 <img class="details-img" src="assets/placeholders/lost-item1.jpg">
-
                 <div class="details-info">
                     <h2>Gray Backpack</h2>
-
                     <div class="details-tags">
                         <span class="tag tag-orange">Item Submission</span>
                     </div>
-
                     <span class="tag tag-transparent"><img src="assets/icons/location.svg">Library</span>
                     <span class="tag tag-transparent"><img src="assets/icons/clock.svg">11/15/2025 9:20 AM</span>
-
+                    <br>
+                    <p><b>Submitter Information</b></p>
+                    <p><b>Student Name:</b> Jill Smith</p>
+                    <p><b>Student Email:</b> 0000000@apps.nsd.org</p>
                     <br>
                     <p><b>Public description:</b> Dark colored backpack</p>
                     <p><b>Private description:</b> Gray North Face backpack</p>
-
                     <br>
                     <p><b>Verification Questions</b></p>
                     <p>Q1: What color is the inside lining?</p>
@@ -213,22 +255,20 @@
         </div>
     </div>
 
-
-    <!-- ================ CLAIMED DETAILS MODAL ================= -->
+    <!-- CLAIMED DETAILS MODAL -->
     <div id="claimed-details-modal" class="details-modal hidden">
         <div class="details-modal-content">
             <button class="details-modal-close">&times;</button>
-
             <div class="details-item-header">
                 <img class="details-img" src="assets/placeholders/lost-item1.jpg">
-
                 <div class="details-info">
                     <h2>Water Bottle</h2>
-
-                    <p><b>Lost on:</b> 11/17/2025 at 4:20 PM</p>
-
                     <br>
-
+                    <p><b>Student Name:</b> Jill Smith</p>
+                    <p><b>Student Email:</b> 0000000@apps.nsd.org</p>
+                    <br>
+                    <p><b>Lost on:</b> 11/17/2025 at 4:20 PM</p>
+                    <br>
                     <p><b>Verification Questions</b></p>
                     <p>Q1: (Your answer…)</p>
                     <p>A1: ___</p>
@@ -236,9 +276,7 @@
                     <p>A2: ___</p>
                     <p>Q3: (Your answer…)</p>
                     <p>A3: ___</p>
-
                     <br>
-
                     <p><b>Additional Information</b></p>
                     <p>No additional notes.</p>
                 </div>
@@ -246,11 +284,11 @@
         </div>
     </div>
 
-
-    <!-- ================= FOOTER ================= -->
     <footer class="site-footer">
         <div class="container footer-inner">
-            <img src="assets/icons/logo-light.svg" width="174">
+            <div class="footer-brand">
+                <img src="assets/icons/logo-light.svg" alt="Boomerang mark" width="174" height="33">
+            </div>
             <div class="copyright">© 2025 Boomerang. All rights reserved.</div>
         </div>
     </footer>

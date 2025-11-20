@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Admin Comparison - Boomerang</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="icon" href="assets/icons/logo-icon.png" type="image/x-icon">
+
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="home.html" class="logo" aria-label="Boomerang home">
+                <img src="assets/icons/logo.svg" alt="Boomerang logo" width="138" height="26">
+            </a>
+
+            <button id="menu-icon" aria-label="Toggle menu">
+                <img src="assets/icons/menu.svg" alt="Menu icon">
+            </button>
+
+            <nav class="main-nav" aria-label="Main navigation">
+                <a class="nav-link" href="browse-items.html">Browse items</a>
+                <a class="nav-link" href="report-found-item.html">Report found item</a>
+                <a class="nav-link nav-pill" id="nav-current" href="dashboard.html">Dashboard</a>
+                <a class="nav-link nav-cta" href="log-in.html">Log out</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <h1>Admin Comparison</h1>
+        <p class="subtitle">Compare retrieval requests vs submission requests side by side to determine if they are the same item.</p>
+
+        <div class="comparison-section">
+
+            <!-- Comparison Card -->
+            <div class="comparison-card">
+
+                <img src="assets/placeholders/lost-item1.jpg" alt="Item">
+
+                <div class="comparison-info">
+                    <div class="comparison-columns">
+
+                        <!-- Retrieval Request Column -->
+                        <div class="comparison-column">
+                            <h2>Retrieval Request</h2>
+                            <br>
+                            <p><b>Item Name:</b> Gray Backpack</p>
+                            <p><b>Submitted on:</b> 11/20/2025</p>
+                            <p><b>Student Email:</b> 1000000@apps.nsd.org</p>
+                            <p><b>Description:</b> Gray North Face backpack</p>
+                            <p><b>Q1:</b> Color inside lining?</p>
+                            <p><b>A1:</b> Blue</p>
+                            <p><b>Q2:</b> Brand?</p>
+                            <p><b>A2:</b> North Face</p>
+                            <p><b>Q3:</b> What's in front pocket?</p>
+                            <p><b>A3:</b> Kpop photocards</p>
+                        </div>
+
+                        <!-- Submission Request Column -->
+                        <div class="comparison-column">
+                            <h2>Submission Request</h2>
+                            <br>
+                            <p><b>Item Name:</b> Gray Backpack</p>
+                            <p><b>Found on:</b> 11/18/2025</p>
+                            <p><b>Location Found:</b> Library</p>
+                            <p><b>Reporter Email:</b> 2000000@apps.nsd.org</p>
+                            <p><b>Public Description:</b> Dark colored backpack</p>
+                            <p><b>Private Description:</b> Gray North Face backpack</p>
+                            <p><b>Q1:</b> Color inside lining?</p>
+                            <p><b>A1:</b> Blue</p>
+                            <p><b>Q2:</b> Brand?</p>
+                            <p><b>A2:</b> North Face</p>
+                            <p><b>Q3:</b> What's in front pocket?</p>
+                            <p><b>A3:</b> Kpop photocards</p>
+                        </div>
+
+                    </div>
+
+                    <br>
+
+                    <a href="admin-dashboard.html"><button class="btn btn-orange btn-sm full-width">Approve Match</button></a>
+                    <a href="admin-dashboard.html"><button class="btn btn-blue btn-sm full-width">Reject Match</button></a>
+                </div>
+            </div>
+
+            <!-- You can duplicate this "comparison-card" div for more items -->
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <img src="assets/icons/logo-light.svg" alt="Boomerang mark" width="174" height="33">
+            </div>
+            <div class="copyright">© 2025 Boomerang. All rights reserved.</div>
+        </div>
+    </footer>
+</body>
+
+</html>
