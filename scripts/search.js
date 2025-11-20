@@ -77,7 +77,8 @@ function createItemCard(item) {
         </div>
 
         <div class="item-text">
-            <h3 class="item-name">${item.category}</h3>
+            <h3 class="item-name">${item.category}</h3> 
+            
             <p class="item-desc">${item.public_description}</p>
         </div>
 
@@ -89,7 +90,7 @@ function createItemCard(item) {
         <a class="btn btn-blue btn-sm full-width" href="claim-lost-item.html">Claim this item</a>
     </div>
   `;
-
+// note: lines 80, 76, and 75 need to be updated. Image also needs to be updated
   return card;
 }
 
