@@ -16,11 +16,12 @@ async function load() {
     console.log("printed")
     try {
         const items = await getAllItems();
-
+        const availableItems = items.filter(item => item.status === "available to claim");
+        console.log("Available items:", availableItems.length);
         // console.log("All items:", items);
 
         // Example: iterate and read nested fields safely
-        items.forEach(item => {
+        availableItems.forEach(item => {
             lostThings.push({id: item.id, 
                         public_description: item.public_description, 
                         location_found: item.location_found, 
