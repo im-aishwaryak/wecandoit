@@ -43,6 +43,7 @@ async function load() {
     } catch (err) {
         console.error("Error loading items:", err);
     }
+    renderItems(lostThings)
 }
 
 load()
