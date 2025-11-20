@@ -12,7 +12,8 @@
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="icon" href="assets/icons/logo-icon.png" type="image/x-icon">
-    <script src="scripts/search.js"></script>
+    <script type="module" src="scripts/search.js"></script>
+    <!-- <script type="module" src="firebaseModule.js"></script> -->
 
 </head>
 
@@ -56,8 +57,8 @@
 
         <div class="search-filter">
             <input autocomplete="off" class="input" type="text" id="search-input" placeholder="Search"
-                onkeyup="search()" />
-            <select class="input" id="category-filter" onchange="search()">
+                 />
+            <select class="input" id="category-filter">
                 <option value="all">All Categories</option>
             </select>
         </div>
@@ -80,10 +81,10 @@
             <p id="searchOutputMSG">No items found matching your search</p>
         </div>
 
-        <div class="item-grid">
+        <div class="item-grid"id="item-grid">
 
-            <!-- 1. Water Bottle -->
-            <div class="item-card">
+             <!--
+            <div class="item-card" >
                 <div class="image-wrapper">
                     <img class="item-img" src="assets/placeholders/lost-item1.jpg" alt="Water bottle">
                     <button class="img-expand-btn" onclick="openImageModal('assets/placeholders/lost-item1.jpg')">
@@ -112,7 +113,7 @@
                 </div>
             </div>
 
-            <!-- 2. Presentation Clicker -->
+            
             <div class="item-card">
 
                 <div class="image-wrapper">
@@ -143,7 +144,7 @@
                 </div>
             </div>
 
-            <!-- 3. Chromebook Charger -->
+            
             <div class="item-card">
                 <div class="image-wrapper">
                     <img class="item-img" src="assets/placeholders/lost-item3.jpg" alt="Chromebook charger">
@@ -173,7 +174,7 @@
                 </div>
             </div>
 
-            <!-- 4. Chromebook Computer -->
+            
             <div class="item-card">
                 <div class="image-wrapper">
                     <img class="item-img" src="assets/placeholders/lost-item4.jpg" alt="Chromebook">
@@ -202,7 +203,7 @@
                     <a class="btn btn-blue btn-sm full-width" href="claim-lost-item.html">Claim this item</a>
                 </div>
             </div>
-
+        -->
 
         </div>
 
