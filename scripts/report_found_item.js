@@ -15,7 +15,6 @@ const uploadData = async() =>{
     var date = document.getElementById("date").value; 
     var time = document.getElementById("time").value; 
 
-    //IMAGE SAVING CODE GET IT DONE EUHEHUUFWBBUEQUYQYUFEYUUYIE
     var image_url = await uploadImage()
 
     var q1 = document.getElementById("question1").value
