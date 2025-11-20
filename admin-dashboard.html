@@ -63,7 +63,7 @@
             <nav class="main-nav" aria-label="Main navigation">
                 <a class="nav-link" href="browse-items.html">Browse items</a>
                 <a class="nav-link" href="report-found-item.html">Report found item</a>
-                <a class="nav-link nav-pill" id="nav-current" href="dashboard.html">Dashboard</a>
+                <a class="nav-link nav-pill" id="nav-current" href="admin-dashboard.html">Dashboard</a>
                 <a class="nav-link nav-cta" href="log-in.html">Log out</a>
             </nav>
         </div>
@@ -74,34 +74,13 @@
         <br>
 
         <!-- Ready to Claim -->
-        <div class="items-section">
-            <h2>Ready to Claim</h2>
+        <div class="items-section" id="ready-to-claim-section">
+            <h2 class="subsection-title">Ready to Claim</h2>
             <p class="subtitle">These items have been approved by you and need to be picked up by the student.</p>
-
-            <div class="dashboard-item-card">
-                <img src="assets/placeholders/lost-item2.jpg" alt="Item" class="dashboard-item-img">
-                <div class="dashboard-item-info">
-                    <h4>Presentation Clicker</h4>
-                    <p class="item-location" style="padding-bottom: 5px;">Claimed by <span
-                            class="tag tag-gray">1000000@apps.nsd.org</span></p>
-                    <p class="item-location" style="padding-bottom: 5px;">Approved on 11/22/2025</p>
-                    <p class="item-location" style="padding-bottom: 5px;">Pick up by 11/29/2025</p>
-                </div>
-                <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
-                <button class="btn btn-blue btn-sm">Item Retrieved</button>
-            </div>
-
-            <div class="dashboard-item-card">
-                <img src="assets/placeholders/lost-item3.jpg" alt="Item" class="dashboard-item-img">
-                <div class="dashboard-item-info">
-                    <h4>USB-C Charger</h4>
-                    <p class="item-location" style="padding-bottom: 5px;">Claimed by <span
-                            class="tag tag-gray">1000000@apps.nsd.org</span></p>
-                    <p class="item-location" style="padding-bottom: 5px;">Approved on 11/20/2025</p>
-                    <p class="item-location" style="padding-bottom: 5px;">Pick up by 11/27/2025</p>
-                </div>
-                <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
-                <button class="btn btn-blue btn-sm">Item Retrieved</button>
+        
+            <!-- Empty container for JS to fill -->
+            <div id="readyToClaimContainer">
+                <p class="empty-msg">No current pending requests</p>
             </div>
         </div>
 
@@ -152,7 +131,7 @@
 
         <div class="items-section">
             <div>
-                <h2>Found Items</h2>
+                <h3 class = "subsection-title">Found Items</h3>
                 <p class="subtitle">These are lost items students have found. Displayed in the <u>Browse items</u> tab.</p>
             </div>
             <div class="dashboard-item-card">
@@ -191,7 +170,7 @@
 
         <!-- Reunited Items -->
         <div class="items-section">
-            <h2>Reunited Items</h2>
+            <h3 class = "subsection-title">Reunited Items</h3>
             <br>
 
             <div class="dashboard-item-card">
@@ -295,3 +274,5 @@
 </body>
 
 </html>
+
+<script type = "module" src = "scripts/admin.js"></script>

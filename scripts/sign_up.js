@@ -7,6 +7,7 @@ import {
 
 
 let user; 
+let user_status; 
 const signInGoogleButton = document.getElementById("google-auth sign-in");
 const signInEmailButton = document.getElementById("email sign-up")
 
@@ -20,7 +21,13 @@ const userGoogleSignIn = async () => {
             console.log(user);
             //signInButton.style.display = "none";
             AddUser();
-            window.location.href = "home.html";
+            if(user_status == "Student"){
+              window.location.href = "dashboard.html";
+            // ...
+          }
+            else{
+              window.location.href = "admin-dashboard.html"
+            }
         }).catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
@@ -36,8 +43,13 @@ const userEmailSignIn = async () => {
     // Signed up 
     user = userCredential.user;
     await AddUser() 
-    window.location.href = "home.html";
+    if(user_status == "Student"){
+      window.location.href = "dashboard.html";
     // ...
+  }
+    else{
+      window.location.href = "admin-dashboard.html"
+    }
   })
   .catch((error) => {
     const errorCode = error.code;
@@ -56,8 +68,6 @@ async function AddUser() {
         console.log("no user ")
         return;
     }
-    var ref = doc(db, "User_Data", user.email);
-    var user_status = ""
     if (auth.currentUser.email.includes("@apps.nsd.org")){
       user_status = "Student"
     }
@@ -68,6 +78,7 @@ async function AddUser() {
       alert("email must be tied to North Creek High School")
       return; 
     }
+    var ref = doc(db, "User_Data", user.email);
     await setDoc(
       ref, {
       items_posted: 0,

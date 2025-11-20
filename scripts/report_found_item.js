@@ -9,6 +9,7 @@ const report_button = document.getElementById("submit-button")
 const uploadData = async() =>{
     console.log("in function")
     var category = document.getElementById("category").value; 
+    var item_name = document.getElementById("item").value; 
     var public_desc = document.getElementById("public_desc").value; 
     var private_desc = document.getElementById("private_desc").value; 
     var location = document.getElementById("location").value; 
@@ -35,6 +36,7 @@ const uploadData = async() =>{
     await addDoc(
         ref, {
             category: category,
+            item_name: item_name,
             image_url: image_url,
             public_description: public_desc,
             private_description: private_desc, 
@@ -42,7 +44,8 @@ const uploadData = async() =>{
             date_found: date,
             time_found: time,
             verification_qs: verifications,
-            status: "pending"
+            status: "pending submission", 
+            retrieval_date: ""
         }
     ); 
 }

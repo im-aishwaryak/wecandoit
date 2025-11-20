@@ -5,6 +5,15 @@ import {
 } from './firebaseModule.js';
 
 let user; 
+let user_status; 
+
+signOut(auth)
+  .then(() => {
+    console.log("Signed out on page load");
+  })
+  .catch((e) => console.log(e));
+
+
 const logInGoogleButton = document.getElementById("google-auth btn");
 const logInEmailButton = document.getElementById("email log-in")
 
@@ -19,6 +28,13 @@ const userGoogleLogIn = async () => {
                 window.location.href = "home.html";
             }
             AddUser();
+            if(user_status == "Student"){
+              window.location.href = "dashboard.html";
+            // ...
+          }
+            else{
+              window.location.href = "admin-dashboard.html"
+            }
         }).catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
@@ -28,21 +44,39 @@ const userGoogleLogIn = async () => {
 const userEmailLogIn = async () => {
     var email = document.getElementById("email").value;
     var password = document.getElementById("password").value; 
-  
-    signInWithEmailAndPassword(auth, email, password)
-  .then((userCredential) => {
+
+
+  signInWithEmailAndPassword(auth, email, password)
+  .then(async (userCredential) => {
     // Signed in 
     user = userCredential.user;
     if(auth.currentUser.email != null){
+      console.log("omff")
       localStorage.setItem("user_logged_in", true)
-      window.location.href = "home.html";
+      
+      var ref = doc(db, "User_Data", user.email)
+      const snap = await getDoc(ref); 
+      console.log(ref)
+      console.log(snap)
+
+      if (snap.exists()) {
+        console.log("wow")
+        const data = snap.data();
+        user_status = data.user_status;
+      }
+      console.log(user_status)
+      if(user_status == "Student"){
+        window.location.href = "dashboard.html";
+      }
+      else{
+        window.location.href = "admin-dashboard.html";
+      }
     }
     // ...
   })
   .catch((error) => {
     const errorCode = error.code;
-    const errorMessage = error.message;
-    alert(" cooked ")
+    const errorMessage = error.message; 
   });
 }
 
@@ -57,9 +91,18 @@ async function AddUser() {
         console.log("no user ")
         return;
     }
+    if (auth.currentUser.email.includes("@apps.nsd.org")){
+      user_status = "Student"
+    }
+    else if (auth.currentUser.email.includes("@nsd.org")){
+      user_status = "Admin"
+    }
+    else{
+      alert("email must be tied to North Creek High School")
+      return; 
+    }
     var ref = doc(db, "User_Data", user.email);
-
-      await setDoc(
+    await setDoc(
         ref, {
         items_posted: 0,
     })
