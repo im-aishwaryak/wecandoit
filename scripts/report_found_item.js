@@ -42,7 +42,8 @@ const uploadData = async() =>{
             location_found: location, 
             date_found: date,
             time_found: time,
-            verification_qs: verifications
+            verification_qs: verifications,
+            status: "pending"
         }
     ); 
 }
