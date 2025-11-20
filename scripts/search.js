@@ -27,7 +27,8 @@ async function load() {
                         category: item.category,
                         date_found: item.date_found,
                         time_found: item.time_found,
-                        status: item.status
+                        status: item.status,
+                        img: item.image_url
                     })
 
         /*
@@ -67,7 +68,7 @@ function createItemCard(item) {
 
   card.innerHTML = `
     <div class="image-wrapper">
-        <img class="item-img" src="assets/placeholders/lost-item3.jpg" alt="Chromebook charger">
+        <img class="item-img" src=${item.img} alt="Chromebook charger">
         <button class="img-expand-btn" onclick="openImageModal('assets/placeholders/lost-item3.jpg')">
             <img src="assets/icons/expand.svg" alt="expand">
         </button>
