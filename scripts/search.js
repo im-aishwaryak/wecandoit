@@ -70,7 +70,7 @@ function createItemCard(item) {
     <div class="image-wrapper">
         <img class="item-img" src=${item.img} alt="Chromebook charger">
         <button class="img-expand-btn" onclick="openImageModal('assets/placeholders/lost-item3.jpg')">
-            <img src=${item.img} alt="expand">
+            <img src="assets/icons/expand.svg" alt="expand">
         </button>
     </div>
     <div class="item-info">
