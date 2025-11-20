@@ -26,7 +26,8 @@ async function load() {
                         location_found: item.location_found, 
                         category: item.category,
                         date_found: item.date_found,
-                        time_found: item.time_found
+                        time_found: item.time_found,
+                        status: item.status
                     })
 
         /*
