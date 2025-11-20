@@ -93,6 +93,7 @@ function createItemCard(item) {
         <a class="btn btn-blue btn-sm full-width" href="claim-lost-item.html">Claim this item</a>
     </div>
   `;
+  
 // note: lines 80, 76, and 75 need to be updated. Image also needs to be updated
   return card;
 }

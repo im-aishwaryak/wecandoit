@@ -151,8 +151,8 @@ async function loadPendingRetrievalRequests() {
                 <h4>${claim.item_name}</h4>
                 <p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(claim.date_found)}</p>
             </div>
-            <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
             <a href="review-claim.html?id=${claimDoc.id}"><button class="btn btn-blue btn-sm">Review</button></a>
+            <button class="btn btn-blue btn-sm" data-modal="claimed">Approve</button>
         `;
         
         card.dataset.claimData = JSON.stringify(claim);

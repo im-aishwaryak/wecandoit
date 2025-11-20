@@ -56,16 +56,15 @@ const userEmailLogIn = async () => {
       
       var ref = doc(db, "User_Data", user.email)
       const snap = await getDoc(ref); 
-      console.log(ref)
-      console.log(snap)
-
+      
       if (snap.exists()) {
         console.log("wow")
         const data = snap.data();
-        user_status = data.user_status;
+        user_status = data.status;
       }
-      console.log(user_status)
-      if(user_status == "Student"){
+    
+      if(user_status === "Student"){
+        console.log("jiiiij")
         window.location.href = "dashboard.html";
       }
       else{
