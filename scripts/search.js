@@ -25,11 +25,12 @@ async function load() {
             lostThings.push({id: item.id, 
                         public_description: item.public_description, 
                         location_found: item.location_found, 
+                        item_name: item.item_name,
                         category: item.category,
                         date_found: item.date_found,
                         time_found: item.time_found,
                         status: item.status,
-                        img: item.image_url
+                        image_url: item.image_url
                     })
 
         /*
@@ -66,10 +67,13 @@ const itemGrid = document.getElementById("item-grid");
 function createItemCard(item) {
   const card = document.createElement("div");
   card.classList.add("item-card");
+  console.log(item.id)
+  console.log(item.category)
+  console.log(item.image_url)
 
   card.innerHTML = `
     <div class="image-wrapper">
-        <img class="item-img" src=${item.img} alt="Chromebook charger">
+        <img class="item-img" src="${item.image_url}" alt="Chromebook charger">
         <button class="img-expand-btn" onclick="openImageModal('assets/placeholders/lost-item3.jpg')">
             <img src="assets/icons/expand.svg" alt="expand">
         </button>
@@ -81,7 +85,7 @@ function createItemCard(item) {
         </div>
 
         <div class="item-text">
-            <h3 class="item-name">${item.category}</h3> 
+            <h3 class="item-name">${item.item_name}</h3> 
             
             <p class="item-desc">${item.public_description}</p>
         </div>
@@ -91,7 +95,7 @@ function createItemCard(item) {
             <span class="tag tag-transparent"><img src="assets/icons/clock.svg">${item.date_found}</span>
         </div>
 
-        <a class="btn btn-blue btn-sm full-width" href="claim-lost-item.html">Claim this item</a>
+        <a class="btn btn-blue btn-sm full-width" href="claim-lost-item.html?id=${item.id}">Claim this item</a>
     </div>
   `;
   
