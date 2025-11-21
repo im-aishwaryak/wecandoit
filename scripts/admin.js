@@ -25,8 +25,8 @@
 
 // scripts/admin_dashboard.js
 import {
-    db, auth,
-    collection, query, where, getDocs, doc, updateDoc
+    db, auth, onAuthStateChanged,
+    collection, query, where, getDocs, getDoc, doc, updateDoc
 } from './firebaseModule.js';
 
 // Load admin dashboard data
@@ -67,6 +67,7 @@ async function loadReadyToClaim() {
     if (!container) return;
     
     // Clear existing cards
+    console.log("so far it works")
     const existingCards = container.querySelectorAll('.dashboard-item-card');
     existingCards.forEach(card => card.remove());
     
@@ -115,10 +116,12 @@ async function loadReadyToClaim() {
 
 // Load pending retrieval requests (claims waiting approval)
 async function loadPendingRetrievalRequests() {
-    const claimsRef = collection(db, "Claims");
-    const q = query(claimsRef, where("status", "==", "pending"));
+    const itemsRef = collection(db, "Item_Data");
+    const q = query(itemsRef, where("status", "==", "pending retrieval"));
     
     const snapshot = await getDocs(q);
+
+
     const targetTitle = Array.from(document.querySelectorAll(".subsection-title"))
     .find(el => el.textContent.trim() === "Item Retrieval Requests");
 
@@ -139,21 +142,26 @@ async function loadPendingRetrievalRequests() {
         return;
     }
     
-    for (const claimDoc of snapshot.docs) {
-        const claim = claimDoc.data();
+    for (const itemDoc of snapshot.docs) {
+        const item = itemDoc.data();
+        const claimRef = doc(db, "Claims", item.claim_id);
+        const claimSnap = await getDoc(claimRef);
+            
+        if (claimSnap.exists()) {
+            currentClaim = { id: claimSnap.id, ...claimSnap.data() };
         
         const card = document.createElement('div');
         card.className = 'dashboard-item-card';
         card.innerHTML = `
-            <img src="${claim.item_image || 'assets/placeholders/lost-item1.jpg'}" class="dashboard-item-img">
+            <img src="${item.image_url || 'assets/placeholders/lost-item1.jpg'}" class="dashboard-item-img">
             <div class="dashboard-item-info">
-                <h4>${claim.item_name}</h4>
-                <p class="item-location" style="padding-bottom: 5px;">Claimed by <span class="tag tag-gray">${claim.claimant_email || 'Unknown'}</span></p>
-                <p class="item-location" style="padding-bottom: 5px;">Submitted by <span class="tag tag-gray">${claim.submitter_email || 'Unknown'}</span></p>
-                <p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(claim.date_found)}</p>
+                <h4>${item.item_name}</h4>
+                <p class="item-location" style="padding-bottom: 5px;">Claimed by <span class="tag tag-gray">${currentClaim.claimant_email || 'Unknown'}</span></p>
+                <p class="item-location" style="padding-bottom: 5px;">Submitted by <span class="tag tag-gray">${item.submitter_email || 'Unknown'}</span></p>
+                <p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(currentClaim.date_found)}</p>
             </div>
             <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
-            <a href="review-claim.html?id=${claimDoc.id}"><button class="btn btn-blue btn-sm">Review</button></a>
+            <a href="review-claim.html?id=${item.id}"><button class="btn btn-blue btn-sm">Review</button></a>
         `;
         
         card.dataset.claimData = JSON.stringify(claim);
@@ -370,15 +378,18 @@ function formatDate(isoString) {
 }
 
 // Initialize when auth is ready
-auth.onAuthStateChanged((user) => {
+onAuthStateChanged(auth, (user) => {
     if (user) {
+        console.log("Auth ready, loading dashboard...");
         loadAdminDashboard();
+    } else {
+        console.log("No auth, waiting...");
     }
 });
 
 
 
-
+/*
 // Add these at the end of student_dashboard.js
 
 // Populate the reported item modal
@@ -481,4 +492,4 @@ window.populateClaimedModal = function(claimData, claimId) {
     if (additionalInfo) {
         additionalInfo.textContent = claimData.additional_notes || 'No additional notes.';
     }
-};
+}; */ }

@@ -1,4 +1,4 @@
-// scripts/claim_item.js
+//scripts/claim_item.js
 import {
     db, auth,
     doc, getDoc, collection, addDoc, updateDoc, increment
@@ -76,6 +76,7 @@ function displayItemDetails() {
                 </div>
             </div>
         `;
+
     }
 }
 
@@ -96,6 +97,7 @@ function displayVerificationQuestions() {
     
     if (container && questionKeys.length > 0) {
         // Clear existing inputs (keep the label and hint)
+        console.log("works in here?")
         const inputFields = container.querySelectorAll('.input-field');
         inputFields.forEach(field => field.remove());
         
@@ -175,9 +177,10 @@ async function submitClaim(e) {
             item_name: currentItem.item_name,
             item_image: currentItem.image_url,
             item_category: currentItem.category,
+
             
             // Claimant info (the person claiming the item)
-            claimant_id: user.uid,
+            claimant_id: user.email,
             claimant_name: studentName,
             claimant_email: studentEmail,
             
@@ -207,15 +210,15 @@ async function submitClaim(e) {
         await updateDoc(itemRef, {
             status: "pending retrieval",
             claim_id: claimDoc.id,
-            receiver_id: user.uid,
-            receiver_email: studentEmail
+            //receiver_id: user.uid,
+            //receiver_email: studentEmail
         });
         
         console.log("Item updated with receiver info");
         
         // Update user's items_claimed count (use Users collection with uid)
         try {
-            const userRef = doc(db, "Users", user.uid);
+            const userRef = doc(db, "User_Data", user.email);
             const userSnap = await getDoc(userRef);
             
             if (userSnap.exists()) {
