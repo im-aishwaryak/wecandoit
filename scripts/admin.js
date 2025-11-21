@@ -115,10 +115,11 @@ async function loadReadyToClaim() {
 
 // Load pending retrieval requests (claims waiting approval)
 async function loadPendingRetrievalRequests() {
+
     const claimsRef = collection(db, "Claims");
-    const q = query(claimsRef, where("status", "==", "pending"));
-    
-    const snapshot = await getDocs(q);
+    const q2 = query(claimsRef, where("status", "==", "pending"));
+    const claimSnap = await getDocs(q2);
+
     const targetTitle = Array.from(document.querySelectorAll(".subsection-title"))
     .find(el => el.textContent.trim() === "Item Retrieval Requests");
 
@@ -139,7 +140,7 @@ async function loadPendingRetrievalRequests() {
         return;
     }
     
-    for (const claimDoc of snapshot.docs) {
+    for (const claimDoc of claimSnap.docs) {
         const claim = claimDoc.data();
         
         const card = document.createElement('div');

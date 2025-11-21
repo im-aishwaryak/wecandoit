@@ -27,10 +27,10 @@ async function loadReviewData() {
         console.log("📦 [ITEM] Fetching item from Item_Data collection...");
         
         // Load item
-        const itemRef = doc(db, "Claims", itemId);
+        const itemRef = doc(db, "Claims", itemId); //claim ref 
         console.log("📦 [ITEM] Item reference created:", itemRef.path);
         
-        const itemSnap = await getDoc(itemRef);
+        const itemSnap = await getDoc(itemRef); 
         console.log("📦 [ITEM] Item snapshot retrieved, exists:", itemSnap.exists());
         
         if (!itemSnap.exists()) {
@@ -40,7 +40,7 @@ async function loadReviewData() {
             return;
         }
         
-        currentItem = { id: itemSnap.id, ...itemSnap.data() };
+        currentItem = { id: itemSnap.id, ...itemSnap.data() }; //claim data!!!!!!!
         console.log("✅ [ITEM] Item loaded successfully:", {
             id: currentItem.id,
             item_name: currentItem.item_name,
@@ -52,10 +52,10 @@ async function loadReviewData() {
         // Load associated retrieval claim
         console.log("🔗 [CLAIM] Checking for associated claim...");
         
-        if (currentItem.claimant_id) {
+        if (currentItem.item_id) {
             console.log("🔗 [CLAIM] claim_id found in item:", currentItem.claimant_id);
             
-            const claimRef = doc(db, "Claims", currentItem.id);
+            const claimRef = doc(db, "Item_Data", currentItem.item_id);
             console.log("🔗 [CLAIM] Claim reference created:", claimRef.path);
             
             const claimSnap = await getDoc(claimRef);
