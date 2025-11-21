@@ -153,8 +153,8 @@ function searchByValue(){
     const searchValue = document.getElementById("search-input").value.toLowerCase();
     console.log(searchValue)
     return lostThings.filter(obj => {
-        if (!obj.category) return false;        // skip invalid objects
-        return String(obj.category).toLowerCase().includes(searchValue);
+        if (!obj.item_name) return false;        // skip invalid objects
+        return String(obj.item_name).toLowerCase().includes(searchValue);
     });
 
     // const categoryValue = document.getElementById("category-filter").value;
