@@ -64,7 +64,7 @@
                 <a class="nav-link" href="browse-items.html">Browse items</a>
                 <a class="nav-link" href="report-found-item.html">Report found item</a>
                 <a class="nav-link nav-pill" id="nav-current" href="admin-dashboard.html">Dashboard</a>
-                <a class="nav-link nav-cta" href="log-in.html">Log out</a>
+                <a class="nav-link nav-cta" id="logout-btn" href="#">Log out</a>
             </nav>
         </div>
     </header>
@@ -77,10 +77,9 @@
         <div class="items-section" id="ready-to-claim-section">
             <h2 class="subsection-title">Ready to Claim</h2>
             <p class="subtitle">These items have been approved by you and need to be picked up by the student.</p>
-        
+
             <!-- Empty container for JS to fill -->
             <div id="readyToClaimContainer">
-                <p class="empty-msg">No current pending requests</p>
             </div>
         </div>
 
@@ -96,7 +95,7 @@
                     <h3 class="subsection-title">Item Retrieval Requests</h3>
                     <p class="subtitle">These are items students are claiming to be theirs.</p>
                 </div>
-                
+
             </div>
 
             <div class="items-section">
@@ -104,7 +103,7 @@
                     <h3 class="subsection-title">Item Submission Requests</h3>
                     <p class="subtitle">These are lost items students have found.</p>
                 </div>
-            
+
             </div>
         </div>
 
@@ -112,17 +111,18 @@
 
         <div class="items-section">
             <div>
-                <h3 class = "subsection-title">Found Items</h3>
-                <p class="subtitle">These are lost items students have found. Displayed in the <u>Browse items</u> tab.</p>
+                <h3 class="subsection-title">Found Items</h3>
+                <p class="subtitle">These are lost items students have found. Displayed in the <u>Browse items</u> tab.
+                </p>
             </div>
-            
+
         </div>
 
         <br>
 
         <!-- Reunited Items -->
         <div class="items-section">
-            <h3 class = "subsection-title">Reunited Items</h3>
+            <h3 class="subsection-title">Reunited Items</h3>
             <br>
 
             <div class="dashboard-item-card">
@@ -215,6 +215,9 @@
         </div>
     </div>
 
+    <script type="module" src="scripts/admin.js"></script>
+    <script type="module" src="scripts/logout.js"></script> <!-- Add this -->
+
     <footer class="site-footer">
         <div class="container footer-inner">
             <div class="footer-brand">
@@ -226,5 +229,3 @@
 </body>
 
 </html>
-
-<script type = "module" src = "scripts/admin.js"></script>

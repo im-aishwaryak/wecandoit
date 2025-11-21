@@ -54,7 +54,7 @@
                     }   
                 </script>
 
-                
+
                 <a class="nav-link nav-cta" href="log-in.html">Log out</a>
             </nav>
         </div>
@@ -64,7 +64,8 @@
         <section class="form-container">
 
             <div class="form-header">
-                <h1 class="title-w-icon">Report a found item<img src="assets/icons/suitcase-icon.png" height="43px"></h1>
+                <h1 class="title-w-icon">Report a found item<img src="assets/icons/suitcase-icon.png" height="43px">
+                </h1>
                 <p class="subtitle">
                     Fill out this form to report an item you found. It will be reviewed by an administrator before being
                     posted.
@@ -75,15 +76,15 @@
             <form class="report-form">
 
                 <div class="form-group">
-                    <label class="form-label" >Item name <span class="required">*</span></label>
-                    
-                    <input class="input" id = "item" placeholder="Example: Backpack" />
+                    <label class="form-label">Item name <span class="required">*</span></label>
+
+                    <input class="input" id="item" placeholder="Example: Backpack" />
                 </div>
 
                 <!-- Category -->
                 <div class="form-group">
                     <label class="form-label">Category <span class="required">*</span></label>
-                    <select class="input" id = "category">
+                    <select class="input" id="category">
                         <option disabled selected>Select a category</option>
                         <option>Backpack</option>
                         <option>Electronics</option>
@@ -98,38 +99,39 @@
                     <p class="form-hint">
                         Keep it <u>vague</u>. Don't include specific brands or identifying details.
                     </p>
-                    <input class="input" id = "public_desc" placeholder="Example: Dark colored backpack" />
+                    <input class="input" id="public_desc" placeholder="Example: Dark colored backpack" />
                 </div>
 
                 <!-- Private description -->
                 <div class="form-group">
                     <label class="form-label">Private description <span class="required">*</span></label>
                     <p class="form-hint">Keep it <u>specific</u>. Include all details.</p>
-                    <textarea class="input input-textarea" id = "private_desc" placeholder="Example: Gray North Face backpack..."></textarea>
+                    <textarea class="input input-textarea" id="private_desc"
+                        placeholder="Example: Gray North Face backpack..."></textarea>
                 </div>
 
                 <!-- Location -->
                 <div class="form-group">
                     <label class="form-label">Where did you find it? <span class="required">*</span></label>
-                    <input class="input" id = "location" placeholder="Example: Library 2nd floor near computers" />
+                    <input class="input" id="location" placeholder="Example: Library 2nd floor near computers" />
                 </div>
 
                 <!-- When -->
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Date <span class="required">*</span></label>
-                        <input type="date" id = "date" class="input" />
+                        <input type="date" id="date" class="input" />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Time</label>
-                        <input type="time" id = "time" class="input" />
+                        <input type="time" id="time" class="input" />
                     </div>
                 </div>
 
                 <!-- Upload -->
                 <div class="form-group">
                     <label class="form-label">Upload photo <span class="required">*</span></label>
-                    <input type="file" id = "image_file" class="form-input file-input" />
+                    <input type="file" id="image_file" class="form-input file-input" />
                 </div>
 
                 <!-- Verification -->
@@ -180,11 +182,23 @@
 
 
 
-                <button class="btn btn-orange full-width" id = "submit-button">Submit for review</button>
+                <button class="btn btn-orange full-width" id="submit-button">Submit for review</button>
             </form>
 
         </section>
     </main>
+
+    <script>
+        const toggle = document.querySelector(".nav-toggle");
+        const nav = document.querySelector(".main-nav");
+
+        toggle.addEventListener("click", () => {
+            nav.classList.toggle("open");
+            toggle.classList.toggle("open");
+        });
+    </script>
+    <script type="module" src="scripts/protect-auth.js"></script>
+    <script type="module" src="scripts/report_found_item.js"></script>
 
     <footer class="site-footer">
         <div class="container footer-inner">
@@ -196,17 +210,7 @@
     </footer>
 </body>
 
-<script>
-    const toggle = document.querySelector(".nav-toggle");
-    const nav = document.querySelector(".main-nav");
 
-    toggle.addEventListener("click", () => {
-        nav.classList.toggle("open");
-        toggle.classList.toggle("open");
-    });
-</script>
 
 
 </html>
-
-<script type = "module" src = "scripts/report_found_item.js"></script>

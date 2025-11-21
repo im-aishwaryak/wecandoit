@@ -70,7 +70,7 @@
                     </div>
                 </div>
 
-                <button class="btn btn-orange full-width" id = "email log-in">Log in</button>
+                <button class="btn btn-orange full-width" id="email log-in">Log in</button>
 
                 <div class="auth-divider">
                     <div class="line"></div>
@@ -78,7 +78,7 @@
                     <div class="line"></div>
                 </div>
 
-                <button class="btn btn-blue full-width" id = "google-auth btn" style="justify-content: space-between;">
+                <button class="btn btn-blue full-width" id="google-auth btn" style="justify-content: space-between;">
                     <img src="assets/icons/google-icon.svg" alt="Google logo">
                     <span>Google</span>
                     <img src="assets/icons/google-icon.svg" alt="" style="opacity: 0;">
@@ -95,17 +95,21 @@
             <div class="copyright">© 2025 Boomerang. All rights reserved.</div>
         </div>
     </footer>
+
+    <script>
+        const toggle = document.querySelector(".nav-toggle");
+        const nav = document.querySelector(".main-nav");
+
+        toggle.addEventListener("click", () => {
+            nav.classList.toggle("open");
+            toggle.classList.toggle("open");
+        });
+    </script>
+
+    <script type="module" src="scripts/login.js"></script>
+
 </body>
 
-<script>
-    const toggle = document.querySelector(".nav-toggle");
-    const nav = document.querySelector(".main-nav");
 
-    toggle.addEventListener("click", () => {
-        nav.classList.toggle("open");
-        toggle.classList.toggle("open");
-    });
-</script>
 
 </html>
-<script type = "module" src = "scripts/login.js"></script>

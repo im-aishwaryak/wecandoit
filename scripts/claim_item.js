@@ -9,7 +9,7 @@ let currentItem = null;
 // Get item ID from URL
 const urlParams = new URLSearchParams(window.location.search);
 const itemId = urlParams.get('id');
-console.log(itemId)
+console.log("Item ID from URL:", itemId);
 
 // Load item details on page load
 async function loadItemDetails() {
@@ -31,8 +31,8 @@ async function loadItemDetails() {
         
         currentItem = { id: itemSnap.id, ...itemSnap.data() };
         
-        console.log(currentItem.item_name)
-        console.log(currentItem.image_url)
+        console.log("Item loaded:", currentItem.item_name);
+        console.log("Image URL:", currentItem.image_url);
 
         displayItemDetails();
         displayVerificationQuestions();
@@ -51,13 +51,12 @@ function displayItemDetails() {
     if (itemCard && currentItem) {
         let dateDisplay = currentItem.date_found || "Unknown date";
         if (currentItem.time_found) {
-            dateDisplay += ` ${currentItem.time_found}`;
+            dateDisplay += ` at ${currentItem.time_found}`;
         }
        
-        
         itemCard.innerHTML = `
-            <img class="item-img" style="width: 150px; height: 150px"
-                src="${currentItem.image_url|| 'assets/placeholders/lost-item2.jpg'}" 
+            <img class="item-img" style="width: 150px; height: 150px; object-fit: cover;"
+                src="${currentItem.image_url || 'assets/placeholders/lost-item2.jpg'}" 
                 alt="${currentItem.item_name || 'Item'}">
 
             <div class="item-info">
@@ -82,9 +81,8 @@ function displayItemDetails() {
 
 // Display verification questions from the item
 function displayVerificationQuestions() {
-    const verificationSection = document.querySelector('.form-group');
-    
     if (!currentItem || !currentItem.verification_qs) {
+        console.log("No verification questions found");
         return;
     }
     
@@ -103,13 +101,15 @@ function displayVerificationQuestions() {
         
         // Add question inputs dynamically
         questionKeys.forEach((question, index) => {
-            const inputField = document.createElement('div');
-            inputField.className = 'input-field';
-            inputField.innerHTML = `
-                <label for="answer${index + 1}">${question} <span class="required">*</span></label>
-                <input type="text" id="answer${index + 1}" placeholder="Your answer ..." required>
-            `;
-            container.appendChild(inputField);
+            if (question && question.trim()) {  // Only add if question exists
+                const inputField = document.createElement('div');
+                inputField.className = 'input-field';
+                inputField.innerHTML = `
+                    <label for="answer${index + 1}">${question} <span class="required">*</span></label>
+                    <input type="text" id="answer${index + 1}" placeholder="Your answer ..." required>
+                `;
+                container.appendChild(inputField);
+            }
         });
     }
 }
@@ -151,7 +151,7 @@ async function submitClaim(e) {
     
     // Get verification answers
     const answers = {};
-    const questions = Object.keys(currentItem.verification_qs);
+    const questions = Object.keys(currentItem.verification_qs).filter(q => q && q.trim());
     
     for (let i = 0; i < questions.length; i++) {
         const answerInput = document.getElementById(`answer${i + 1}`);
@@ -174,33 +174,59 @@ async function submitClaim(e) {
             item_id: currentItem.id,
             item_name: currentItem.item_name,
             item_image: currentItem.image_url,
+            item_category: currentItem.category,
+            
+            // Claimant info (the person claiming the item)
+            claimant_id: user.uid,
             claimant_name: studentName,
             claimant_email: studentEmail,
+            
+            // Submitter info (the person who found the item)
+            submitter_id: currentItem.submitter_id,
+            submitter_email: currentItem.submitter_email,
+            
+            // Claim details
             lost_date: lostDate,
             lost_time: lostTime || "",
             verification_answers: answers,
             additional_info: additionalInfo,
+            
+            // Status tracking
             status: "pending",
             submitted_at: new Date().toISOString(),
             reviewed_at: null,
             reviewed_by: null,
+            reviewer_id: null,
             review_notes: ""
         });
         
-        // Update item status to "claimed_pending"
+        console.log("Claim created with ID:", claimDoc.id);
+        
+        // Update item to add receiver/claimant info
         const itemRef = doc(db, "Item_Data", currentItem.id);
         await updateDoc(itemRef, {
             status: "pending retrieval",
             claim_id: claimDoc.id,
-            //claimed_by: studentEmail,
-            //claimed_at: new Date().toISOString()
+            receiver_id: user.uid,
+            receiver_email: studentEmail
         });
         
-        // Update user's items_claimed count
-        const userRef = doc(db, "User_Data", user.email);
-        await updateDoc(userRef, {
-            items_claimed: increment(1)
-        });
+        console.log("Item updated with receiver info");
+        
+        // Update user's items_claimed count (use Users collection with uid)
+        try {
+            const userRef = doc(db, "Users", user.uid);
+            const userSnap = await getDoc(userRef);
+            
+            if (userSnap.exists()) {
+                await updateDoc(userRef, {
+                    items_claimed: increment(1)
+                });
+            }
+        } catch (userError) {
+            console.log("Could not update user claim count:", userError);
+            // Don't fail the whole claim if this fails
+        }
         
         alert("Claim submitted successfully! An administrator will review your request.");
         window.location.href = "dashboard.html";
