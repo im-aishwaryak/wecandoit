@@ -191,7 +191,7 @@ async function submitClaim(e) {
         const itemRef = doc(db, "Item_Data", currentItem.id);
         await updateDoc(itemRef, {
             status: "pending retrieval",
-            //claim_id: claimDoc.item_id,
+            claim_id: claimDoc.id,
             //claimed_by: studentEmail,
             //claimed_at: new Date().toISOString()
         });

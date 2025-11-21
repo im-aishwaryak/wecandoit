@@ -44,10 +44,11 @@ const userEmailSignIn = async () => {
     user = userCredential.user;
     await AddUser() 
     if(user_status == "Student"){
+      localStorage.setItem("user_identity", "student")
       window.location.href = "dashboard.html";
-    // ...
   }
     else{
+      localStorage.setItem("user_identity", "admin")
       window.location.href = "admin-dashboard.html"
     }
   })

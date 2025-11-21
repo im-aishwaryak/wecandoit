@@ -12,6 +12,7 @@ import {
 const lostThings = [
 ];
 
+
 async function load() {
     console.log("printed")
     try {

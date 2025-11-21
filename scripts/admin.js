@@ -56,7 +56,7 @@ async function loadAdminDashboard() {
  //Load items ready to claim (approved claims waiting pickup)
 async function loadReadyToClaim() {
     const claimsRef = collection(db, "Item_Data");
-    const q = query(claimsRef, where("status", "==", "claimed + ready to retrieve"));
+    const q = query(claimsRef, where("status", "==", "claimed and ready to retrieve"));
     
     const snapshot = await getDocs(q);
     
@@ -151,8 +151,8 @@ async function loadPendingRetrievalRequests() {
                 <h4>${claim.item_name}</h4>
                 <p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(claim.date_found)}</p>
             </div>
+            <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
             <a href="review-claim.html?id=${claimDoc.id}"><button class="btn btn-blue btn-sm">Review</button></a>
-            <button class="btn btn-blue btn-sm" data-modal="claimed">Approve</button>
         `;
         
         card.dataset.claimData = JSON.stringify(claim);

@@ -64,10 +64,13 @@ const userEmailLogIn = async () => {
       }
     
       if(user_status === "Student"){
-        console.log("jiiiij")
+        console.log("student !!!")
+        localStorage.setItem("user_identity", "student")
         window.location.href = "dashboard.html";
       }
       else{
+        console.log("admin !!!")
+        localStorage.setItem("user_identity", "admin")
         window.location.href = "admin-dashboard.html";
       }
     }
