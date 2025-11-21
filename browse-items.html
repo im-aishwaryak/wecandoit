@@ -54,7 +54,20 @@
             <nav class="main-nav" aria-label="Main navigation">
                 <a class="nav-link" href="browse-items.html">Browse items</a>
                 <a class="nav-link" href="report-found-item.html">Report found item</a>
-                <a class="nav-link nav-pill" id="nav-current" href="dashboard.html">Dashboard</a>
+                
+                <a class="nav-link nav-pill" id="nav-current" href= "#">Dashboard</a>
+
+                <script>
+                    const userStatus = localStorage.getItem("user_identity")
+                    const dashboardLink = document.getElementById("nav-current");
+
+                    if (userStatus === "admin") {
+                        dashboardLink.href = "admin-dashboard.html";
+                    } else {
+                        dashboardLink.href = "dashboard.html";
+                    }   
+                </script>
+
                 <a class="nav-link nav-cta" href="log-in.html">Log out</a>
             </nav>
         </div>

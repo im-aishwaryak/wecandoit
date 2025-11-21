@@ -5,7 +5,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebas
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 
 import {
-    getFirestore, doc, getDoc, setDoc, query, where, collection, addDoc, updateDoc, deleteDoc, deleteField, getDocs, onSnapshot
+    getFirestore, doc, getDoc, setDoc, query, where, collection, addDoc, updateDoc, increment, deleteDoc, deleteField, getDocs, onSnapshot
 }
     from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
@@ -35,7 +35,7 @@ const storage = getStorage();
 
 export{app, db, auth, provider, signInWithPopup, signOut,createUserWithEmailAndPassword, signInWithEmailAndPassword, 
      doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc, deleteField, getDocs, onSnapshot,
-    storage, ref, uploadBytes, getDownloadURL, query, where}
+    storage, ref, uploadBytes, getDownloadURL, query, where, increment}
 
 
 // ---------------------------
