@@ -6,8 +6,18 @@ import {
 
 const report_button = document.getElementById("submit-button")
 
-const uploadData = async() =>{
+const uploadData = async() => {
     console.log("in function")
+    
+    // Get the current user
+    const currentUser = auth.currentUser;
+    
+    if (!currentUser) {
+        console.error("No user is logged in!");
+        alert("You must be logged in to submit an item.");
+        return;
+    }
+    
     var category = document.getElementById("category").value; 
     var item_name = document.getElementById("item").value; 
     var public_desc = document.getElementById("public_desc").value; 
@@ -33,6 +43,7 @@ const uploadData = async() =>{
     var ref = collection(db, "Item_Data")
     console.log(ref)
     console.log(localStorage.getItem("user_logged_in"))
+    
     await addDoc(
         ref, {
             category: category,
@@ -45,7 +56,11 @@ const uploadData = async() =>{
             time_found: time,
             verification_qs: verifications,
             status: "pending submission", 
-            retrieval_date: ""
+            retrieval_date: "",
+            // Add user tracking fields
+            submitter_id: currentUser.uid,
+            submitter_email: currentUser.email,
+            submitted_at: new Date().toISOString()
         }
     ); 
 }
@@ -56,7 +71,7 @@ report_button.addEventListener("click", async (e) => {
     window.location.reload();
 });
 
-const uploadImage = async() =>{
+const uploadImage = async() => {
     const data = new FormData();
     const file = document.getElementById("image_file").files[0]; 
     data.append("file", file);

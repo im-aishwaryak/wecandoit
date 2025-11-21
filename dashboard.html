@@ -53,8 +53,13 @@
                     btn.closest(".details-modal").classList.add("hidden");
                 });
             });
+
+            
         });
     </script>
+
+    <!-- ⭐ ADD THIS: Auth Protection Script -->
+    <script type="module" src="scripts/dashboard-init.js"></script>
 
     <!-- ================= HEADER ================= -->
     <header class="site-header">
@@ -83,30 +88,11 @@
         <br>
 
         <!-- Ready to Claim -->
-        <div class="items-section">
+        <div class="items-section" id="ready-to-claim-section">
             <h2>Ready to Claim</h2>
             <p class="subtitle">These items have been approved by admin and can be picked up in the <u>NCHS Main
                     Office</u>.</p>
-
-            <div class="dashboard-item-card">
-                <img src="assets/placeholders/lost-item2.jpg" class="dashboard-item-img">
-                <div class="dashboard-item-info">
-                    <h4>Presentation Clicker</h4>
-                    <p class="item-location">Approved on 11/22/2025</p>
-                    <p class="item-location">Pick up by 11/29/2025</p>
-                </div>
-                <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
-            </div>
-
-            <div class="dashboard-item-card">
-                <img src="assets/placeholders/lost-item3.jpg" class="dashboard-item-img">
-                <div class="dashboard-item-info">
-                    <h4>USB-C Charger</h4>
-                    <p class="item-location">Approved on 11/20/2025</p>
-                    <p class="item-location">Pick up by 11/27/2025</p>
-                </div>
-                <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
-            </div>
+            <!-- Cards will be inserted here dynamically -->
         </div>
 
         <br>
@@ -117,134 +103,37 @@
             <br>
 
             <!-- Item Retrieval Requests -->
-            <div class="items-section">
+            <div class="items-section" id="pending-retrieval-section">
                 <h3 class="subsection-title">Item Retrieval Requests</h3>
-                <p class="subtitle">These are items you've requested as yours from the lost items page. Admin approval may take 1–3 days.</p>
-
-                <div class="dashboard-item-card">
-                    <img src="assets/placeholders/lost-item1.jpg" class="dashboard-item-img">
-                    <div class="dashboard-item-info">
-                        <h4>Gray Backpack</h4>
-                        <p class="item-location">Submitted on 11/20/2025</p>
-                    </div>
-                    <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
-                </div>
+                <p class="subtitle">These are items you've requested as yours from the lost items page. Admin approval
+                    may take 1–3 days.</p>
+                <!-- Cards will be inserted here dynamically -->
             </div>
 
             <!-- Item Submission Requests -->
-            <div class="items-section">
+            <div class="items-section" id="pending-submissions-section">
                 <h3 class="subsection-title">Item Submission Requests</h3>
                 <p class="subtitle">These are lost items you've found and are sending to admin.</p>
-
-                <div class="dashboard-item-card">
-                    <img src="assets/placeholders/lost-item1.jpg" class="dashboard-item-img">
-                    <div class="dashboard-item-info">
-                        <h4>Gray Backpack</h4>
-                        <p class="item-location">Submitted on 11/20/2025</p>
-                        <p class="item-location">Found in Library</p>
-                    </div>
-                    <button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>
-                </div>
+                <!-- Cards will be inserted here dynamically -->
             </div>
         </div>
 
         <br>
 
         <!-- Your Items -->
-        <div class="items-section">
+        <div class="items-section" id="your-items-section">
             <h2>Your Items</h2>
             <br>
-
-            <div class="dashboard-item-card">
-                <img src="assets/placeholders/lost-item4.jpg" class="dashboard-item-img">
-                <div class="dashboard-item-info">
-                    <h4>Blue Backpack</h4>
-                    <span class="tag tag-orange">Item Retrieval</span>
-                    <p class="item-location">Retrieved 3 days ago</p>
-                </div>
-                <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
-            </div>
-
-            <div class="dashboard-item-card">
-                <img src="assets/placeholders/lost-item4.jpg" class="dashboard-item-img">
-                <div class="dashboard-item-info">
-                    <h4>Blue Backpack</h4>
-                    <span class="tag tag-blue">Item Submission</span>
-                    <p class="item-location">Submitted 3 days ago<br>Picked up 2 days ago</p>
-                </div>
-                <button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>
-            </div>
+            <!-- Cards will be inserted here dynamically -->
         </div>
+
     </main>
 
 
-    <!-- ================ REPORTED DETAILS MODAL ================= -->
-    <div id="reported-details-modal" class="details-modal hidden">
-        <div class="details-modal-content">
-            <button class="details-modal-close">&times;</button>
-
-            <div class="details-item-header">
-                <img class="details-img" src="assets/placeholders/lost-item1.jpg">
-
-                <div class="details-info">
-                    <h2>Gray Backpack</h2>
-
-                    <div class="details-tags">
-                        <span class="tag tag-orange">Item Submission</span>
-                    </div>
-
-                    <span class="tag tag-transparent"><img src="assets/icons/location.svg">Library</span>
-                    <span class="tag tag-transparent"><img src="assets/icons/clock.svg">11/15/2025 9:20 AM</span>
-
-                    <br>
-                    <p><b>Public description:</b> Dark colored backpack</p>
-                    <p><b>Private description:</b> Gray North Face backpack</p>
-
-                    <br>
-                    <p><b>Verification Questions</b></p>
-                    <p>Q1: What color is the inside lining?</p>
-                    <p>A1: blue</p>
-                    <p>Q2: What brand is it?</p>
-                    <p>A2: north face</p>
-                    <p>Q3: What's in the front pocket?</p>
-                    <p>A3: kpop photocards</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
 
-    <!-- ================ CLAIMED DETAILS MODAL ================= -->
-    <div id="claimed-details-modal" class="details-modal hidden">
-        <div class="details-modal-content">
-            <button class="details-modal-close">&times;</button>
-
-            <div class="details-item-header">
-                <img class="details-img" src="assets/placeholders/lost-item1.jpg">
-
-                <div class="details-info">
-                    <h2>Water Bottle</h2>
-
-                    <p><b>Lost on:</b> 11/17/2025 at 4:20 PM</p>
-
-                    <br>
-
-                    <p><b>Verification Questions</b></p>
-                    <p>Q1: (Your answer…)</p>
-                    <p>A1: ___</p>
-                    <p>Q2: (Your answer…)</p>
-                    <p>A2: ___</p>
-                    <p>Q3: (Your answer…)</p>
-                    <p>A3: ___</p>
-
-                    <br>
-
-                    <p><b>Additional Information</b></p>
-                    <p>No additional notes.</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <script type="module" src="scripts/student_dashboard.js"></script>
+    <script type="module" src="scripts/dashboard-init.js"></script>
 
 
     <!-- ================= FOOTER ================= -->

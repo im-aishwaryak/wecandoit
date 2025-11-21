@@ -28,6 +28,15 @@
             menuIcon.addEventListener("click", () => {
                 nav.classList.toggle("show");
             });
+
+            function openImageModal(src) {
+                document.getElementById("modal-img").src = src;
+                document.getElementById("image-modal").classList.remove("hidden");
+            }
+
+            function closeImageModal() {
+                document.getElementById("image-modal").classList.add("hidden");
+            }
         });
     </script>
 
@@ -56,22 +65,21 @@
         <h1 class="title-w-icon">Browse Found Items<img src="assets/icons/folder-icon.png" height="43px"></h1>
 
         <div class="search-filter">
-            <input autocomplete="off" class="input" type="text" id="search-input" placeholder="Search"
-                 />
-            <select class="input" id="category-filter">
+            <input autocomplete="off" class="input" type="text" id="search-input" placeholder="Search" />
+            <!--<select class="input" id="category-filter">
                 <option value="all">All Categories</option>
-            </select>
+            </select>-->
         </div>
 
         <br>
-
+        <!--
         <div class="filtered-tags">
             <span class="tag tag-orange">Electronics
                 <button class="filter-x" onclick="">
                     <img src="assets/icons/x.svg">
                 </button>
             </span>
-        </div>
+        </div>-->
 
         <br>
 
@@ -81,9 +89,9 @@
             <p id="searchOutputMSG">No items found matching your search</p>
         </div>
 
-        <div class="item-grid"id="item-grid">
+        <div class="item-grid" id="item-grid">
 
-             <!--
+            <!--
             <div class="item-card" >
                 <div class="image-wrapper">
                     <img class="item-img" src="assets/placeholders/lost-item1.jpg" alt="Water bottle">
