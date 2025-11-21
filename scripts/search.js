@@ -14,7 +14,6 @@ const lostThings = [
 
 
 async function load() {
-    console.log("printed")
     try {
         const items = await getAllItems();
         const availableItems = items.filter(item => item.status === "available to claim");
@@ -109,19 +108,27 @@ function createItemCard(item) {
 
 
 
-
-
-
-
-
-
 //this function handles all the searching
 function search() {
-    const filteredItems = searchByValue();
+    // first we get the value from the search bar
+    const searchValue = document.getElementById("search-input").value.toLowerCase();
 
+    // then we filter items first by direct matches
+    let filteredItems = searchByValue(searchValue);
+
+    // now, after filtering direct matches, we are going to look for typos
+    const notMatchesList = lostThings.filter(x => !filteredItems.includes(x));
+    fuzzySearch(searchValue, notMatchesList).forEach(item => console.log("Fuzzy search: " + item.item_name))
+
+    
+    filteredItems = filteredItems.concat(fuzzySearch(searchValue, notMatchesList));
+
+
+    
     // Testing area
     console.log("type: " + typeof filteredItems);
-    filteredItems.forEach(item => console.log("Matched items: " + item.category));
+    filteredItems.forEach(item => console.log("Matched items: " + item.item_name));
+    
     
     // This part changes the html
     if(filteredItems.length === 0){
@@ -130,7 +137,8 @@ function search() {
         document.getElementById("searchOutputMSG").textContent = "Items found: " + filteredItems.length;
     }
 
-    renderItems(filteredItems)
+    renderItems(filteredItems);
+
 }
 
 
@@ -148,18 +156,123 @@ function renderItems(items) {
 
 //this function basically searches by the value that the user types in
 //specifically not the catory dropdown search
-function searchByValue(){
-    console.log()
-    const searchValue = document.getElementById("search-input").value.toLowerCase();
-    console.log(searchValue)
+function searchByValue(searchValue){
+    // console.log()
+    
+    // console.log(searchValue)
     return lostThings.filter(obj => {
         if (!obj.item_name) return false;        // skip invalid objects
         return String(obj.item_name).toLowerCase().includes(searchValue);
     });
-
-    // const categoryValue = document.getElementById("category-filter").value;
-
-    // const 
-    
-
 }
+
+
+
+
+// searches a list with typos
+function fuzzySearch(query, list, threshold = 4) {
+    // Convert the search query to lowercase so comparisons
+    // are case-insensitive.
+    query = query.toLowerCase();
+
+    return list
+        .map(item => {
+            // Convert the item's name to lowercase
+            // so comparisons are case-insensitive.
+            const lower = item.item_name.toLowerCase();
+
+            // Compute the Levenshtein distance between:
+            // - the user query
+            // - the full item name
+            //
+            // This distance measures how many edits it would take
+            // to transform 'query' into 'lower'.
+            const distance = levenshtein(query, lower);
+
+            // Check whether the query appears anywhere inside the item name.
+            // This helps when the user types only part of an item name.
+            const includes = lower.includes(query);
+
+            // We will use "score" to determine how good the match is.
+            // Start with the Levenshtein distance, since lower distance = better match.
+            let score = distance;
+
+            // If the query is actually *contained* in the item name,
+            // give it a slight advantage by reducing the score.
+            // (Lower score = better match.)
+            if (includes) score -= 2;
+
+            // Return an object wrapping the item with its score
+            // so we can filter and sort them later.
+            return { item, score };
+        })
+        // Filter out items with a score too high (bad matches).
+        // 'threshold' defines how many edits we allow.
+        .filter(result => result.score <= threshold)
+
+        // Sort matches from best score (closest match) to worst.
+        .sort((a, b) => a.score - b.score)
+
+        // Return only the item objects (drop score metadata)
+        .map(result => result.item);
+}
+
+
+
+
+// returns the number of edits needed to turn string a into string b
+function levenshtein(a, b) {
+    // Create a 2D matrix (dp) where:
+    // dp[i][j] represents the minimum number of edits needed
+    // to convert the first i characters of string 'a'
+    // into the first j characters of string 'b'.
+    //
+    // The matrix has (a.length + 1) rows and (b.length + 1) columns.
+
+    const dp = Array.from({ length: a.length + 1 }, (_, i) =>
+        Array.from({ length: b.length + 1 }, (_, j) =>
+            // Initialize the first row and first column:
+            // dp[i][0] = i → converting i characters into empty string requires i deletions
+            // dp[0][j] = j → converting empty string into j characters requires j insertions
+            i === 0 ? j : j === 0 ? i : 0
+        )
+    );
+
+    // Fill in the rest of the matrix
+    for (let i = 1; i <= a.length; i++) {
+        for (let j = 1; j <= b.length; j++) {
+            // If characters match, no new edit is needed.
+            // Carry over the previous diagonal value.
+            if (a[i - 1] === b[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1];
+            } else {
+                // Characters do NOT match.
+                // We consider three possible operations:
+                //
+                // 1. Deletion: remove a character from 'a'
+                //    → dp[i - 1][j]
+                //
+                // 2. Insertion: add a character to 'a'
+                //    → dp[i][j - 1]
+                //
+                // 3. Substitution: replace a character in 'a'
+                //    → dp[i - 1][j - 1]
+                //
+                // We choose the operation with the smallest cost and add 1
+                // because performing that operation costs one edit.
+                dp[i][j] = Math.min(
+                    dp[i - 1][j],     // deletion
+                    dp[i][j - 1],     // insertion
+                    dp[i - 1][j - 1]  // substitution
+                ) + 1;
+            }
+        }
+    }
+
+    // The final answer—the minimum number of edits required
+    // to transform the full string 'a' into string 'b'—
+    // is located in the bottom-right cell.
+    return dp[a.length][b.length];
+}
+
+
