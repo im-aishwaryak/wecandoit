@@ -19,7 +19,6 @@
     <!-- ================== JS ================== -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-
             /* MOBILE NAV */
             const menuIcon = document.getElementById("menu-icon");
             const nav = document.querySelector(".main-nav");
@@ -28,23 +27,36 @@
                 nav.classList.toggle("show");
             });
 
-            /* ========= MODAL LOGIC ========= */
-
+            /* ========= MODAL LOGIC WITH EVENT DELEGATION ========= */
             const reportedModal = document.getElementById("reported-details-modal");
             const claimedModal = document.getElementById("claimed-details-modal");
 
-            /* Any "View Details" for reported items */
-            document.querySelectorAll("[data-modal='reported']").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    reportedModal.classList.remove("hidden");
-                });
-            });
+            // Use event delegation on the document
+            document.addEventListener("click", (e) => {
+                // Check if clicked element is a "View Details" button
+                if (e.target.matches("[data-modal='reported']")) {
+                    if (reportedModal) {
+                        const card = e.target.closest('.dashboard-item-card');
+                        if (card && card.dataset.itemData) {
+                            const itemData = JSON.parse(card.dataset.itemData);
+                            const itemId = card.dataset.itemId;
+                            window.populateReportedModal(itemData, itemId); // Call the populate function
+                        }
+                        reportedModal.classList.remove("hidden");
+                    }
+                }
 
-            /* Any "View Details" for claimed items */
-            document.querySelectorAll("[data-modal='claimed']").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    claimedModal.classList.remove("hidden");
-                });
+                if (e.target.matches("[data-modal='claimed']")) {
+                    if (claimedModal) {
+                        const card = e.target.closest('.dashboard-item-card');
+                        if (card && card.dataset.claimData) {
+                            const claimData = JSON.parse(card.dataset.claimData);
+                            const claimId = card.dataset.claimId;
+                            window.populateClaimedModal(claimData, claimId); // Call the populate function
+                        }
+                        claimedModal.classList.remove("hidden");
+                    }
+                }
             });
 
             /* Close Buttons */
@@ -53,8 +65,6 @@
                     btn.closest(".details-modal").classList.add("hidden");
                 });
             });
-
-            
         });
     </script>
 
@@ -76,7 +86,7 @@
                 <a class="nav-link" href="browse-items.html">Browse items</a>
                 <a class="nav-link" href="report-found-item.html">Report found item</a>
                 <a class="nav-link nav-pill" id="nav-current" href="dashboard.html">Dashboard</a>
-                <a class="nav-link nav-cta" href="log-in.html">Log out</a>
+                <a class="nav-link nav-cta" id="logout-btn" href="#">Log out</a>
             </nav>
         </div>
     </header>
@@ -133,7 +143,69 @@
 
 
     <script type="module" src="scripts/student_dashboard.js"></script>
-    <script type="module" src="scripts/dashboard-init.js"></script>
+    <script type="module" src="scripts/logout.js"></script> <!-- Add this -->
+
+    <!-- REPORTED DETAILS MODAL -->
+    <div id="reported-details-modal" class="details-modal hidden">
+        <div class="details-modal-content">
+            <button class="details-modal-close">&times;</button>
+            <div class="details-item-header">
+                <img class="details-img" src="assets/placeholders/lost-item1.jpg">
+                <div class="details-info">
+                    <h2>Gray Backpack</h2>
+                    <div class="details-tags">
+                        <span class="tag tag-orange">Item Submission</span>
+                    </div>
+                    <span class="tag tag-transparent"><img src="assets/icons/location.svg">Library</span>
+                    <span class="tag tag-transparent"><img src="assets/icons/clock.svg">11/15/2025 9:20 AM</span>
+                    <br>
+                    <p><b>Submitter Information</b></p>
+                    <p><b>Student Name:</b> Jill Smith</p>
+                    <p><b>Student Email:</b> 0000000@apps.nsd.org</p>
+                    <br>
+                    <p><b>Public description:</b> Dark colored backpack</p>
+                    <p><b>Private description:</b> Gray North Face backpack</p>
+                    <br>
+                    <p><b>Verification Questions</b></p>
+                    <p>Q1: What color is the inside lining?</p>
+                    <p>A1: blue</p>
+                    <p>Q2: What brand is it?</p>
+                    <p>A2: north face</p>
+                    <p>Q3: What's in the front pocket?</p>
+                    <p>A3: kpop photocards</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLAIMED DETAILS MODAL -->
+    <div id="claimed-details-modal" class="details-modal hidden">
+        <div class="details-modal-content">
+            <button class="details-modal-close">&times;</button>
+            <div class="details-item-header">
+                <img class="details-img" src="assets/placeholders/lost-item1.jpg">
+                <div class="details-info">
+                    <h2>Water Bottle</h2>
+                    <br>
+                    <p><b>Student Name:</b> Jill Smith</p>
+                    <p><b>Student Email:</b> 0000000@apps.nsd.org</p>
+                    <br>
+                    <p><b>Lost on:</b> 11/17/2025 at 4:20 PM</p>
+                    <br>
+                    <p><b>Verification Questions</b></p>
+                    <p>Q1: (Your answer…)</p>
+                    <p>A1: ___</p>
+                    <p>Q2: (Your answer…)</p>
+                    <p>A2: ___</p>
+                    <p>Q3: (Your answer…)</p>
+                    <p>A3: ___</p>
+                    <br>
+                    <p><b>Additional Information</b></p>
+                    <p>No additional notes.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
     <!-- ================= FOOTER ================= -->

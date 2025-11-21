@@ -1,4 +1,3 @@
-
 //admin roles: 
 //approves found item submissions
 //approves lost item claims 
@@ -93,7 +92,7 @@ async function loadReadyToClaim() {
             <img src="${claim.image_url || 'assets/placeholders/lost-item1.jpg'}" class="dashboard-item-img">
             <div class="dashboard-item-info">
                 <h4>${claim.item_name}</h4>
-                <p class="item-location" style="padding-bottom: 5px;"></p>
+                <p class="item-location" style="padding-bottom: 5px;">Claimed by <span class="tag tag-gray">${claim.claimant_email || 'Unknown'}</span></p>
                 <p class="item-location" style="padding-bottom: 5px;">Approved on ${formatDate(claim.approved_at)}</p>
             </div>
             <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
@@ -116,8 +115,8 @@ async function loadReadyToClaim() {
 
 // Load pending retrieval requests (claims waiting approval)
 async function loadPendingRetrievalRequests() {
-    const claimsRef = collection(db, "Item_Data");
-    const q = query(claimsRef, where("status", "==", "pending retrieval"));
+    const claimsRef = collection(db, "Claims");
+    const q = query(claimsRef, where("status", "==", "pending"));
     
     const snapshot = await getDocs(q);
     const targetTitle = Array.from(document.querySelectorAll(".subsection-title"))
@@ -146,9 +145,11 @@ async function loadPendingRetrievalRequests() {
         const card = document.createElement('div');
         card.className = 'dashboard-item-card';
         card.innerHTML = `
-            <img src="${claim.image_url || 'assets/placeholders/lost-item1.jpg'}" class="dashboard-item-img">
+            <img src="${claim.item_image || 'assets/placeholders/lost-item1.jpg'}" class="dashboard-item-img">
             <div class="dashboard-item-info">
                 <h4>${claim.item_name}</h4>
+                <p class="item-location" style="padding-bottom: 5px;">Claimed by <span class="tag tag-gray">${claim.claimant_email || 'Unknown'}</span></p>
+                <p class="item-location" style="padding-bottom: 5px;">Submitted by <span class="tag tag-gray">${claim.submitter_email || 'Unknown'}</span></p>
                 <p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(claim.date_found)}</p>
             </div>
             <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
@@ -195,7 +196,8 @@ async function loadPendingSubmissions() {
             <img src="${item.image_url || 'assets/placeholders/lost-item1.jpg'}" class="dashboard-item-img">
             <div class="dashboard-item-info">
                 <h4>${item.item_name || item.category}</h4>
-                <p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(item.date_found)} </p>
+                <p class="item-location" style="padding-bottom: 5px;">Submitted by <span class="tag tag-gray">${item.submitter_email || 'Unknown'}</span></p>
+                <p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(item.date_found)}</p>
                 <p class="item-location">Found in ${item.location_found}</p>
             </div>
             <button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>
@@ -253,7 +255,8 @@ async function loadFoundItems() {
             <img src="${item.image_url || 'assets/placeholders/lost-item1.jpg'}" class="dashboard-item-img">
             <div class="dashboard-item-info">
                 <h4>${item.item_name || item.category}</h4>
-                <p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(item.date_found)} </p>
+                <p class="item-location" style="padding-bottom: 5px;">Submitted by <span class="tag tag-gray">${item.submitter_email || 'Unknown'}</span></p>
+                <p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(item.date_found)}</p>
                 <p class="item-location">Found in ${item.location_found}</p>
             </div>
             <button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>
@@ -282,7 +285,7 @@ async function loadReunitedItems() {
     existingCards.forEach(card => card.remove());
     
     if (snapshot.empty) {
-        console.log("empty:(")
+        console.log("empty:(");
         const emptyMsg = document.createElement('p');
         emptyMsg.className = 'subtitle';
         emptyMsg.textContent = 'No reunited items yet.';
@@ -302,8 +305,10 @@ async function loadReunitedItems() {
             <img src="${claim.image_url || 'assets/placeholders/lost-item1.jpg'}" class="dashboard-item-img">
             <div class="dashboard-item-info">
                 <h4>${claim.item_name}</h4>
-                <p class="item-location">Submitted on ${formatDate(claim.date_found)} </p>
-                <p class="item-location">Retrieved on ${formatDate(claim.date_found)}</p>
+                <p class="item-location" style="padding-bottom: 5px;">Submitted by <span class="tag tag-gray">${claim.submitter_email || 'Unknown'}</span></p>
+                <p class="item-location" style="padding-bottom: 5px;">Retrieved by <span class="tag tag-gray">${claim.receiver_email || 'Unknown'}</span></p>
+                <p class="item-location">Submitted on ${formatDate(claim.date_found)}</p>
+                <p class="item-location">Retrieved on ${formatDate(claim.retrieved_at)}</p>
             </div>
             <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
         `;
@@ -324,6 +329,8 @@ async function approveItem(itemId) {
         await updateDoc(itemRef, {
             status: "available to claim",
             approved_at: new Date().toISOString(),
+            approver_id: user.uid,
+            approver_email: user.email
         });
         
         alert('Item approved and now visible to students!');
@@ -368,3 +375,110 @@ auth.onAuthStateChanged((user) => {
         loadAdminDashboard();
     }
 });
+
+
+
+
+// Add these at the end of student_dashboard.js
+
+// Populate the reported item modal
+window.populateReportedModal = function(itemData, itemId) {
+    console.log("Populating reported modal:", itemData);
+    
+    const modal = document.getElementById("reported-details-modal");
+    if (!modal) return;
+    
+    // Update image
+    const img = modal.querySelector('.details-img');
+    if (img) img.src = itemData.image_url || 'assets/placeholders/lost-item1.jpg';
+    
+    // Update title
+    const title = modal.querySelector('h2');
+    if (title) title.textContent = itemData.item_name || itemData.category || 'Unknown Item';
+    
+    // Update tag if exists
+    const tag = modal.querySelector('.tag-orange');
+    if (tag) tag.textContent = 'Item Submission';
+    
+    // Update location and time tags
+    const tags = modal.querySelectorAll('.tag-transparent');
+    if (tags[0]) tags[0].innerHTML = `<img src="assets/icons/location.svg">${itemData.location_found || 'Unknown'}`;
+    if (tags[1]) tags[1].innerHTML = `<img src="assets/icons/clock.svg">${formatDate(itemData.submitted_at) || 'Unknown'}`;
+    
+    // Update submitter info
+    const paragraphs = modal.querySelectorAll('p');
+    paragraphs.forEach(p => {
+        if (p.innerHTML.includes('Student Name:')) {
+            p.innerHTML = `<b>Student Name:</b> ${itemData.submitter_name || 'N/A'}`;
+        }
+        if (p.innerHTML.includes('Student Email:')) {
+            p.innerHTML = `<b>Student Email:</b> ${itemData.submitter_email || 'N/A'}`;
+        }
+        if (p.innerHTML.includes('Public description:')) {
+            p.innerHTML = `<b>Public description:</b> ${itemData.public_description || 'N/A'}`;
+        }
+        if (p.innerHTML.includes('Private description:')) {
+            p.innerHTML = `<b>Private description:</b> ${itemData.private_description || 'N/A'}`;
+        }
+    });
+    
+    // Update verification questions
+    const verificationSection = Array.from(paragraphs).find(p => p.textContent.includes('Verification Questions'));
+    if (verificationSection && itemData.verification_questions) {
+        let html = '<p><b>Verification Questions</b></p>';
+        itemData.verification_questions.forEach((q, index) => {
+            html += `<p>Q${index + 1}: ${q.question || 'N/A'}</p>`;
+            html += `<p>A${index + 1}: ${q.answer || 'N/A'}</p>`;
+        });
+        verificationSection.outerHTML = html;
+    }
+};
+
+// Populate the claimed item modal
+window.populateClaimedModal = function(claimData, claimId) {
+    console.log("Populating claimed modal:", claimData);
+    
+    const modal = document.getElementById("claimed-details-modal");
+    if (!modal) return;
+    
+    // Update image
+    const img = modal.querySelector('.details-img');
+    if (img) img.src = claimData.image_url || claimData.item_image || 'assets/placeholders/lost-item1.jpg';
+    
+    // Update title
+    const title = modal.querySelector('h2');
+    if (title) title.textContent = claimData.item_name || 'Unknown Item';
+    
+    // Update all paragraphs
+    const paragraphs = modal.querySelectorAll('p');
+    paragraphs.forEach(p => {
+        if (p.innerHTML.includes('Student Name:')) {
+            p.innerHTML = `<b>Student Name:</b> ${claimData.claimant_name || claimData.receiver_name || 'N/A'}`;
+        }
+        if (p.innerHTML.includes('Student Email:')) {
+            p.innerHTML = `<b>Student Email:</b> ${claimData.claimant_email || claimData.receiver_email || 'N/A'}`;
+        }
+        if (p.innerHTML.includes('Lost on:')) {
+            p.innerHTML = `<b>Lost on:</b> ${formatDate(claimData.submitted_at) || 'N/A'}`;
+        }
+    });
+    
+    // Update verification questions if they exist
+    if (claimData.verification_answers) {
+        const verificationSection = Array.from(paragraphs).find(p => p.textContent.includes('Verification Questions'));
+        if (verificationSection) {
+            let html = '<p><b>Verification Questions</b></p>';
+            claimData.verification_answers.forEach((qa, index) => {
+                html += `<p>Q${index + 1}: ${qa.question || 'N/A'}</p>`;
+                html += `<p>A${index + 1}: ${qa.answer || 'N/A'}</p>`;
+            });
+            verificationSection.outerHTML = html;
+        }
+    }
+    
+    // Update additional information
+    const additionalInfo = Array.from(paragraphs).find(p => p.previousElementSibling?.textContent?.includes('Additional Information'));
+    if (additionalInfo) {
+        additionalInfo.textContent = claimData.additional_notes || 'No additional notes.';
+    }
+};

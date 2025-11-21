@@ -1,226 +1,261 @@
-// scripts/claim_item.js
+// scripts/review_claim.js
 import {
     db, auth,
-    doc, getDoc, collection, addDoc, updateDoc, increment
+    doc, getDoc, updateDoc, collection, query, where, getDocs
 } from './firebaseModule.js';
 
+let currentClaim = null;
 let currentItem = null;
 
-// Get item ID from URL
+// Get item ID from URL (this is the Item_Data document ID)
 const urlParams = new URLSearchParams(window.location.search);
 const itemId = urlParams.get('id');
-console.log(itemId)
+console.log("Item ID from URL:", itemId);
 
-// Load item details on page load
-async function loadItemDetails() {
+// Load claim and item details
+async function loadReviewData() {
     if (!itemId) {
         alert("No item selected");
-        window.location.href = "browse-items.html";
+        window.location.href = "admin-dashboard.html";
         return;
     }
     
     try {
+        // Load item from Item_Data
         const itemRef = doc(db, "Item_Data", itemId);
         const itemSnap = await getDoc(itemRef);
         
         if (!itemSnap.exists()) {
             alert("Item not found");
-            window.location.href = "browse-items.html";
+            window.location.href = "admin-dashboard.html";
             return;
         }
         
         currentItem = { id: itemSnap.id, ...itemSnap.data() };
+        console.log("Item loaded:", currentItem);
         
-        console.log(currentItem.item_name)
-        console.log(currentItem.image_url)
-
-        displayItemDetails();
-        displayVerificationQuestions();
+        // Find the claim that references this item
+        const claimsRef = collection(db, "Claims");
+        const q = query(claimsRef, where("item_id", "==", itemId));
+        const claimSnapshot = await getDocs(q);
+        
+        if (!claimSnapshot.empty) {
+            // Get the first claim (should only be one pending claim per item)
+            currentClaim = { id: claimSnapshot.docs[0].id, ...claimSnapshot.docs[0].data() };
+            console.log("Claim loaded:", currentClaim);
+        } else {
+            console.warn("No claim found for this item. Checking if claim_id exists in item...");
+            
+            // Fallback: check if the item has a claim_id field
+            if (currentItem.claim_id) {
+                const claimRef = doc(db, "Claims", currentItem.claim_id);
+                const claimSnap = await getDoc(claimRef);
+                
+                if (claimSnap.exists()) {
+                    currentClaim = { id: claimSnap.id, ...claimSnap.data() };
+                    console.log("Claim loaded via claim_id:", currentClaim);
+                } else {
+                    alert("No claim found for this item");
+                    window.location.href = "admin-dashboard.html";
+                    return;
+                }
+            } else {
+                alert("No claim found for this item");
+                window.location.href = "admin-dashboard.html";
+                return;
+            }
+        }
+        
+        displayComparison();
         
     } catch (error) {
-        console.error("Error loading item:", error);
-        alert("Error loading item details");
-        window.location.href = "browse-items.html";
+        console.error("Error loading review data:", error);
+        alert("Error loading claim details: " + error.message);
+        window.location.href = "admin-dashboard.html";
     }
 }
 
-// Display item details in the form
-function displayItemDetails() {
-    const itemCard = document.querySelector('.item-card');
+// Display comparison between claim and item
+function displayComparison() {
+    if (!currentClaim || !currentItem) {
+        alert("Missing claim or item data");
+        return;
+    }
     
-    if (itemCard && currentItem) {
-        let dateDisplay = currentItem.date_found || "Unknown date";
-        if (currentItem.time_found) {
-            dateDisplay += ` ${currentItem.time_found}`;
-        }
-       
+    const comparisonCard = document.querySelector('.comparison-card');
+    
+    if (!comparisonCard) {
+        console.error("Comparison card container not found");
+        return;
+    }
+    
+    // Build verification questions comparison
+    let verificationHTML = '';
+    const itemQuestions = currentItem.verification_qs || {};
+    const claimAnswers = currentClaim.verification_answers || {};
+    
+    Object.keys(itemQuestions).forEach((question, index) => {
+        const correctAnswer = itemQuestions[question];
+        const claimAnswer = claimAnswers[question] || 'No answer provided';
         
-        itemCard.innerHTML = `
-            <img class="item-img" style="width: 150px; height: 150px"
-                src="${currentItem.image_url|| 'assets/placeholders/lost-item2.jpg'}" 
-                alt="${currentItem.item_name || 'Item'}">
-
-            <div class="item-info">
-                <div class="item-tags">
-                    <span class="tag tag-blue">Available</span>
-                    <span class="tag tag-orange"><img src="assets/icons/tag-right.svg">${currentItem.category || 'Other'}</span>
-                </div>
-
-                <div class="item-text">
-                    <h3 class="item-name">${currentItem.item_name || currentItem.category || 'Unknown Item'}</h3>
-                    <p class="item-desc">${currentItem.public_description || 'No description available'}</p>
-                </div>
-
-                <div class="item-tags">
-                    <span class="tag tag-transparent"><img src="assets/icons/location.svg">${currentItem.location_found || 'Unknown'}</span>
-                    <span class="tag tag-transparent"><img src="assets/icons/clock.svg">${dateDisplay}</span>
-                </div>
-            </div>
+        // Check if answers match (case-insensitive, trimmed)
+        const isMatch = correctAnswer.toLowerCase().trim() === claimAnswer.toLowerCase().trim();
+        const matchClass = isMatch ? 'style="color: green; font-weight: bold;"' : 'style="color: red;"';
+        
+        verificationHTML += `
+            <p><b>Q${index + 1}:</b> ${question}</p>
+            <p><b>Correct A${index + 1}:</b> ${correctAnswer}</p>
+            <p ${matchClass}><b>Claimant A${index + 1}:</b> ${claimAnswer} ${isMatch ? '✓' : '✗'}</p>
+            <br>
         `;
-    }
+    });
+    
+    comparisonCard.innerHTML = `
+        <img src="${currentItem.image_url || 'assets/placeholders/lost-item1.jpg'}" alt="Item" style="max-width: 300px; border-radius: 10px;">
+
+        <div class="comparison-info">
+            <div class="comparison-columns">
+
+                <!-- Retrieval Request Column -->
+                <div class="comparison-column">
+                    <h2>Retrieval Request (Claim)</h2>
+                    <br>
+                    <p><b>Item Name:</b> ${currentClaim.item_name}</p>
+                    <p><b>Submitted on:</b> ${formatDate(currentClaim.submitted_at)}</p>
+                    <p><b>Claimant Name:</b> ${currentClaim.claimant_name}</p>
+                    <p><b>Student Email:</b> ${currentClaim.claimant_email}</p>
+                    <p><b>Lost on:</b> ${currentClaim.lost_date}${currentClaim.lost_time ? ' at ' + currentClaim.lost_time : ''}</p>
+                    <br>
+                    <p><b>Verification Answers:</b></p>
+                    ${Object.entries(claimAnswers).map(([q, a], i) => 
+                        `<p>Q${i + 1}: ${q}</p><p>A${i + 1}: ${a}</p>`
+                    ).join('')}
+                    <br>
+                    <p><b>Additional Information:</b></p>
+                    <p>${currentClaim.additional_info || 'None provided'}</p>
+                </div>
+
+                <!-- Submission Request Column -->
+                <div class="comparison-column">
+                    <h2>Item Submission (Original)</h2>
+                    <br>
+                    <p><b>Item Name:</b> ${currentItem.item_name || currentItem.category}</p>
+                    <p><b>Category:</b> ${currentItem.category}</p>
+                    <p><b>Found on:</b> ${currentItem.date_found}${currentItem.time_found ? ' at ' + currentItem.time_found : ''}</p>
+                    <p><b>Location Found:</b> ${currentItem.location_found}</p>
+                    <p><b>Reporter Email:</b> ${currentItem.submitter_email || 'Unknown'}</p>
+                    <p><b>Public Description:</b> ${currentItem.public_description}</p>
+                    <p><b>Private Description:</b> ${currentItem.private_description}</p>
+                    <br>
+                    <p><b>Verification Questions & Correct Answers:</b></p>
+                    ${Object.entries(itemQuestions).map(([q, a], i) => 
+                        `<p>Q${i + 1}: ${q}</p><p>A${i + 1}: ${a}</p>`
+                    ).join('')}
+                </div>
+
+            </div>
+
+            <br>
+            
+            <div style="background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                <h3 style="margin: 0 0 10px 0;">Verification Check</h3>
+                ${verificationHTML}
+            </div>
+
+            <button class="btn btn-orange btn-sm full-width" id="approve-btn">Approve Match</button>
+            <button class="btn btn-blue btn-sm full-width" id="reject-btn">Reject Match</button>
+        </div>
+    `;
+    
+    // Add event listeners
+    document.getElementById('approve-btn').addEventListener('click', approveClaim);
+    document.getElementById('reject-btn').addEventListener('click', rejectClaim);
 }
 
-// Display verification questions from the item
-function displayVerificationQuestions() {
-    const verificationSection = document.querySelector('.form-group');
-    
-    if (!currentItem || !currentItem.verification_qs) {
+// Approve the claim
+async function approveClaim() {
+    if (!confirm('Approve this claim? The student will be notified to pick up the item.')) {
         return;
     }
-    
-    const questions = currentItem.verification_qs;
-    const questionKeys = Object.keys(questions);
-    
-    // Find the verification questions container
-    const container = Array.from(document.querySelectorAll('.form-group')).find(group =>
-        group.querySelector('label')?.textContent.includes('Verification Questions')
-    );
-    
-    if (container && questionKeys.length > 0) {
-        // Clear existing inputs (keep the label and hint)
-        const inputFields = container.querySelectorAll('.input-field');
-        inputFields.forEach(field => field.remove());
-        
-        // Add question inputs dynamically
-        questionKeys.forEach((question, index) => {
-            const inputField = document.createElement('div');
-            inputField.className = 'input-field';
-            inputField.innerHTML = `
-                <label for="answer${index + 1}">${question} <span class="required">*</span></label>
-                <input type="text" id="answer${index + 1}" placeholder="Your answer ..." required>
-            `;
-            container.appendChild(inputField);
-        });
-    }
-}
-
-// Submit claim
-async function submitClaim(e) {
-    e.preventDefault();
-    
-    const user = auth.currentUser;
-    if (!user) {
-        alert("You must be logged in to claim an item");
-        window.location.href = "log-in.html";
-        return;
-    }
-    
-    if (!currentItem) {
-        alert("No item selected");
-        return;
-    }
-    
-    // Get form values
-    const studentName = document.querySelector('input[placeholder="First and Last Name"]').value.trim();
-    const studentEmail = document.querySelector('input[placeholder="0000000@apps.nsd.org"]').value.trim();
-    const lostDate = document.querySelector('input[type="date"]').value;
-    const lostTime = document.querySelector('input[type="time"]').value;
-    const additionalInfo = document.querySelector('textarea').value.trim();
-    
-    // Validate required fields
-    if (!studentName || !studentEmail || !lostDate) {
-        alert("Please fill in all required fields");
-        return;
-    }
-    
-    // Validate email matches logged-in user
-    if (studentEmail !== user.email) {
-        alert("Email must match your logged-in account");
-        return;
-    }
-    
-    // Get verification answers
-    const answers = {};
-    const questions = Object.keys(currentItem.verification_qs);
-    
-    for (let i = 0; i < questions.length; i++) {
-        const answerInput = document.getElementById(`answer${i + 1}`);
-        if (!answerInput || !answerInput.value.trim()) {
-            alert("Please answer all verification questions");
-            return;
-        }
-        answers[questions[i]] = answerInput.value.trim().toLowerCase();
-    }
-    
-    // Disable submit button
-    const submitBtn = document.querySelector('button.btn-orange');
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Submitting...";
     
     try {
-        // Create claim document
-        const claimRef = collection(db, "Claims");
-        const claimDoc = await addDoc(claimRef, {
-            item_id: currentItem.id,
-            item_name: currentItem.item_name,
-            item_image: currentItem.image_url,
-            claimant_name: studentName,
-            claimant_email: studentEmail,
-            lost_date: lostDate,
-            lost_time: lostTime || "",
-            verification_answers: answers,
-            additional_info: additionalInfo,
-            status: "pending",
-            submitted_at: new Date().toISOString(),
-            reviewed_at: null,
-            reviewed_by: null,
-            review_notes: ""
+        const user = auth.currentUser;
+        
+        // Update claim status
+        const claimRef = doc(db, "Claims", currentClaim.id);
+        await updateDoc(claimRef, {
+            status: "approved",
+            reviewed_at: new Date().toISOString(),
+            reviewed_by: user.email,
+            reviewer_id: user.uid,
+            review_notes: "Approved - verification successful"
         });
         
-        // Update item status to "claimed_pending"
+        // Update item status
         const itemRef = doc(db, "Item_Data", currentItem.id);
         await updateDoc(itemRef, {
-            status: "pending retrieval",
-            claim_id: claimDoc.id,
-            //claimed_by: studentEmail,
-            //claimed_at: new Date().toISOString()
+            status: "claimed and ready to retrieve",
+            approved_at: new Date().toISOString(),
+            approver_id: user.uid,
+            approver_email: user.email
         });
         
-        // Update user's items_claimed count
-        const userRef = doc(db, "User_Data", user.email);
-        await updateDoc(userRef, {
-            items_claimed: increment(1)
-        });
-        
-        alert("Claim submitted successfully! An administrator will review your request.");
-        window.location.href = "dashboard.html";
+        alert('Claim approved! Student can now pick up the item from the main office.');
+        window.location.href = "admin-dashboard.html";
         
     } catch (error) {
-        console.error("Error submitting claim:", error);
-        alert("Failed to submit claim. Please try again.");
-        
-        // Re-enable button
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Submit for review";
+        console.error("Error approving claim:", error);
+        alert('Failed to approve claim: ' + error.message);
     }
+}
+
+// Reject the claim
+async function rejectClaim() {
+    const reason = prompt('Enter reason for rejection (optional):');
+    
+    if (reason === null) {
+        return; // User cancelled
+    }
+    
+    try {
+        const user = auth.currentUser;
+        
+        // Update claim status
+        const claimRef = doc(db, "Claims", currentClaim.id);
+        await updateDoc(claimRef, {
+            status: "rejected",
+            reviewed_at: new Date().toISOString(),
+            reviewed_by: user.email,
+            reviewer_id: user.uid,
+            review_notes: reason || "Rejected - verification failed"
+        });
+        
+        // Update item status back to available
+        const itemRef = doc(db, "Item_Data", currentItem.id);
+        await updateDoc(itemRef, {
+            status: "available to claim",
+            receiver_id: "",
+            receiver_email: "",
+            claim_id: ""
+        });
+        
+        alert('Claim rejected. The item is now available again.');
+        window.location.href = "admin-dashboard.html";
+        
+    } catch (error) {
+        console.error("Error rejecting claim:", error);
+        alert('Failed to reject claim: ' + error.message);
+    }
+}
+
+// Helper: Format date
+function formatDate(isoString) {
+    if (!isoString) return 'Unknown date';
+    const date = new Date(isoString);
+    return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
 }
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    loadItemDetails();
-    
-    const submitBtn = document.querySelector('button.btn-orange');
-    if (submitBtn) {
-        submitBtn.addEventListener('click', submitClaim);
-    }
+    loadReviewData();
 });

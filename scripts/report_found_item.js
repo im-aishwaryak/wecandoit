@@ -60,13 +60,17 @@ const uploadData = async() => {
             // Add user tracking fields
             submitter_id: currentUser.uid,
             submitter_email: currentUser.email,
+            reciever_id: "",
+            reciever_email: "", 
+            approver_id: "",
+            approver_email: "",
             submitted_at: new Date().toISOString()
         }
     ); 
 }
 
 report_button.addEventListener("click", async (e) => {
-    e.preventDefault();   // 🔥 stops page reload
+    e.preventDefault();   // stops page reload
     await uploadData();
     alert("Item Report Submitted!")
     window.location.reload();
