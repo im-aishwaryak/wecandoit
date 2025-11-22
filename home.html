@@ -32,11 +32,11 @@
                 <img src="assets/icons/logo.svg" alt="Boomerang logo" width="138" height="26">
             </a>
 
-            <button id="menu-icon" aria-label="Toggle menu">
+            <button id="menu-icon" aria-label="Toggle main menu" aria-expanded="false" aria-controls="mainnav">
                 <img src="assets/icons/menu.svg" alt="Menu icon">
             </button>
 
-            <nav class="main-nav" aria-label="Main navigation">
+            <nav class="main-nav" id="mainnav" aria-label="Main navigation">
                 <a class="nav-link" href="home.html">Home</a>
                 <a class="nav-link" href="home.html#how-it-works">How it works</a>
                 <a class="nav-link nav-pill" href="log-in.html">Log in</a>
@@ -45,7 +45,7 @@
         </div>
     </header>
 
-    <main>
+    <main id="main-content">
         <!-- HERO -->
         <section class="hero section">
             <div class="container hero-inner">
@@ -58,13 +58,13 @@
                     <p class="hero-sub">Join Boomerang, a dashboard to keep track of lost items in your community</p>
 
                     <div class="hero-actions">
-                        <a class="btn btn-blue" href="sign-up.html">Sign up today!</a>
+                        <a class="btn btn-blue" href="sign-up.html" aria-label="Sign up for Boomerang today">Sign up today!</a>
                     </div>
                 </div>
 
                 <div class="hero-visual-wrap" aria-hidden="true">
                     <img class="hero-visual" src="assets/placeholders/hero-visual-placeholder.svg"
-                        alt="Boomerang dashboard preview">
+                        alt="Preview of the Boomerang dashboard showing lost item tracking">
                 </div>
             </div>
         </section>
@@ -72,31 +72,28 @@
         <!-- FEATURES / cards -->
         <section class="section features">
             <div class="container">
-                <h2 class="section-title" id="how-it-works">Lost <img src="assets/icons/logo-arrow.svg"> Found, Made
-                    Easy</h2>
+                <h2 class="section-title" id="how-it-works">Lost <img src="assets/icons/logo-arrow.svg" alt="Arrow icon"> Found, Made Easy</h2>
 
-                <div class="feature-grid" >
-                    <article class="feature-card" id = "browse_items">
+                <div class="feature-grid">
+                    <article class="feature-card" id="browse_items" role="button" tabindex="0" aria-label="Browse items">
                         <div class="feature-icon">
-                            <img src="assets/icons/folder-icon.png" alt="" aria-hidden="true">
+                            <img src="assets/icons/folder-icon.png" alt="Folder icon representing browsing items">
                         </div>
                         <h3>Browse Items</h3>
-                        <p>Search found items, detailed with category, date, location, and last place found.
-                        </p>
+                        <p>Search found items, detailed with category, date, location, and last place found.</p>
                     </article>
 
-                    <article class="feature-card" id = "report_found_items">
+                    <article class="feature-card" id="report_found_items" role="button" tabindex="0" aria-label="Report found items">
                         <div class="feature-icon">
-                            <img src="assets/icons/info-icon.png" alt="" aria-hidden="true">
+                            <img src="assets/icons/info-icon.png" alt="Information icon representing reporting found items">
                         </div>
                         <h3>Report Found Items</h3>
-                        <p>Found something? Upload a description and photo. We'll alert anyone who's reported it
-                            missing.</p>
+                        <p>Found something? Upload a description and photo. We'll alert anyone who's reported it missing.</p>
                     </article>
-                    
-                    <article class="feature-card" id = "report_lost_items">
+
+                    <article class="feature-card" id="report_lost_items" role="button" tabindex="0" aria-label="Claim lost items">
                         <div class="feature-icon">
-                            <img src="assets/icons/suitcase-icon.png" alt="" aria-hidden="true">
+                            <img src="assets/icons/suitcase-icon.png" alt="Suitcase icon representing claiming lost items">
                         </div>
                         <h3>Claim Lost Items</h3>
                         <p>Submit a request if you find your item. Requests will be sent to admin to review instantly.</p>
@@ -112,37 +109,30 @@
                     <h2 class="section-title">For Students</h2>
                     <div class="panel-grid">
                         <div class="panel-card">
-                            <h4>Never Lose Track Again</h4>
-                            <p>Get instant notifications when items matching your description are found, and claim them
-                                securely with student ID verification.</p>
+                            <h3>Never Lose Track Again</h3>
+                            <p>Get instant notifications when items matching your description are found, and claim them securely with student ID verification.</p>
                         </div>
                         <div class="panel-card">
-                            <h4>Be a Hero</h4>
-                            <p>Found something? You can make someone's day by reporting it in under 2 minutes and earn
-                                recognition badges.</p>
+                            <h3>Be a Hero</h3>
+                            <p>Found something? You can make someone's day by reporting it in under 2 minutes and earn recognition badges.</p>
                         </div>
                     </div>
                 </div>
-
-                <br><br><br>
 
                 <div class="panel">
                     <h2 class="section-title">For Staff &amp; Administration</h2>
                     <div class="panel-grid">
                         <div class="panel-card">
-                            <h4>Streamline Lost-and-Found Management</h4>
-                            <p>Organizes everything automatically, sends notifications, and tracks items from discovery
-                                to return.</p>
+                            <h3>Streamline Lost-and-Found Management</h3>
+                            <p>Organizes everything automatically, sends notifications, and tracks items from discovery to return.</p>
                         </div>
                         <div class="panel-card">
-                            <h4>Reduce Administrative Burden</h4>
-                            <p>Automatically archive items, generate donation lists with one click, and reduce front
-                                desk inquiries.</p>
+                            <h3>Reduce Administrative Burden</h3>
+                            <p>Automatically archive items, generate donation lists with one click, and reduce front desk inquiries.</p>
                         </div>
                         <div class="panel-card">
-                            <h4>Data-Driven Insights</h4>
-                            <p>See where items are most commonly lost, identify peak times, and make informed decisions
-                                about campus storage solutions.</p>
+                            <h3>Data-Driven Insights</h3>
+                            <p>See where items are most commonly lost, identify peak times, and make informed decisions about campus storage solutions.</p>
                         </div>
                     </div>
                 </div>
@@ -153,30 +143,29 @@
     <footer class="site-footer">
         <div class="container footer-inner">
             <div class="footer-brand">
-                <img src="assets/icons/logo-light.svg" alt="Boomerang mark" width="174" height="33">
+                <img src="assets/icons/logo-light.svg" alt="Boomerang logo mark" width="174" height="33">
             </div>
             <div class="copyright">© 2025 Boomerang. All rights reserved.</div>
         </div>
     </footer>
+
+    <script>
+        const toggle = document.querySelector(".nav-toggle");
+        const nav = document.querySelector(".main-nav");
+
+        toggle.addEventListener("click", () => {
+            nav.classList.toggle("open");
+            toggle.classList.toggle("open");
+        });
+
+        document.getElementById("report_found_items").addEventListener("click", () => {
+            window.location.href = "report-found-item.html";
+        });
+
+        document.getElementById("browse_items").addEventListener("click", () => {
+            window.location.href = "browse-items.html";
+        });
+    </script>
 </body>
-
-<script>
-    const toggle = document.querySelector(".nav-toggle");
-    const nav = document.querySelector(".main-nav");
-
-    toggle.addEventListener("click", () => {
-        nav.classList.toggle("open");
-        toggle.classList.toggle("open");
-    });
-
-    document.getElementById("report_found_items").addEventListener("click", () => {
-        window.location.href = "report-found-item.html";
-    });
-
-    document.getElementById("browse_items").addEventListener("click", () => {
-        window.location.href = "browse-items.html";
-    });
-
-</script>
 
 </html>
