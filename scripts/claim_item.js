@@ -229,10 +229,31 @@ async function submitClaim(e) {
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     loadItemDetails();
-   
+
     const submitBtn = document.querySelector('button.btn-orange');
     if (submitBtn) {
         submitBtn.addEventListener('click', submitClaim);
     }
+
+    // ---------------------- Autofill name & email ----------------------
+    auth.onAuthStateChanged(user => {
+        if (!user) return; // no user logged in
+
+        const nameInput = document.getElementById('student-name');
+        const emailInput = document.getElementById('student-email');
+
+        // Fill email
+        if (emailInput) emailInput.value = user.email || "";
+
+        // Fill name from displayName or fallback to email prefix
+        if (nameInput) {
+            if (user.displayName) {
+                nameInput.value = user.displayName;
+            } else {
+                const defaultName = user.email ? user.email.split('@')[0] : "";
+                nameInput.value = defaultName;
+            }
+        }
+    });
 });
 

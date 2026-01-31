@@ -54,8 +54,8 @@
             <nav class="main-nav" aria-label="Main navigation">
                 <a class="nav-link" href="browse-items.html">Browse items</a>
                 <a class="nav-link" href="report-found-item.html">Report found item</a>
-                
-                <a class="nav-link nav-pill" id="nav-current" href= "#">Dashboard</a>
+
+                <a class="nav-link nav-pill" id="nav-current" href="#">Dashboard</a>
 
                 <script>
                     const userStatus = localStorage.getItem("user_identity")
@@ -68,7 +68,8 @@
                     }   
                 </script>
 
-                <a class="nav-link nav-cta" href="log-in.html">Log out</a>
+                <a class="nav-link nav-cta" href="log-in.html">Log out <span id="log-in-email"
+                        class="log-in-email-placeholder">0000000@apps.nsd.org</span></a>
             </nav>
         </div>
     </header>
@@ -244,6 +245,35 @@
     </main>
 
     <script type="module" src="scripts/protect-auth.js"></script>
+    <script type="module">
+        import { auth } from './scripts/firebaseModule.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const emailSpan = document.getElementById("log-in-email");
+            const navLink = document.querySelector('a.nav-cta');
+
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // Fill the span with the logged-in email
+                    if (emailSpan) emailSpan.textContent = user.email;
+
+                    // Optional: update nav link text and handle sign-out
+                    if (navLink) {
+                        navLink.href = "#"; // prevent default redirect
+                        navLink.addEventListener("click", async (e) => {
+                            e.preventDefault();
+                            await auth.signOut();
+                            window.location.href = "log-in.html";
+                        });
+                    }
+                } else {
+                    // No user signed in
+                    if (emailSpan) emailSpan.textContent = "Not logged in";
+                    if (navLink) navLink.href = "log-in.html";
+                }
+            });
+        });
+    </script>
 
     <footer class="site-footer">
         <div class="container footer-inner">

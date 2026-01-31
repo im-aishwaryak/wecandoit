@@ -55,7 +55,8 @@
                 </script>
 
 
-                <a class="nav-link nav-cta" href="log-in.html">Log out</a>
+                <a class="nav-link nav-cta" href="log-in.html">Log out <span id="log-in-email"
+                    class="log-in-email-placeholder">0000000@apps.nsd.org</span></a>
             </nav>
         </div>
     </header>
@@ -64,10 +65,11 @@
         <section class="form-container">
 
             <div class="form-header">
-                <h1 class="title-w-icon">Report a found item<img src="assets/icons/suitcase-icon.png" height="43px">
+                <h1 class="title-w-icon">Report found item<img src="assets/icons/suitcase-icon.png" height="43px">
                 </h1>
                 <p class="subtitle">
-                    Fill out this form to report an item you found. It will be reviewed by an administrator before being
+                    Fill out this form to report a lost item you found. It will be reviewed by an administrator before
+                    being
                     posted.
                     <span class="required">*</span>&nbsp;<b>Indicates required response.</b>
                 </p>
@@ -94,21 +96,21 @@
                 </div>
 
                 <!-- Public description -->
-                <div class="form-group">
+                <!--<div class="form-group">
                     <label class="form-label">Public description <span class="required">*</span></label>
                     <p class="form-hint">
                         Keep it <u>vague</u>. Don't include specific brands or identifying details.
                     </p>
                     <input class="input" id="public_desc" placeholder="Example: Dark colored backpack" />
-                </div>
+                </div>-->
 
                 <!-- Private description -->
-                <div class="form-group">
+                <!--<div class="form-group">
                     <label class="form-label">Private description <span class="required">*</span></label>
                     <p class="form-hint">Keep it <u>specific</u>. Include all details.</p>
                     <textarea class="input input-textarea" id="private_desc"
                         placeholder="Example: Gray North Face backpack..."></textarea>
-                </div>
+                </div>-->
 
                 <!-- Location -->
                 <div class="form-group">
@@ -142,42 +144,150 @@
                     <!-- Question 1 -->
                     <div class="verification-section">
                         <div class="input-field">
-                            <label for="question1">Question 1 <span class="required">*</span></label>
-                            <input type="text" id="question1" placeholder="Example: What color is the inside lining?"
-                                required>
+                            <label class="drop-down">Question 1 <span class="required">*</span></label>
+
+                            <select id="question1-select" required>
+                                <option value="" disabled selected>Select a question</option>
+
+                                <option value="What color is the item?">
+                                    What color is the item?
+                                </option>
+
+                                <option value="What brand name or logo is on the item (if any)?">
+                                    What brand name or logo is on the item (if any)?
+                                </option>
+
+                                <option value="What material is the item made of?">
+                                    What material is the item made of?
+                                </option>
+
+                                <option value="Is there anything inside or attached to the item? If so, what?">
+                                    Is there anything inside or attached to the item? If so, what?
+                                </option>
+
+                                <option value="Does the item have any writing, stickers, or markings on it?">
+                                    Does the item have any writing, stickers, or markings on it?
+                                </option>
+
+                                <option value="Are there any unique features or damage on the item?">
+                                    Are there any unique features or damage on the item?
+                                </option>
+
+                                <option value="custom">Custom question…</option>
+                            </select>
+
+                            <!-- hidden by default -->
+                            <input type="text" id="question1-custom" placeholder="Enter your custom question"
+                                style="display:none; margin-top:8px;" />
                         </div>
+
                         <br>
+
                         <div class="input-field">
                             <label for="answer1">Answer 1 <span class="required">*</span></label>
-                            <input type="text" id="answer1" placeholder="Example: blue" required>
+                            <input type="text" id="answer1" required>
                         </div>
                     </div>
+
 
                     <!-- Question 2 -->
                     <div class="verification-section">
                         <div class="input-field">
-                            <label for="question2">Question 2 <span class="required">*</span></label>
-                            <input type="text" id="question2" placeholder="Example: What brand is it?" required>
+                            <label class="drop-down">Question 2 <span class="required">*</span></label>
+
+                            <select id="question2-select" required>
+
+                                <option value="" disabled selected>Select a question</option>
+
+                                <option value="What color is the item?">
+                                    What color is the item?
+                                </option>
+
+                                <option value="What brand name or logo is on the item (if any)?">
+                                    What brand name or logo is on the item (if any)?
+                                </option>
+
+                                <option value="What material is the item made of?">
+                                    What material is the item made of?
+                                </option>
+
+                                <option value="Is there anything inside or attached to the item? If so, what?">
+                                    Is there anything inside or attached to the item? If so, what?
+                                </option>
+
+                                <option value="Does the item have any writing, stickers, or markings on it?">
+                                    Does the item have any writing, stickers, or markings on it?
+                                </option>
+
+                                <option value="Are there any unique features or damage on the item?">
+                                    Are there any unique features or damage on the item?
+                                </option>
+
+                                <option value="custom">Custom question…</option>
+                            </select>
+
+                            <!-- hidden by default -->
+                            <input type="text" id="question2-custom" placeholder="Enter your custom question"
+                                style="display:none; margin-top:8px;" />
                         </div>
+
                         <br>
+
                         <div class="input-field">
                             <label for="answer2">Answer 2 <span class="required">*</span></label>
-                            <input type="text" id="answer2" placeholder="Example: north face" required>
+                            <input type="text" id="answer2" required>
                         </div>
                     </div>
+
 
                     <!-- Question 3 -->
                     <div class="verification-section">
                         <div class="input-field">
-                            <label for="question3">Question 3</label>
-                            <input type="text" id="question3" placeholder="Example: What's in the front pocket?">
+                            <label class="drop-down">Question 3 <span class="required">*</span></label>
+
+                            <select id="question3-select" required>
+                                <option value="" disabled selected>Select a question</option>
+
+                                <option value="What color is the item?">
+                                    What color is the item?
+                                </option>
+
+                                <option value="What brand name or logo is on the item (if any)?">
+                                    What brand name or logo is on the item (if any)?
+                                </option>
+
+                                <option value="What material is the item made of?">
+                                    What material is the item made of?
+                                </option>
+
+                                <option value="Is there anything inside or attached to the item? If so, what?">
+                                    Is there anything inside or attached to the item? If so, what?
+                                </option>
+
+                                <option value="Does the item have any writing, stickers, or markings on it?">
+                                    Does the item have any writing, stickers, or markings on it?
+                                </option>
+
+                                <option value="Are there any unique features or damage on the item?">
+                                    Are there any unique features or damage on the item?
+                                </option>
+
+                                <option value="custom">Custom question…</option>
+                            </select>
+
+                            <!-- hidden by default -->
+                            <input type="text" id="question3-custom" placeholder="Enter your custom question"
+                                style="display:none; margin-top:8px;" />
                         </div>
+
                         <br>
+
                         <div class="input-field">
-                            <label for="answer3">Answer 3</label>
-                            <input type="text" id="answer3" placeholder="Example: kpop photocards">
+                            <label for="answer3">Answer 3 <span class="required">*</span></label>
+                            <input type="text" id="answer3" required>
                         </div>
                     </div>
+
                 </div>
 
 
@@ -199,6 +309,35 @@
     </script>
     <script type="module" src="scripts/protect-auth.js"></script>
     <script type="module" src="scripts/report_found_item.js"></script>
+    <script type="module">
+        import { auth } from './scripts/firebaseModule.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const emailSpan = document.getElementById("log-in-email");
+            const navLink = document.querySelector('a.nav-cta');
+
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // Fill the span with the logged-in email
+                    if (emailSpan) emailSpan.textContent = user.email;
+
+                    // Optional: update nav link text and handle sign-out
+                    if (navLink) {
+                        navLink.href = "#"; // prevent default redirect
+                        navLink.addEventListener("click", async (e) => {
+                            e.preventDefault();
+                            await auth.signOut();
+                            window.location.href = "log-in.html";
+                        });
+                    }
+                } else {
+                    // No user signed in
+                    if (emailSpan) emailSpan.textContent = "Not logged in";
+                    if (navLink) navLink.href = "log-in.html";
+                }
+            });
+        });
+    </script>
 
     <footer class="site-footer">
         <div class="container footer-inner">
