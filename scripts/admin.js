@@ -104,7 +104,7 @@ async function loadReadyToClaim() {
                 <p class="item-location" style="padding-bottom: 5px;"></p>
                 <p class="item-location" style="padding-bottom: 5px;">Approved on ${formatDate(claim.approved_at)}</p>
             </div>
-            <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
+            <!--<button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>-->
             <button class="btn btn-blue btn-sm mark-retrieved" data-claim-id="${claimDoc.id}">Item Retrieved</button>
         `;
        
@@ -162,7 +162,7 @@ async function loadPendingRetrievalRequests() {
                 <h4>${claim.item_name}</h4>
                 <p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(claim.date_found)}</p>
             </div>
-            <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
+            <!--<button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>-->
             <a href="review-claim.html?id=${claimDoc.id}"><button class="btn btn-blue btn-sm">Review</button></a>
         `;
        
@@ -211,7 +211,7 @@ async function loadPendingSubmissions() {
                 <p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(item.date_found)} </p>
                 <p class="item-location">Found in ${item.location_found}</p>
             </div>
-            <button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>
+            <!--<button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>-->
             <button class="btn btn-blue btn-sm approve-item" data-item-id="${itemDoc.id}">Approve</button>
         `;
        
@@ -271,7 +271,7 @@ async function loadFoundItems() {
                 <p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(item.date_found)} </p>
                 <p class="item-location">Found in ${item.location_found}</p>
             </div>
-            <button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>
+            <!--<button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>-->
         `;
        
         card.dataset.itemData = JSON.stringify(item);
@@ -322,7 +322,7 @@ async function loadReunitedItems() {
                 <p class="item-location">Submitted on ${formatDate(claim.date_found)} </p>
                 <p class="item-location">Retrieved on ${formatDate(claim.date_found)}</p>
             </div>
-            <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
+            <!--<button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>-->
         `;
        
         card.dataset.claimData = JSON.stringify(claim);

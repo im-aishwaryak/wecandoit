@@ -532,7 +532,7 @@ async function loadReadyToClaim() {
                 <p class="item-location" style="padding-bottom: 5px;"></p>
                 <p class="item-location" style="padding-bottom: 5px;">Approved on ${formatDate(claim.reviewed_at)}</p>
             </div>
-            <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
+            <!--<button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>-->
         `;
        
         card.dataset.claimData = JSON.stringify(claim);
@@ -586,7 +586,7 @@ async function loadPendingRetrievalRequests() {
                 <h4>${claim.item_name}</h4>
                 <p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(claim.lost_date)}</p>
             </div>
-            <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
+            <!--<button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>-->
         `;
        
         card.dataset.claimData = JSON.stringify(claim);
@@ -638,7 +638,7 @@ async function loadPendingSubmissions() {
                 <p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(item.date_found)} </p>
                 <p class="item-location">Found in ${item.location_found}</p>
             </div>
-            <button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>
+            <!--<button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>-->
         `;
        
         card.dataset.itemData = JSON.stringify(item);
@@ -696,7 +696,7 @@ async function loadFoundItems() {
                 <p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(item.date_found)} </p>
                 <p class="item-location">Found in ${item.location_found}</p>
             </div>
-            <button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>
+            <!--<button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>-->
         `;
        
         card.dataset.itemData = JSON.stringify(item);
