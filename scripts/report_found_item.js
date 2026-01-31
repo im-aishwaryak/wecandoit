@@ -5,6 +5,44 @@ import {
 } from './firebaseModule.js';
 
 
+// aishwarya changes 1/31
+
+function getQuestionValue(num) {
+  const select = document.getElementById(`question${num}-select`);
+  const custom = document.getElementById(`question${num}-custom`);
+
+  if (!select) return "";
+
+  if (select.value === "custom") {
+    return custom.value.trim();
+  }
+  return select.value;
+}
+
+function setupQuestionDropdown(num) {
+  const select = document.getElementById(`question${num}-select`);
+  const custom = document.getElementById(`question${num}-custom`);
+
+  if (!select || !custom) return;
+
+  select.addEventListener("change", () => {
+    custom.style.display = select.value === "custom" ? "block" : "none";
+  });
+}
+
+setupQuestionDropdown(1);
+setupQuestionDropdown(2);
+setupQuestionDropdown(3);
+
+
+
+
+
+
+
+
+
+
 const report_button = document.getElementById("submit-button")
 
 
@@ -22,8 +60,8 @@ const uploadData = async() => {
    
     var category = document.getElementById("category").value;
     var item_name = document.getElementById("item").value;
-    var public_desc = document.getElementById("public_desc").value;
-    var private_desc = document.getElementById("private_desc").value;
+    var public_desc = ""; //document.getElementById("public_desc").value;
+    var private_desc = ""; //document.getElementById("private_desc").value;
     var location = document.getElementById("location").value;
     var date = document.getElementById("date").value;
     var time = document.getElementById("time").value;
@@ -32,14 +70,14 @@ const uploadData = async() => {
     var image_url = await uploadImage()
 
 
-    var q1 = document.getElementById("question1").value
+    var q1 = getQuestionValue(1);
     var a1 = document.getElementById("answer1").value
    
-    var q2 = document.getElementById("question2").value
+    var q2 = getQuestionValue(2);
     var a2 = document.getElementById("answer2").value
 
 
-    var q3 = document.getElementById("question3").value
+    var q3 = getQuestionValue(3);
     var a3 = document.getElementById("answer3").value
 
 

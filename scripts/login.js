@@ -18,12 +18,12 @@ signOut(auth)
 
 
 
-const logInGoogleButton = document.getElementById("google-auth btn");
+//const logInGoogleButton = document.getElementById("google-auth btn");
 const logInEmailButton = document.getElementById("email log-in")
 
 
 
-
+/*
 const userGoogleLogIn = async () => {
     signInWithPopup(auth, provider)
         .then((result) => {
@@ -45,7 +45,7 @@ const userGoogleLogIn = async () => {
             const errorCode = error.code;
             const errorMessage = error.message;
         })
-}
+}*/
 
 
 const userEmailLogIn = async () => {
@@ -114,7 +114,7 @@ const userEmailLogIn = async () => {
 
 
 
-logInGoogleButton.addEventListener('click', userGoogleLogIn)
+//logInGoogleButton.addEventListener('click', userGoogleLogIn)
 logInEmailButton.addEventListener('click', userEmailLogIn)
 
 

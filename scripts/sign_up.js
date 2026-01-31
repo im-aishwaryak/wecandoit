@@ -11,14 +11,14 @@ import {
 
 let user;
 let user_status;
-const signInGoogleButton = document.getElementById("google-auth sign-in");
+//const signInGoogleButton = document.getElementById("google-auth sign-in");
 const signInEmailButton = document.getElementById("email sign-up")
 
 
 
 
 
-
+/*
 const userGoogleSignIn = async () => {
     signInWithPopup(auth, provider)
         .then((result) => {
@@ -38,7 +38,7 @@ const userGoogleSignIn = async () => {
             const errorCode = error.code;
             const errorMessage = error.message;
         })
-}
+}*/
 
 
 const userEmailSignIn = async () => {
@@ -72,7 +72,7 @@ const userEmailSignIn = async () => {
 
 
 
-signInGoogleButton.addEventListener('click', userGoogleSignIn)
+//signInGoogleButton.addEventListener('click', userGoogleSignIn)
 signInEmailButton.addEventListener('click', userEmailSignIn)
 
 
