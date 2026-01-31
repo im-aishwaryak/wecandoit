@@ -88,6 +88,24 @@ const userEmailLogIn = async () => {
   .catch((error) => {
     const errorCode = error.code;
     const errorMessage = error.message;
+    console.log(errorCode)
+    switch (errorCode) {
+      case "auth/user-not-found":
+        alert("No account found with that email.");
+        break;
+  
+      case "auth/invalid-credential":
+        alert("Incorrect email or password. Try again.");
+        break;
+  
+  
+      case "auth/too-many-requests":
+        alert("Too many attempts. Try again later.");
+        break;
+  
+      default:
+        alert("Login failed. Please try again.");
+    }
   });
 }
 
