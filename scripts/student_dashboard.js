@@ -1,4 +1,4 @@
-import { db, auth, collection, query, where, getDocs } from './firebaseModule.js';
+/* import { db, auth, collection, query, where, getDocs } from './firebaseModule.js';
 
 // Wait for auth state
 // Wait for auth to be ready, then load data
@@ -126,7 +126,7 @@ async function loadReadyToClaim(userId) {
     existingCards.forEach(card => card.remove());
 
     if (snapshot.empty) {
-        console.log("⚠️ [READY_TO_CLAIM] No items found - showing empty message");
+        console.log("[READY_TO_CLAIM] No items found - showing empty message");
         const emptyMsg = document.createElement('p');
         emptyMsg.className = 'subtitle';
         emptyMsg.textContent = 'No items ready for pickup yet.';
@@ -189,6 +189,7 @@ async function loadReadyToClaim(userId) {
 
 // Load pending retrieval requests
 async function loadPendingRetrievalRequests(userId) {
+    console.log("loading pending retrivals...")
     const claimsRef = collection(db, "Claims");
     const q = query(
         claimsRef,
@@ -446,3 +447,279 @@ window.populateClaimedModal = function(claimData, claimId) {
         additionalInfo.textContent = claimData.additional_notes || 'No additional notes.';
     }
 };
+*/ 
+
+
+
+import {
+    db, auth,
+    collection, query, where, getDocs, doc, updateDoc
+} from './firebaseModule.js';
+
+let user = ""; 
+// Load student dashboard data
+async function loadStudentDashboard() {
+    user = auth.currentUser;
+    if (!user) {
+        console.error("No user logged in");
+        return;
+    }
+   
+    console.log("Loading student dashboard for:", user.email);
+   
+    try {
+        await Promise.all([
+            loadReadyToClaim(),
+            loadPendingRetrievalRequests(), //someone filled out claim form, admin must approve.
+            loadPendingSubmissions(), //someone filled out report found item form, admin must approve
+            loadFoundItems(), //found items available for people to claim
+        ]);
+    } catch (error) {
+        console.error("Error loading student dashboard:", error);
+    }
+}
+
+
+ //Load items ready to claim (approved claims waiting pickup)
+async function loadReadyToClaim() {
+    console.log("ready to claim being loaded.... ")
+    const claimsRef = collection(db, "Claims");
+    const q = query(
+        claimsRef,
+        where("claimant_email", "==", user.email),
+        where("status", "==", "approved")
+    );
+    const snapshot = await getDocs(q);
+   
+    const targetTitle = Array.from(document.querySelectorAll(".items-section"))
+    .find(section => section.querySelector("h2")?.textContent.trim() === "Ready to Claim");
+
+
+    const container = targetTitle?.closest(".items-section");
+   
+    if (!container){
+        console.log("ts pmo")
+        return;
+    }
+        
+   
+    // Clear existing cards
+    const existingCards = container.querySelectorAll('.dashboard-item-card');
+    existingCards.forEach(card => card.remove());
+   
+    if (snapshot.empty) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'subtitle';
+        emptyMsg.textContent = 'No items waiting for pickup.';
+        container.appendChild(emptyMsg);
+        return;
+    }
+   
+    for (const claimDoc of snapshot.docs) {
+        const claim = claimDoc.data();
+       
+        // Calculate pickup deadline
+        const approvedDate = new Date(claim.reviewed_at);
+        const pickupDeadline = new Date(approvedDate);
+        pickupDeadline.setDate(pickupDeadline.getDate() + 7);
+       
+        const card = document.createElement('div');
+        card.className = 'dashboard-item-card';
+        card.innerHTML = `
+            <img src="${claim.item_image || 'assets/placeholders/lost-item1.jpg'}" class="dashboard-item-img">
+            <div class="dashboard-item-info">
+                <h4>${claim.item_name}</h4>
+                <p class="item-location" style="padding-bottom: 5px;"></p>
+                <p class="item-location" style="padding-bottom: 5px;">Approved on ${formatDate(claim.reviewed_at)}</p>
+            </div>
+            <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
+        `;
+       
+        card.dataset.claimData = JSON.stringify(claim);
+        container.appendChild(card);
+    }
+}
+
+
+
+
+
+// Load pending retrieval requests (claims waiting approval)
+async function loadPendingRetrievalRequests() {
+    const claimsRef = collection(db, "Claims");
+    const q = query(
+        claimsRef,
+        where("claimant_email", "==", user.email),
+        where("status", "==", "pending")
+    );
+   
+    const snapshot = await getDocs(q);
+    const targetTitle = Array.from(document.querySelectorAll(".subsection-title"))
+    .find(el => el.textContent.trim() === "Item Retrieval Requests");
+
+
+    const container = targetTitle?.closest(".items-section");
+   
+    if (!container) return;
+   
+    // Clear existing cards
+    const existingCards = container.querySelectorAll('.dashboard-item-card');
+    existingCards.forEach(card => card.remove());
+   
+    if (snapshot.empty) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'subtitle';
+        emptyMsg.textContent = 'No pending retrieval requests.';
+        emptyMsg.style.marginTop = '10px';
+        container.appendChild(emptyMsg);
+        return;
+    }
+   
+    for (const claimDoc of snapshot.docs) {
+        const claim = claimDoc.data();
+       
+        const card = document.createElement('div');
+        card.className = 'dashboard-item-card';
+        card.innerHTML = `
+            <img src="${claim.item_image || 'assets/placeholders/lost-item1.jpg'}" class="dashboard-item-img">
+            <div class="dashboard-item-info">
+                <h4>${claim.item_name}</h4>
+                <p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(claim.lost_date)}</p>
+            </div>
+            <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
+        `;
+       
+        card.dataset.claimData = JSON.stringify(claim);
+        container.appendChild(card);
+    }
+}
+
+
+// Load pending item submissions (items waiting approval)
+async function loadPendingSubmissions() {
+    const itemsRef = collection(db, "Item_Data");
+    const q = query(
+        itemsRef,
+        where("submitter_email", "==", user.email),
+        where("status", "==", "pending submission")
+    );
+   
+    const snapshot = await getDocs(q);
+    const targetTitle = Array.from(document.querySelectorAll(".subsection-title"))
+    .find(el => el.textContent.trim() === "Item Submission Requests");
+
+
+    const container = targetTitle?.closest(".items-section");
+   
+    if (!container) return;
+   
+    // Clear existing cards
+    const existingCards = container.querySelectorAll('.dashboard-item-card');
+    existingCards.forEach(card => card.remove());
+   
+    if (snapshot.empty) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'subtitle';
+        emptyMsg.textContent = 'No pending item submissions.';
+        emptyMsg.style.marginTop = '10px';
+        container.appendChild(emptyMsg);
+        return;
+    }
+   
+    snapshot.docs.forEach(itemDoc => {
+        const item = itemDoc.data();
+       
+        const card = document.createElement('div');
+        card.className = 'dashboard-item-card';
+        card.innerHTML = `
+            <img src="${item.image_url || 'assets/placeholders/lost-item1.jpg'}" class="dashboard-item-img">
+            <div class="dashboard-item-info">
+                <h4>${item.item_name || item.category}</h4>
+                <p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(item.date_found)} </p>
+                <p class="item-location">Found in ${item.location_found}</p>
+            </div>
+            <button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>
+        `;
+       
+        card.dataset.itemData = JSON.stringify(item);
+        container.appendChild(card);
+    });
+   
+}
+
+
+// Load found items (approved and available)
+async function loadFoundItems() {
+    const claimsRef = collection(db, "Item_Data");
+
+    // Query: Items where user is the recipient/claimant
+    const q = query(
+        claimsRef,
+        where("reciever_id", "==", user.email)
+    );
+
+   
+    const snapshot = await getDocs(q);
+    const targetTitle = Array.from(document.querySelectorAll(".subsection-title"))
+    .find(el => el.textContent.trim() === "Found Items");
+
+
+    const container = targetTitle?.closest(".items-section");
+   
+    if (!container) return;
+   
+    // Clear existing cards (keep title and subtitle)
+    const existingCards = container.querySelectorAll('.dashboard-item-card');
+    existingCards.forEach(card => card.remove());
+   
+    if (snapshot.empty) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'subtitle';
+        emptyMsg.textContent = 'No available items currently listed.';
+        emptyMsg.style.marginTop = '10px';
+        container.appendChild(emptyMsg);
+        return;
+    }
+   
+    // Show only first 5 items
+    const itemsToShow = snapshot.docs.slice(0, 5);
+   
+    itemsToShow.forEach(itemDoc => {
+        const item = itemDoc.data();
+       
+        const card = document.createElement('div');
+        card.className = 'dashboard-item-card';
+        card.innerHTML = `
+            <img src="${item.image_url || 'assets/placeholders/lost-item1.jpg'}" class="dashboard-item-img">
+            <div class="dashboard-item-info">
+                <h4>${item.item_name || item.category}</h4>
+                <p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(item.date_found)} </p>
+                <p class="item-location">Found in ${item.location_found}</p>
+            </div>
+            <button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>
+        `;
+       
+        card.dataset.itemData = JSON.stringify(item);
+        container.appendChild(card);
+    });
+}
+
+
+
+
+
+
+// Helper: Format date
+function formatDate(isoString) {
+    if (!isoString) return 'Unknown date';
+    const date = new Date(isoString);
+    return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+}
+
+
+// Initialize when auth is ready
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        loadStudentDashboard();
+    }
+});

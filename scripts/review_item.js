@@ -24,7 +24,7 @@ async function loadReviewData() {
     }
    
     try {
-        // Load claim
+        // Load Item Data
         const itemRef = doc(db, "Item_Data", itemId);
         const itemSnap = await getDoc(itemRef);
        
