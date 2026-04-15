@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Dashboard - Boomerang</title>
+
+    <!-- Figtree font -->
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="icon" href="assets/icons/logo-icon.png" type="image/x-icon">
+</head>
+
+<body>
+
+    <!-- ================== JS ================== -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            /* MOBILE NAV */
+            const menuIcon = document.getElementById("menu-icon");
+            const nav = document.querySelector(".main-nav");
+
+            menuIcon.addEventListener("click", () => {
+                nav.classList.toggle("show");
+            });
+
+            /* ========= MODAL LOGIC WITH EVENT DELEGATION ========= */
+            const reportedModal = document.getElementById("reported-details-modal");
+            const claimedModal = document.getElementById("claimed-details-modal");
+
+            // Use event delegation on the document
+            document.addEventListener("click", (e) => {
+                // Check if clicked element is a "View Details" button
+                if (e.target.matches("[data-modal='reported']")) {
+                    if (reportedModal) {
+                        const card = e.target.closest('.dashboard-item-card');
+                        if (card && card.dataset.itemData) {
+                            const itemData = JSON.parse(card.dataset.itemData);
+                            const itemId = card.dataset.itemId;
+                            window.populateReportedModal(itemData, itemId); // Call the populate function
+                        }
+                        reportedModal.classList.remove("hidden");
+                    }
+                }
+
+                if (e.target.matches("[data-modal='claimed']")) {
+                    if (claimedModal) {
+                        const card = e.target.closest('.dashboard-item-card');
+                        if (card && card.dataset.claimData) {
+                            const claimData = JSON.parse(card.dataset.claimData);
+                            const claimId = card.dataset.claimId;
+                            window.populateClaimedModal(claimData, claimId); // Call the populate function
+                        }
+                        claimedModal.classList.remove("hidden");
+                    }
+                }
+            });
+
+            /* Close Buttons */
+            document.querySelectorAll(".details-modal-close").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    btn.closest(".details-modal").classList.add("hidden");
+                });
+            });
+        });
+    </script>
+
+    <script type="module" src="scripts/dashboard-init.js"></script>
+
+    <!-- ================= HEADER ================= -->
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="logo" aria-label="Boomerang home">
+                <img src="assets/icons/logo.svg" alt="Boomerang logo" width="138" height="26">
+            </a>
+
+            <button id="menu-icon" aria-label="Toggle menu">
+                <img src="assets/icons/menu.svg" alt="Menu icon">
+            </button>
+
+            <nav class="main-nav" aria-label="Main navigation">
+                <a class="nav-link" href="browse-items.html">Browse items</a>
+                <a class="nav-link" href="report-found-item.html">Report found item</a>
+                <a class="nav-link nav-pill" id="nav-current" href="dashboard.html">Dashboard</a>
+                <a class="nav-link nav-cta" href="log-in.html">Log out <span id="log-in-email"
+                        class="log-in-email-placeholder">0000000@apps.nsd.org</span></a>
+            </nav>
+        </div>
+    </header>
+
+
+    <!-- ================= MAIN ================= -->
+    <main>
+
+        <h1>Accessibility Settings</h1>
+
+        <!-- Visual -->
+
+            <div class="a11y-row">
+                <div>
+                    <div class="form-label">High contrast mode</div>
+                    <div class="form-hint">Increases contrast between text and background</div>
+                </div>
+                <label class="a11y-toggle">
+                    <input type="checkbox" id="high-contrast" />
+                    <span class="a11y-slider"></span>
+                </label>
+            </div>
+
+            <div class="a11y-row">
+                <div>
+                    <div class="form-label">Color blind mode</div>
+                </div>
+                <select id="colorblind" class="input">
+                    <option value="none">None</option>
+                    <option value="deuteranopia">Deuteranopia (red/green)</option>
+                    <option value="protanopia">Protanopia (red)</option>
+                    <option value="tritanopia">Tritanopia (blue/yellow)</option>
+                </select>
+            </div>
+
+            <div class="a11y-row a11y-range-row">
+                <div class="a11y-range-top">
+                    <div class="form-label">Font size</div>
+                    <span id="font-size-val" class="a11y-range-val">100%</span>
+                </div>
+                <input type="range" id="font-size" min="80" max="150" step="5" value="100" />
+            </div>
+
+            <div class="a11y-row">
+                <div>
+                    <div class="form-label">Highlight links</div>
+                    <div class="form-hint">Underlines and bolds all links</div>
+                </div>
+                <label class="a11y-toggle">
+                    <input type="checkbox" id="highlight-links" />
+                    <span class="a11y-slider"></span>
+                </label>
+            </div>
+
+            <div class="a11y-row">
+                <div>
+                    <div class="form-label">Reduce motion</div>
+                    <div class="form-hint">Minimises animations and transitions</div>
+                </div>
+                <label class="a11y-toggle">
+                    <input type="checkbox" id="reduce-motion" />
+                    <span class="a11y-slider"></span>
+                </label>
+            </div>
+
+            <div class="a11y-row">
+                <div>
+                    <div class="form-label">Disable parallax</div>
+                    <div class="form-hint">Prevents scroll-based depth effects</div>
+                </div>
+                <label class="a11y-toggle">
+                    <input type="checkbox" id="disable-parallax" />
+                    <span class="a11y-slider"></span>
+                </label>
+            </div>
+        
+            <div class="a11y-row">
+                <div>
+                    <div class="form-label">Dyslexia-friendly font</div>
+                    <div class="form-hint">Uses a specialised font to aid reading</div>
+                </div>
+                <label class="a11y-toggle">
+                    <input type="checkbox" id="dyslexia-font" />
+                    <span class="a11y-slider"></span>
+                </label>
+            </div>
+
+            <div class="a11y-row a11y-range-row">
+                <div class="a11y-range-top">
+                    <div class="form-label">Line spacing</div>
+                    <span id="line-spacing-val" class="a11y-range-val">Normal</span>
+                </div>
+                <input type="range" id="line-spacing" min="1" max="3" step="1" value="2" />
+            </div>
+
+            <div class="a11y-row a11y-range-row">
+                <div class="a11y-range-top">
+                    <div class="form-label">Letter spacing</div>
+                    <span id="letter-spacing-val" class="a11y-range-val">Normal</span>
+                </div>
+                <input type="range" id="letter-spacing" min="1" max="3" step="1" value="2" />
+            </div>
+
+            <div class="a11y-row">
+                <div>
+                    <div class="form-label">Reading guide</div>
+                    <div class="form-hint">Highlights the line under your cursor</div>
+                </div>
+                <label class="a11y-toggle">
+                    <input type="checkbox" id="reading-guide" />
+                    <span class="a11y-slider"></span>
+                </label>
+            </div>
+
+        </div>
+
+        <!-- Actions -->
+        <div class="a11y-actions">
+            <button class="btn btn-orange" id="save-btn">Save settings</button>
+            <button class="btn btn-blue" id="reset-btn">Reset to defaults</button>
+        </div>
+        <p id="saved-msg" class="a11y-saved-msg" aria-live="polite"></p>
+
+        <script src="accessibility-settings.js"></script>
+
+    </main>
+
+
+
+
+    <script type="module" src="scripts/student_dashboard.js"></script>
+    <script type="module" src="scripts/logout.js"></script> <!-- Add this -->
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <img src="assets/icons/logo-light.svg" width="174">
+            <div class="copyright">© 2025 Boomerang. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { auth } from './scripts/firebaseModule.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const emailSpan = document.getElementById("log-in-email");
+            const navLink = document.querySelector('a.nav-cta');
+
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // Fill the span with the logged-in email
+                    if (emailSpan) emailSpan.textContent = user.email;
+
+                    // Optional: update nav link text and handle sign-out
+                    if (navLink) {
+                        navLink.href = "#"; // prevent default redirect
+                        navLink.addEventListener("click", async (e) => {
+                            e.preventDefault();
+                            await auth.signOut();
+                            window.location.href = "log-in.html";
+                        });
+                    }
+                } else {
+                    // No user signed in
+                    if (emailSpan) emailSpan.textContent = "Not logged in";
+                    if (navLink) navLink.href = "log-in.html";
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -37,6 +37,7 @@
 }
 
 /* ==================== BASE RESET ==================== */
+
 * {
     box-sizing: border-box;
 }
@@ -96,7 +97,7 @@ h1 {
 }
 
 .hero-title {
-    font-size: 44px;
+    font-size: 46px;
     margin: 0 0 12px 0;
     line-height: 1.0;
     color: var(--text);
@@ -104,10 +105,14 @@ h1 {
 
 .hero-title em {
     font-style: italic;
+    background: radial-gradient(#EB7222, #F4B890);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
 }
 
 .hero-sub {
-    font-size: 18px;
+    font-size: 24px;
     color: var(--text);
     margin: 0 0 18px 0;
 }
@@ -155,7 +160,15 @@ h1 {
     font-size: 14px;
     border: none;
     cursor: pointer;
-    transition: 0.25s ease;
+    transition: 0.5s ease;
+    border-top: 2px solid #ffffff20;
+    border-bottom: 2px solid #00000020;
+}
+
+.btn-large {
+    padding: 17px 25px;
+    border-radius: 18px;
+    font-size: 20px;    
 }
 
 .btn:hover {
@@ -164,12 +177,12 @@ h1 {
 
 /* Button Variants */
 .btn-blue {
-    background: var(--blue-900);
+    background: radial-gradient(var(--blue-900), #366d9d);
     color: #fff;
 }
 
 .btn-orange {
-    background: var(--orange-600);
+    background: radial-gradient(var(--orange-600), #f29558);
     color: white;
 }
 
@@ -267,7 +280,7 @@ h1 {
 /* ==================== CARD COMPONENT ==================== */
 .card {
     padding: 20px;
-    
+
     border-radius: var(--radius-lg);
     transition: 0.25s ease;
 }
@@ -343,15 +356,15 @@ h1 {
 }
 
 .panel-card:hover {
-    transform: scale(1.02);
-    rotate: 1deg;
+    rotate: 0.5deg;
     filter: brightness(1.05);
 }
 
 .panel-card h4 {
-    margin: 0 0 8px 0;
-    color: var(--accent);
-    font-weight: 700;
+    margin: 0 0 10px 0;
+    font-size: 20px;
+    color: var(--blue-900);
+    font-weight: 600;
 }
 
 .panel-card p {
@@ -482,7 +495,12 @@ h1 {
 }
 
 .nav-cta {
-    background: var(--blue-900);
+    background: radial-gradient(var(--blue-900), #366d9d);
+    color: white;
+}
+
+.nav-cta:hover {
+    background: radial-gradient(#051e43, #255d8f);
     color: white;
 }
 
@@ -493,10 +511,44 @@ h1 {
 }
 
 /* ==================== HERO SECTION ==================== */
+
+.hero-container {
+    width: 560px;
+    max-width: 50%;
+    position: relative;
+}
+
+.hero-container .part1 {
+    position: absolute;
+    left: 186.16px;
+    top: 57.69px;
+}
+
+.hero-container .part2 {
+    position: absolute;
+    left: 1.77px;
+    top: 273.66px;
+}
+
+.hero-container .part {
+    transition: 0.25s ease;
+}
+
+.hero-container .part1:hover {
+    rotate: -2deg;
+    translate: -3px -3px;
+    scale: 1.02;
+}
+
+.hero-container .part2:hover {
+    rotate: 2deg;
+    translate: 3px 0px;
+    scale: 1.02;
+}
+
 .hero {
     padding-top: 56px;
     padding-bottom: 56px;
-    background: var(--bg);
     max-height: 80vh;
     height: 500px;
     display: flex;
@@ -599,6 +651,7 @@ h1 {
 .form-label {
     font-size: 16px;
     font-weight: 600;
+    line-height: 150%;
 }
 
 .form-hint {
@@ -620,10 +673,12 @@ h1 {
 }
 
 select {
-  white-space: normal;      /* allows wrapping */
-  word-wrap: break-word;
-  line-height: 1.3;
+    white-space: normal;
+    /* allows wrapping */
+    word-wrap: break-word;
+    line-height: 1.3;
 }
+
 .input-field select {
     border: none;
     background: transparent;
@@ -632,9 +687,11 @@ select {
     outline: none;
     color: var(--text-primary, #111);
     padding: 0;
-    appearance: none;           /* remove native arrow */
+    appearance: none;
+    /* remove native arrow */
     cursor: pointer;
-    white-space: normal;        /* allows selected value to wrap */
+    white-space: normal;
+    /* allows selected value to wrap */
     line-height: 1.3;
 }
 
@@ -1130,7 +1187,7 @@ select option {
 /* Dashboard Items */
 .items-section {
     margin-bottom: 15px;
-    background-color: rgba(15, 28, 68, 0.062);
+    background-color: rgba(21, 48, 138, 0.062);
     padding: 15px;
     border-radius: var(--radius-lg);
 }
@@ -1384,4 +1441,362 @@ select option {
         padding-left: 16px;
         padding-right: 16px;
     }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ==================== ACCESSIBILITY SETTINGS ==================== */
+
+/* ============================================
+   Accessibility Settings Panel
+   accessibility-settings.css
+   ============================================ */
+
+/* --- Layout --- */
+.a11y-wrap {
+  max-width: 680px;
+  padding: 2rem 1rem;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #111;
+}
+
+.a11y-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.a11y-sub {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+/* --- Section card --- */
+.a11y-section {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.a11y-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 0.75rem;
+}
+
+/* --- Row --- */
+.a11y-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.a11y-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.a11y-row:first-of-type {
+  padding-top: 0;
+}
+
+.a11y-label {
+  font-size: 15px;
+  font-weight: 400;
+  color: #111;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.a11y-desc {
+  font-size: 12px;
+  color: #888;
+  margin-top: 2px;
+}
+
+/* --- Range rows --- */
+.a11y-range-row {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.a11y-range-top {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.a11y-range-val {
+  font-size: 13px;
+  color: #666;
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: #378ADD;
+  cursor: pointer;
+}
+
+/* --- Toggle switch --- */
+.a11y-toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.a11y-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.a11y-slider {
+  position: absolute;
+  inset: 0;
+  background: #d4dae4;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.a11y-slider::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 3px;
+  top: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.a11y-toggle input:checked + .a11y-slider {
+  background: #EB7222;
+}
+
+.a11y-toggle input:checked + .a11y-slider::before {
+  transform: translateX(20px);
+}
+
+.a11y-toggle input:focus-visible + .a11y-slider {
+  outline: 2px solid #378ADD;
+  outline-offset: 2px;
+}
+
+/* --- Select --- */
+.a11y-select {
+  font-size: 13px;
+  font-family: inherit;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #f8f8f8;
+  color: #111;
+  cursor: pointer;
+}
+
+.a11y-select:focus {
+  outline: 2px solid #378ADD;
+  outline-offset: 2px;
+}
+
+/* --- Tag badge --- */
+.a11y-tag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: #E6F1FB;
+  color: #185FA5;
+  font-weight: 500;
+}
+
+/* --- Action buttons --- */
+.a11y-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 1.25rem;
+}
+
+.a11y-btn {
+  padding: 9px 20px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: transparent;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: inherit;
+  color: #111;
+  transition: background 0.15s;
+}
+
+.a11y-btn:hover {
+  background: #f3f3f3;
+}
+
+.a11y-btn:focus-visible {
+  outline: 2px solid #378ADD;
+  outline-offset: 2px;
+}
+
+.a11y-btn-primary {
+  background: #378ADD;
+  color: white;
+  border-color: #378ADD;
+}
+
+.a11y-btn-primary:hover {
+  background: #185FA5;
+}
+
+/* --- Saved message --- */
+.a11y-saved-msg {
+  font-size: 13px;
+  color: #1D9E75;
+  margin-top: 12px;
+  min-height: 20px;
+}
+
+/* ============================================
+   Applied accessibility styles
+   These classes are toggled on <html> or <body>
+   by the JS when settings are active.
+   ============================================ */
+
+/* High contrast */
+body.a11y-high-contrast {
+  filter: contrast(1.5);
+}
+
+/* Color blind filters */
+body.a11y-deuteranopia {
+  filter: url('#deuteranopia-filter');
+}
+body.a11y-protanopia {
+  filter: url('#protanopia-filter');
+}
+body.a11y-tritanopia {
+  filter: url('#tritanopia-filter');
+}
+
+/* Large cursor */
+body.a11y-large-cursor,
+body.a11y-large-cursor * {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M5 2l20 12-8 2-4 9z' fill='black' stroke='white' stroke-width='2'/%3E%3C/svg%3E") 5 2, auto !important;
+}
+
+/* Highlight links */
+body.a11y-highlight-links a {
+  text-decoration: underline !important;
+  font-weight: bold !important;
+  text-underline-offset: 3px;
+}
+
+/* Reduce motion */
+body.a11y-reduce-motion *,
+body.a11y-reduce-motion *::before,
+body.a11y-reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Dyslexia font — loads OpenDyslexic from CDN */
+@import url('https://fonts.cdnfonts.com/css/open-dyslexic');
+
+body.a11y-dyslexia-font,
+body.a11y-dyslexia-font * {
+  font-family: 'OpenDyslexic', sans-serif !important;
+}
+
+/* Line spacing levels */
+body.a11y-line-spacing-1 p,
+body.a11y-line-spacing-1 li,
+body.a11y-line-spacing-1 span {
+  line-height: 1.4 !important;
+}
+body.a11y-line-spacing-2 p,
+body.a11y-line-spacing-2 li,
+body.a11y-line-spacing-2 span {
+  line-height: 1.8 !important;
+}
+body.a11y-line-spacing-3 p,
+body.a11y-line-spacing-3 li,
+body.a11y-line-spacing-3 span {
+  line-height: 2.4 !important;
+}
+
+/* Letter spacing levels */
+body.a11y-letter-spacing-1 p,
+body.a11y-letter-spacing-1 li,
+body.a11y-letter-spacing-1 span {
+  letter-spacing: -0.02em !important;
+}
+body.a11y-letter-spacing-2 p,
+body.a11y-letter-spacing-2 li,
+body.a11y-letter-spacing-2 span {
+  letter-spacing: 0em !important;
+}
+body.a11y-letter-spacing-3 p,
+body.a11y-letter-spacing-3 li,
+body.a11y-letter-spacing-3 span {
+  letter-spacing: 0.08em !important;
+}
+
+/* Reading guide — follows mouse via JS */
+.a11y-reading-guide-line {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  height: 2em;
+  background: rgba(255, 255, 0, 0.2);
+  pointer-events: none;
+  z-index: 9999;
+  display: none;
+}
+body.a11y-reading-guide .a11y-reading-guide-line {
+  display: block;
+}
+
+/* Focus mode */
+body.a11y-focus-mode p:not(:hover),
+body.a11y-focus-mode li:not(:hover) {
+  opacity: 0.4;
+  transition: opacity 0.2s;
+}
+body.a11y-focus-mode p:hover,
+body.a11y-focus-mode li:hover {
+  opacity: 1;
+}
+
+/* SVG color blind filters (invisible, referenced by CSS) */
+.a11y-svg-filters {
+  position: absolute;
+  width: 0;
+  height: 0;
 }
