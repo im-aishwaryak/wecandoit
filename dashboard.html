@@ -18,7 +18,26 @@
 
     <!-- ================== JS ================== -->
     <script>
+
         document.addEventListener("DOMContentLoaded", () => {
+
+            const tabs = document.querySelectorAll('.tab');
+            const panels = document.querySelectorAll('.tab-panel');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // remove active from everything
+                    tabs.forEach(t => t.classList.remove('active'));
+                    panels.forEach(p => p.classList.remove('active'));
+
+                    // add active to the clicked tab + matching panel
+                    tab.classList.add('active');
+                    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+                });
+            });
+
+
+
             /* MOBILE NAV */
             const menuIcon = document.getElementById("menu-icon");
             const nav = document.querySelector(".main-nav");
@@ -85,6 +104,7 @@
             <nav class="main-nav" aria-label="Main navigation">
                 <a class="nav-link" href="browse-items.html">Browse items</a>
                 <a class="nav-link" href="report-found-item.html">Report found item</a>
+                <a class="nav-link" href="settings.html">Settings</a>
                 <a class="nav-link nav-pill" id="nav-current" href="dashboard.html">Dashboard</a>
                 <a class="nav-link nav-cta" href="log-in.html">Log out <span id="log-in-email"
                         class="log-in-email-placeholder">0000000@apps.nsd.org</span></a>
@@ -96,48 +116,34 @@
     <!-- ================= MAIN ================= -->
     <main>
         <h1>Student Dashboard</h1>
-        <br>
+        <p class="subtitle">View and manage your lost item requests and found item submissions.</p><br>
 
-        <!-- Ready to Claim -->
-        <div class="items-section" id="ready-to-claim-section">
-            <h2>Ready to Claim</h2>
-            <p class="subtitle">These items have been approved by admin and can be picked up in the <u>NCHS Main
-                    Office</u>.</p>
-            <!-- Cards will be inserted here dynamically -->
+        <div class="tab-bar">
+            <button class="tab active" data-tab="ready">Ready for pickup <span id="ready-count" class="tab-count">0</span></button>
+            <button class="tab" data-tab="claiming">Items you're claiming <span id="claiming-count" class="tab-count">0</span></button>
+            <button class="tab" data-tab="turnedin">Items turned in <span id="turnedin-count" class="tab-count">0</span></button>
+            <button class="tab" data-tab="history">All item history</button>
         </div>
 
-        <br>
-
-        <!-- Pending Approval -->
-        <div class="items-section">
-            <h2>Pending Approval</h2>
-            <br>
-
-            <!-- Item Retrieval Requests -->
-            <div class="items-section" id="pending-retrieval-section">
-                <h3 class="subsection-title">Item Retrieval Requests</h3>
-                <p class="subtitle">These are items you've requested as yours from the lost items page. Admin approval
-                    may take 1–3 days.</p>
-                <!-- Cards will be inserted here dynamically -->
-            </div>
-
-            <!-- Item Submission Requests -->
-            <div class="items-section" id="pending-submissions-section">
-                <h3 class="subsection-title">Item Submission Requests</h3>
-                <p class="subtitle">These are lost items you've found and are sending to admin.</p>
-                <!-- Cards will be inserted here dynamically -->
-            </div>
+        <div class="tab-panel active" id="panel-ready">
+            <p class="tab-desc">Approved items ready to collect from the NCHS Main Office.</p>
+            <div id="ready-to-claim-section"><!-- cards --></div>
         </div>
 
-        <br>
-
-        <!-- Your Items -->
-        <div class="items-section" id="your-items-section">
-            <h2>Your Items</h2>
-            <br>
-            <!-- Cards will be inserted here dynamically -->
+        <div class="tab-panel" id="panel-claiming">
+            <p class="tab-desc">Items you've marked as yours, waiting for admin review. Approval may take 1-3 days.</p>
+            <div id="pending-retrieval-section"><!-- cards --></div>
         </div>
 
+        <div class="tab-panel" id="panel-turnedin">
+            <p class="tab-desc">Lost items you've found and submitted to the office.</p>
+            <div id="pending-submissions-section"><!-- cards --></div>
+        </div>
+
+        <div class="tab-panel" id="panel-history">
+            <p class="tab-desc">Your complete history of lost item claims and found item submissions.</p>
+            <div id="your-items-section"><!-- cards --></div>
+        </div>
     </main>
 
 

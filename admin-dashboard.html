@@ -17,6 +17,22 @@
 <body>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+
+            const tabs = document.querySelectorAll('.tab');
+            const panels = document.querySelectorAll('.tab-panel');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // remove active from everything
+                    tabs.forEach(t => t.classList.remove('active'));
+                    panels.forEach(p => p.classList.remove('active'));
+
+                    // add active to the clicked tab + matching panel
+                    tab.classList.add('active');
+                    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+                });
+            });
+
             const menuIcon = document.getElementById("menu-icon");
             const nav = document.querySelector(".main-nav");
 
@@ -73,83 +89,48 @@
 
     <main>
         <h1>Admin Dashboard</h1>
-        <br>
+        <p class="subtitle">View and manage student lost item requests and found item submissions.</p><br>
 
-        <!-- Ready to Claim -->
-        <div class="items-section" id="ready-to-claim-section">
-            <h2 class="subsection-title">Ready to Claim</h2>
-            <p class="subtitle">These items have been approved by you and need to be picked up by the student.</p>
-
-            <!-- Empty container for JS to fill -->
-            <div id="readyToClaimContainer">
-            </div>
+        <div class="tab-bar">
+            <button class="tab active" data-tab="ready">Ready for pickup <span id="readyCount"
+                    class="tab-count">0</span></button>
+            <button class="tab" data-tab="claiming">Item claims <span id="claimingCount"
+                    class="tab-count">0</span></button>
+            <button class="tab" data-tab="turnedin">Items submitted <span id="turnedinCount"
+                    class="tab-count">0</span></button>
+            <button class="tab" data-tab="catalog">Lost items catalog <span id="catalogCount"
+                    class="tab-count">0</span></button>
+            <button class="tab" data-tab="history">Reunited items</button>
         </div>
 
-        <br>
-
-        <!-- Pending Approval -->
-        <div class="items-section">
-            <h2>Pending Approval</h2>
-            <br>
-
-            <div class="items-section">
-                <div>
-                    <h3 class="subsection-title">Item Retrieval Requests</h3>
-                    <p class="subtitle">These are items students are claiming to be theirs.</p>
-                </div>
-
-            </div>
-
-            <div class="items-section">
-                <div>
-                    <h3 class="subsection-title">Item Submission Requests</h3>
-                    <p class="subtitle">These are lost items students have found.</p>
-                </div>
-
-            </div>
+        <div class="tab-panel active" id="panel-ready">
+            <p class="tab-desc">These items have been approved by you and need to be picked up by the student. Click
+                "Item Retrieved" once they've picked it up from the office.</p>
+            <div id="readyToClaimContainer"><!-- cards --></div>
         </div>
 
-        <br>
-
-        <div class="items-section">
-            <div>
-                <h3 class="subsection-title">Found Items</h3>
-                <p class="subtitle">These are lost items students have found. Displayed in the <u>Browse items</u> tab.
-                </p>
-            </div>
-
+        <div class="tab-panel" id="panel-claiming">
+            <p class="tab-desc">These are items students are claiming to be theirs. You'll need to approve them in order
+                for the student to retrieve them.</p>
+            <div id="pendingRetrievalContainer"><!-- cards --></div>
         </div>
 
-        <br>
+        <div class="tab-panel" id="panel-turnedin">
+            <p class="tab-desc">These are lost items students have found and brought in so they can be returned to their
+                owners. You'll need to approve them in order
+                for the student to retrieve them.</p>
+            <div id="pendingSubmissionsContainer"><!-- cards --></div>
+        </div>
 
-        <!-- Reunited Items -->
-        <div class="items-section">
-            <h3 class="subsection-title">Reunited Items</h3>
-            <br>
+        <div class="tab-panel" id="panel-catalog">
+            <p class="tab-desc">These are lost items approved by you and brought to the office. They're displayed in the
+                <u>Browse items</u> tab for students.</p>
+            <div id="catalogContainer"><!-- cards --></div>
+        </div>
 
-            <div class="dashboard-item-card">
-                <img src="assets/placeholders/lost-item4.jpg" alt="Item" class="dashboard-item-img">
-                <div class="dashboard-item-info">
-                    <h4>Blue Backpack</h4>
-                    <p class="item-location">Submitted on 11/20/2025 by <span
-                            class="tag tag-gray">1000000@apps.nsd.org</span></p>
-                    <p class="item-location">Retrieved on 11/20/2025 by <span
-                            class="tag tag-gray">0000000@apps.nsd.org</span></p>
-                </div>
-                <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
-            </div>
-
-            <div class="dashboard-item-card">
-                <img src="assets/placeholders/lost-item4.jpg" alt="Item" class="dashboard-item-img">
-                <div class="dashboard-item-info">
-                    <h4>Blue Backpack</h4>
-                    <p class="item-location">Submitted on 11/20/2025 by <span
-                            class="tag tag-gray">1000000@apps.nsd.org</span></p>
-                    <p class="item-location">Retrieved on 11/20/2025 by <span
-                            class="tag tag-gray">0000000@apps.nsd.org</span></p>
-                </div>
-                <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
-            </div>
+        <div class="tab-panel" id="panel-history">
+            <p class="tab-desc">Your complete history of lost item claims and found item submissions.</p>
+            <div id="historyContainer"><!-- cards --></div>
         </div>
 
 

@@ -1204,7 +1204,7 @@ select option {
 }
 
 .dashboard-item-card {
-    background: #fff;
+    background: #F3F4F7;
     padding: 12px;
     padding-right: 15px;
     border-radius: var(--radius-md);
@@ -1799,4 +1799,75 @@ body.a11y-focus-mode li:hover {
   position: absolute;
   width: 0;
   height: 0;
+}
+
+
+
+
+
+
+
+.tab-panel {
+  display: none;
+}
+.tab-panel.active {
+  display: block;
+}
+
+.tab-bar {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 1rem;
+}
+
+.tab {
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-size: 14px;
+  color: #797979;
+  font-family: 'Figtree', sans-serif;
+  font-weight: 600;
+}
+
+.tab.active {
+  color: #000;
+  border-bottom-color: #000;
+}
+
+.tab-desc {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+}
+
+.tab-count {
+    background-color: #eee;
+    font-size: 14px;
+    padding: 3px 5px;
+    border-radius: 7px;
+    margin-left: 8px;
+}
+
+#ready-count, #readyCount {
+    color: #125997;
+    background-color: #66b0f065;
+}
+
+#claiming-count, #claimingCount {
+    color: #b05314;
+    background-color: #ff7a2165;
+}
+
+#turnedin-count, #turnedinCount {
+    color: #9F6D00;
+    background-color: #f4b73265;
+}
+
+#catalogCount {
+    color: #4e525c;
+    background-color: #d6d8df;
 }

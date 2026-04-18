@@ -447,7 +447,7 @@ window.populateClaimedModal = function(claimData, claimId) {
         additionalInfo.textContent = claimData.additional_notes || 'No additional notes.';
     }
 };
-*/ 
+*/
 
 
 
@@ -456,7 +456,7 @@ import {
     collection, query, where, getDocs, doc, updateDoc
 } from './firebaseModule.js';
 
-let user = ""; 
+let user = "";
 // Load student dashboard data
 async function loadStudentDashboard() {
     user = auth.currentUser;
@@ -464,9 +464,9 @@ async function loadStudentDashboard() {
         console.error("No user logged in");
         return;
     }
-   
+
     console.log("Loading student dashboard for:", user.email);
-   
+
     try {
         await Promise.all([
             loadReadyToClaim(),
@@ -480,7 +480,7 @@ async function loadStudentDashboard() {
 }
 
 
- //Load items ready to claim (approved claims waiting pickup)
+//Load items ready to claim (approved claims waiting pickup)
 async function loadReadyToClaim() {
     console.log("ready to claim being loaded.... ")
     const claimsRef = collection(db, "Claims");
@@ -490,23 +490,14 @@ async function loadReadyToClaim() {
         where("status", "==", "approved")
     );
     const snapshot = await getDocs(q);
-   
-    const targetTitle = Array.from(document.querySelectorAll(".items-section"))
-    .find(section => section.querySelector("h2")?.textContent.trim() === "Ready to Claim");
 
+    const container = document.getElementById("ready-to-claim-section");
+    if (!container) { console.log("ts pmo"); return; }
 
-    const container = targetTitle?.closest(".items-section");
-   
-    if (!container){
-        console.log("ts pmo")
-        return;
-    }
-        
-   
     // Clear existing cards
     const existingCards = container.querySelectorAll('.dashboard-item-card');
     existingCards.forEach(card => card.remove());
-   
+
     if (snapshot.empty) {
         const emptyMsg = document.createElement('p');
         emptyMsg.className = 'subtitle';
@@ -514,15 +505,20 @@ async function loadReadyToClaim() {
         container.appendChild(emptyMsg);
         return;
     }
-   
+
+    const tabCount = document.getElementById("ready-count");
+    if (tabCount) {
+        tabCount.textContent = snapshot.size;
+    }
+
     for (const claimDoc of snapshot.docs) {
         const claim = claimDoc.data();
-       
+
         // Calculate pickup deadline
         const approvedDate = new Date(claim.reviewed_at);
         const pickupDeadline = new Date(approvedDate);
         pickupDeadline.setDate(pickupDeadline.getDate() + 7);
-       
+
         const card = document.createElement('div');
         card.className = 'dashboard-item-card';
         card.innerHTML = `
@@ -534,7 +530,7 @@ async function loadReadyToClaim() {
             </div>
             <!--<button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>-->
         `;
-       
+
         card.dataset.claimData = JSON.stringify(claim);
         container.appendChild(card);
     }
@@ -552,20 +548,16 @@ async function loadPendingRetrievalRequests() {
         where("claimant_email", "==", user.email),
         where("status", "==", "pending")
     );
-   
+
     const snapshot = await getDocs(q);
-    const targetTitle = Array.from(document.querySelectorAll(".subsection-title"))
-    .find(el => el.textContent.trim() === "Item Retrieval Requests");
 
+    const container = document.getElementById("pending-retrieval-section");
+    if (!container) { console.log("ts pmo"); return; }
 
-    const container = targetTitle?.closest(".items-section");
-   
-    if (!container) return;
-   
     // Clear existing cards
     const existingCards = container.querySelectorAll('.dashboard-item-card');
     existingCards.forEach(card => card.remove());
-   
+
     if (snapshot.empty) {
         const emptyMsg = document.createElement('p');
         emptyMsg.className = 'subtitle';
@@ -574,10 +566,15 @@ async function loadPendingRetrievalRequests() {
         container.appendChild(emptyMsg);
         return;
     }
-   
+
+    const tabCount = document.getElementById("claiming-count");
+    if (tabCount) {
+        tabCount.textContent = snapshot.size;
+    }
+
     for (const claimDoc of snapshot.docs) {
         const claim = claimDoc.data();
-       
+
         const card = document.createElement('div');
         card.className = 'dashboard-item-card';
         card.innerHTML = `
@@ -588,7 +585,7 @@ async function loadPendingRetrievalRequests() {
             </div>
             <!--<button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>-->
         `;
-       
+
         card.dataset.claimData = JSON.stringify(claim);
         container.appendChild(card);
     }
@@ -603,20 +600,16 @@ async function loadPendingSubmissions() {
         where("submitter_email", "==", user.email),
         where("status", "==", "pending submission")
     );
-   
+
     const snapshot = await getDocs(q);
-    const targetTitle = Array.from(document.querySelectorAll(".subsection-title"))
-    .find(el => el.textContent.trim() === "Item Submission Requests");
 
+    const container = document.getElementById("pending-submissions-section");
+    if (!container) { console.log("ts pmo"); return; }
 
-    const container = targetTitle?.closest(".items-section");
-   
-    if (!container) return;
-   
     // Clear existing cards
     const existingCards = container.querySelectorAll('.dashboard-item-card');
     existingCards.forEach(card => card.remove());
-   
+
     if (snapshot.empty) {
         const emptyMsg = document.createElement('p');
         emptyMsg.className = 'subtitle';
@@ -625,10 +618,15 @@ async function loadPendingSubmissions() {
         container.appendChild(emptyMsg);
         return;
     }
-   
+
+    const tabCount = document.getElementById("turnedin-count");
+    if (tabCount) {
+        tabCount.textContent = snapshot.size;
+    }
+
     snapshot.docs.forEach(itemDoc => {
         const item = itemDoc.data();
-       
+
         const card = document.createElement('div');
         card.className = 'dashboard-item-card';
         card.innerHTML = `
@@ -640,11 +638,11 @@ async function loadPendingSubmissions() {
             </div>
             <!--<button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>-->
         `;
-       
+
         card.dataset.itemData = JSON.stringify(item);
         container.appendChild(card);
     });
-   
+
 }
 
 
@@ -658,20 +656,16 @@ async function loadFoundItems() {
         where("reciever_id", "==", user.email)
     );
 
-   
+
     const snapshot = await getDocs(q);
-    const targetTitle = Array.from(document.querySelectorAll(".subsection-title"))
-    .find(el => el.textContent.trim() === "Found Items");
 
+    const container = document.getElementById("your-items-section");
+    if (!container) { console.log("ts pmo"); return; }
 
-    const container = targetTitle?.closest(".items-section");
-   
-    if (!container) return;
-   
     // Clear existing cards (keep title and subtitle)
     const existingCards = container.querySelectorAll('.dashboard-item-card');
     existingCards.forEach(card => card.remove());
-   
+
     if (snapshot.empty) {
         const emptyMsg = document.createElement('p');
         emptyMsg.className = 'subtitle';
@@ -680,13 +674,13 @@ async function loadFoundItems() {
         container.appendChild(emptyMsg);
         return;
     }
-   
+
     // Show only first 5 items
     const itemsToShow = snapshot.docs.slice(0, 5);
-   
+
     itemsToShow.forEach(itemDoc => {
         const item = itemDoc.data();
-       
+
         const card = document.createElement('div');
         card.className = 'dashboard-item-card';
         card.innerHTML = `
@@ -698,7 +692,7 @@ async function loadFoundItems() {
             </div>
             <!--<button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>-->
         `;
-       
+
         card.dataset.itemData = JSON.stringify(item);
         container.appendChild(card);
     });

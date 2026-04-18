@@ -43,9 +43,9 @@ async function loadAdminDashboard() {
         console.error("No user logged in");
         return;
     }
-   
+
     console.log("Loading admin dashboard for:", user.email);
-   
+
     try {
         await Promise.all([
             loadReadyToClaim(),
@@ -60,25 +60,20 @@ async function loadAdminDashboard() {
 }
 
 
- //Load items ready to claim (approved claims waiting pickup)
+//Load items ready to claim (approved claims waiting pickup)
 async function loadReadyToClaim() {
     const claimsRef = collection(db, "Item_Data");
     const q = query(claimsRef, where("status", "==", "claimed and ready to retrieve"));
-   
+
     const snapshot = await getDocs(q);
-   
-    const targetTitle = Array.from(document.querySelectorAll(".subsection-title"))
-    .find(el => el.textContent.trim() === "Ready to Claim");
 
+    const container = document.getElementById("readyToClaimContainer");
+    if (!container) { console.log("ts pmo"); return; }
 
-    const container = targetTitle?.closest(".items-section");
-   
-    if (!container) return;
-   
     // Clear existing cards
     const existingCards = container.querySelectorAll('.dashboard-item-card');
     existingCards.forEach(card => card.remove());
-   
+
     if (snapshot.empty) {
         const emptyMsg = document.createElement('p');
         emptyMsg.className = 'subtitle';
@@ -86,15 +81,21 @@ async function loadReadyToClaim() {
         container.appendChild(emptyMsg);
         return;
     }
-   
+
+    const tabCount = document.getElementById("readyCount");
+    if (tabCount) {
+        tabCount.textContent = snapshot.size;
+    }
+
+
     for (const claimDoc of snapshot.docs) {
         const claim = claimDoc.data();
-       
+
         // Calculate pickup deadline
         const approvedDate = new Date(claim.reviewed_at);
         const pickupDeadline = new Date(approvedDate);
         pickupDeadline.setDate(pickupDeadline.getDate() + 7);
-       
+
         const card = document.createElement('div');
         card.className = 'dashboard-item-card';
         card.innerHTML = `
@@ -107,11 +108,11 @@ async function loadReadyToClaim() {
             <!--<button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>-->
             <button class="btn btn-blue btn-sm mark-retrieved" data-claim-id="${claimDoc.id}">Item Retrieved</button>
         `;
-       
+
         card.dataset.claimData = JSON.stringify(claim);
         container.appendChild(card);
     }
-   
+
     // Add event listeners to "Item Retrieved" buttons
     document.querySelectorAll('.mark-retrieved').forEach(btn => {
         btn.addEventListener('click', async (e) => {
@@ -128,20 +129,16 @@ async function loadReadyToClaim() {
 async function loadPendingRetrievalRequests() {
     const claimsRef = collection(db, "Item_Data");
     const q = query(claimsRef, where("status", "==", "pending retrieval"));
-   
+
     const snapshot = await getDocs(q);
-    const targetTitle = Array.from(document.querySelectorAll(".subsection-title"))
-    .find(el => el.textContent.trim() === "Item Retrieval Requests");
 
+    const container = document.getElementById("pendingRetrievalContainer");
+    if (!container) { console.log("ts pmo"); return; }
 
-    const container = targetTitle?.closest(".items-section");
-   
-    if (!container) return;
-   
     // Clear existing cards
     const existingCards = container.querySelectorAll('.dashboard-item-card');
     existingCards.forEach(card => card.remove());
-   
+
     if (snapshot.empty) {
         const emptyMsg = document.createElement('p');
         emptyMsg.className = 'subtitle';
@@ -150,10 +147,15 @@ async function loadPendingRetrievalRequests() {
         container.appendChild(emptyMsg);
         return;
     }
-   
+
+    const tabCount = document.getElementById("claimingCount");
+    if (tabCount) {
+        tabCount.textContent = snapshot.size;
+    }
+
     for (const claimDoc of snapshot.docs) {
         const claim = claimDoc.data();
-       
+
         const card = document.createElement('div');
         card.className = 'dashboard-item-card';
         card.innerHTML = `
@@ -165,7 +167,7 @@ async function loadPendingRetrievalRequests() {
             <!--<button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>-->
             <a href="review-claim.html?id=${claimDoc.id}"><button class="btn btn-blue btn-sm">Review</button></a>
         `;
-       
+
         card.dataset.claimData = JSON.stringify(claim);
         container.appendChild(card);
     }
@@ -176,20 +178,15 @@ async function loadPendingRetrievalRequests() {
 async function loadPendingSubmissions() {
     const itemsRef = collection(db, "Item_Data");
     const q = query(itemsRef, where("status", "==", "pending submission"));
-   
+
     const snapshot = await getDocs(q);
-    const targetTitle = Array.from(document.querySelectorAll(".subsection-title"))
-    .find(el => el.textContent.trim() === "Item Submission Requests");
+    const container = document.getElementById("pendingSubmissionsContainer");
+    if (!container) { console.log("ts pmo"); return; }
 
-
-    const container = targetTitle?.closest(".items-section");
-   
-    if (!container) return;
-   
     // Clear existing cards
     const existingCards = container.querySelectorAll('.dashboard-item-card');
     existingCards.forEach(card => card.remove());
-   
+
     if (snapshot.empty) {
         const emptyMsg = document.createElement('p');
         emptyMsg.className = 'subtitle';
@@ -198,10 +195,15 @@ async function loadPendingSubmissions() {
         container.appendChild(emptyMsg);
         return;
     }
-   
+
+    const tabCount = document.getElementById("turnedinCount");
+    if (tabCount) {
+        tabCount.textContent = snapshot.size;
+    }
+
     snapshot.docs.forEach(itemDoc => {
         const item = itemDoc.data();
-       
+
         const card = document.createElement('div');
         card.className = 'dashboard-item-card';
         card.innerHTML = `
@@ -214,11 +216,11 @@ async function loadPendingSubmissions() {
             <!--<button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>-->
             <button class="btn btn-blue btn-sm approve-item" data-item-id="${itemDoc.id}">Approve</button>
         `;
-       
+
         card.dataset.itemData = JSON.stringify(item);
         container.appendChild(card);
     });
-   
+
     // Add event listeners to approve buttons
     document.querySelectorAll('.approve-item').forEach(btn => {
         btn.addEventListener('click', async (e) => {
@@ -233,20 +235,17 @@ async function loadPendingSubmissions() {
 async function loadFoundItems() {
     const itemsRef = collection(db, "Item_Data");
     const q = query(itemsRef, where("status", "==", "available to claim"));
-   
+
     const snapshot = await getDocs(q);
-    const targetTitle = Array.from(document.querySelectorAll(".subsection-title"))
-    .find(el => el.textContent.trim() === "Found Items");
+    const container = document.getElementById("catalogContainer");
+    if (!container) { console.log("ts pmo"); return; }
 
-
-    const container = targetTitle?.closest(".items-section");
-   
     if (!container) return;
-   
+
     // Clear existing cards (keep title and subtitle)
     const existingCards = container.querySelectorAll('.dashboard-item-card');
     existingCards.forEach(card => card.remove());
-   
+
     if (snapshot.empty) {
         const emptyMsg = document.createElement('p');
         emptyMsg.className = 'subtitle';
@@ -255,13 +254,21 @@ async function loadFoundItems() {
         container.appendChild(emptyMsg);
         return;
     }
-   
+
+    const tabCount = document.getElementById("catalogCount");
+    if (tabCount) {
+        tabCount.textContent = snapshot.size;
+    }
+
     // Show only first 5 items
-    const itemsToShow = snapshot.docs.slice(0, 5);
-   
+    //const itemsToShow = snapshot.docs.slice(0, 5);
+
+    // Show all items
+    const itemsToShow = snapshot.docs;
+
     itemsToShow.forEach(itemDoc => {
         const item = itemDoc.data();
-       
+
         const card = document.createElement('div');
         card.className = 'dashboard-item-card';
         card.innerHTML = `
@@ -273,7 +280,7 @@ async function loadFoundItems() {
             </div>
             <!--<button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>-->
         `;
-       
+
         card.dataset.itemData = JSON.stringify(item);
         container.appendChild(card);
     });
@@ -284,20 +291,17 @@ async function loadFoundItems() {
 async function loadReunitedItems() {
     const claimsRef = collection(db, "Item_Data");
     const q = query(claimsRef, where("status", "==", "claimed and retrieved"));
-   
+
     const snapshot = await getDocs(q);
-    const targetTitle = Array.from(document.querySelectorAll(".subsection-title"))
-    .find(el => el.textContent.trim() === "Reunited Items");
+    const container = document.getElementById("historyContainer");
+    if (!container) { console.log("ts pmo"); return; }
 
-
-    const container = targetTitle?.closest(".items-section");
-   
     if (!container) return;
-   
+
     // Clear existing cards
     const existingCards = container.querySelectorAll('.dashboard-item-card');
     existingCards.forEach(card => card.remove());
-   
+
     if (snapshot.empty) {
         console.log("empty:(")
         const emptyMsg = document.createElement('p');
@@ -306,13 +310,13 @@ async function loadReunitedItems() {
         container.appendChild(emptyMsg);
         return;
     }
-   
+
     // Show only first 5 items
     const itemsToShow = snapshot.docs.slice(0, 5);
-   
+
     itemsToShow.forEach(claimDoc => {
         const claim = claimDoc.data();
-       
+
         const card = document.createElement('div');
         card.className = 'dashboard-item-card';
         card.innerHTML = `
@@ -324,7 +328,7 @@ async function loadReunitedItems() {
             </div>
             <!--<button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>-->
         `;
-       
+
         card.dataset.claimData = JSON.stringify(claim);
         container.appendChild(card);
     });
@@ -334,19 +338,19 @@ async function loadReunitedItems() {
 // Approve item submission
 async function approveItem(itemId) {
     if (!confirm('Approve this item submission?')) return;
-   
+
     try {
         const user = auth.currentUser;
         const itemRef = doc(db, "Item_Data", itemId);
-       
+
         await updateDoc(itemRef, {
             status: "available to claim",
             approved_at: new Date().toISOString(),
         });
-       
+
         alert('Item approved and now visible to students!');
         loadAdminDashboard(); // Reload dashboard
-       
+
     } catch (error) {
         console.error("Error approving item:", error);
         alert('Failed to approve item. Please try again.');
@@ -357,17 +361,17 @@ async function approveItem(itemId) {
 // Mark item as retrieved
 async function markItemRetrieved(claimId) {
     if (!confirm('Mark this item as retrieved?')) return;
-   
+
     try {
         const itemRef = doc(db, "Item_Data", claimId);
         await updateDoc(itemRef, {
             status: "claimed and retrieved",
             retrieved_at: new Date().toISOString()
         });
-       
+
         alert('Item marked as retrieved!');
         loadAdminDashboard(); // Reload dashboard
-       
+
     } catch (error) {
         console.error("Error marking item as retrieved:", error);
         alert('Failed to update item status. Please try again.');
