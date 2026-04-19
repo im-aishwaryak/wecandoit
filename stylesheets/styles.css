@@ -659,6 +659,20 @@ select option {
     border: none;
 }
 
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: black;
+    color: white;
+    padding: 8px;
+    z-index: 100;
+}
+
+.skip-link:focus {
+    top: 10px;
+}
+
 
 /* ==================== HERO ==================== */
 .hero-container {

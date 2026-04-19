@@ -15,16 +15,7 @@
 </head>
 
 <body>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const menuIcon = document.getElementById("menu-icon");
-            const nav = document.querySelector(".main-nav");
-
-            menuIcon.addEventListener("click", () => {
-                nav.classList.toggle("show");
-            });
-        });
-    </script>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
 
     <header class="site-header">
         <div class="container header-inner">
@@ -32,7 +23,7 @@
                 <img src="assets/icons/logo.svg" alt="Boomerang logo" width="138" height="26">
             </a>
 
-            <button id="menu-icon" aria-label="Toggle menu">
+            <button id="menu-icon" aria-label="Toggle menu" aria-expanded="false" aria-controls="main-nav">
                 <img src="assets/icons/menu.svg" alt="Menu icon">
             </button>
 
@@ -45,7 +36,7 @@
         </div>
     </header>
 
-    <main>
+    <main id="main-content">
         <!-- HERO -->
         <section class="hero section">
             <div class="container hero-inner">
@@ -62,14 +53,16 @@
                     </div>
                 </div>
 
-                <div class="hero-visual-wrap" aria-hidden="true">
+                <div class="hero-visual-wrap">
                     <img class="hero-visual" src="assets/placeholders/hero-visual-placeholder.svg"
                         alt="Boomerang dashboard preview">
                 </div>
 
                 <div class="hero-container">
-                    <img src="assets/placeholders/item-card.svg" class="part part2" alt="Example of a lost item card of a water bottle">
-                    <img src="assets/placeholders/item-card2.svg" class="part part1" alt="Example of a lost item card of a presentation clicker">
+                    <img src="assets/placeholders/item-card.svg" class="part part2"
+                        alt="Example of a lost item card of a water bottle">
+                    <img src="assets/placeholders/item-card2.svg" class="part part1"
+                        alt="Example of a lost item card of a presentation clicker">
                     <img src="assets/placeholders/hero-boomerang.svg" class="part3" alt="Boomerang logo blur vector">
                 </div>
 
@@ -79,11 +72,12 @@
         <!-- FEATURES / cards -->
         <section class="section features">
             <div class="container">
-                <h2 class="section-title" id="how-it-works">Lost <img src="assets/icons/logo-arrow.svg"> Found, Made
+                <h2 class="section-title" id="how-it-works">Lost <img src="assets/icons/logo-arrow.svg"
+                        alt="Right arrow"> Found, Made
                     Easy</h2>
 
                 <div class="feature-grid">
-                    <article class="feature-card" id="browse_items">
+                    <article class="feature-card">
                         <div class="feature-icon">
                             <img src="assets/icons/folder-icon.png" alt="" aria-hidden="true">
                         </div>
@@ -92,7 +86,7 @@
                         </p>
                     </article>
 
-                    <article class="feature-card" id="report_found_items">
+                    <article class="feature-card">
                         <div class="feature-icon">
                             <img src="assets/icons/info-icon.png" alt="" aria-hidden="true">
                         </div>
@@ -101,7 +95,7 @@
                             missing.</p>
                     </article>
 
-                    <article class="feature-card" id="report_lost_items">
+                    <article class="feature-card">
                         <div class="feature-icon">
                             <img src="assets/icons/suitcase-icon.png" alt="" aria-hidden="true">
                         </div>
@@ -166,25 +160,19 @@
             <div class="copyright">© 2025 Boomerang. All rights reserved.</div>
         </div>
     </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const menuIcon = document.getElementById("menu-icon");
+            const nav = document.getElementById("main-nav");
+
+            menuIcon.addEventListener("click", () => {
+                const isOpen = nav.classList.toggle("show");
+                menuIcon.setAttribute("aria-expanded", isOpen);
+            });
+        });
+    </script>
+
 </body>
-
-<script>
-    const toggle = document.querySelector(".nav-toggle");
-    const nav = document.querySelector(".main-nav");
-
-    toggle.addEventListener("click", () => {
-        nav.classList.toggle("open");
-        toggle.classList.toggle("open");
-    });
-
-    document.getElementById("report_found_items").addEventListener("click", () => {
-        window.location.href = "report-found-item.html";
-    });
-
-    document.getElementById("browse_items").addEventListener("click", () => {
-        window.location.href = "browse-items.html";
-    });
-
-</script>
 
 </html>
