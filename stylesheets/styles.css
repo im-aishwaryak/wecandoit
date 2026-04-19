@@ -452,7 +452,7 @@ select option {
     filter: brightness(1.05);
 }
 
-.panel-card h4 {
+.panel-card h3 {
     margin: 0 0 10px 0;
     font-size: var(--font-lg);
     color: var(--blue-900);
