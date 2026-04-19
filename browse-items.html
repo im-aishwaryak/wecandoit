@@ -22,6 +22,15 @@
 <body>
     <div class="a11y-reading-guide-line"></div>
     <script>
+        function openImageModal(src) {
+            document.getElementById("modal-img").src = src;
+            document.getElementById("image-modal").classList.remove("hidden");
+        }
+
+        function closeImageModal() {
+            document.getElementById("image-modal").classList.add("hidden");
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
             const menuIcon = document.getElementById("menu-icon");
             const nav = document.querySelector(".main-nav");
@@ -29,15 +38,6 @@
             menuIcon.addEventListener("click", () => {
                 nav.classList.toggle("show");
             });
-
-            function openImageModal(src) {
-                document.getElementById("modal-img").src = src;
-                document.getElementById("image-modal").classList.remove("hidden");
-            }
-
-            function closeImageModal() {
-                document.getElementById("image-modal").classList.add("hidden");
-            }
         });
     </script>
 
@@ -80,7 +80,10 @@
 
         <h1 class="title-w-icon">Browse Found Items<img src="assets/icons/folder-icon.png" height="43px"></h1>
 
+        <br><br>
+
         <div class="search-filter">
+            <img src="assets/icons/search.svg" alt="Search icon" class="search-icon">
             <input autocomplete="off" class="input" type="text" id="search-input" placeholder="Search" />
             <!--<select class="input" id="category-filter">
                 <option value="all">All Categories</option>
@@ -234,7 +237,7 @@
 
         <div id="image-modal" class="image-modal hidden">
             <div class="image-modal-content">
-                <button class="image-modal-close" onclick="closeImageModal()">×</button>
+                <button class="image-modal-close" onclick="closeImageModal()"><img src="assets/icons/x.svg" alt="Close"></button>
                 <img id="modal-img" src="" alt="Expanded item image">
             </div>
         </div>
@@ -246,7 +249,6 @@
 
     </main>
 
-    <script type="module" src="scripts/protect-auth.js"></script>
     <script>
         document.addEventListener("mousemove", (e) => {
             const guide = document.querySelector(".a11y-reading-guide-line");

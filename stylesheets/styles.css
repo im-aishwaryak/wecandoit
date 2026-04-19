@@ -41,7 +41,7 @@
     --yellow-tag-text: #9F6D00;
     --yellow-tag-bg: rgba(244, 183, 50, 0.4);
     --gray-tag-text: #4e525c;
-    --gray-tag-bg: #4e525c67;
+    --gray-tag-bg: rgba(78, 82, 92, 0.4);
 
     /* Spacing Scale */
     --space-xxs: 6px;
@@ -251,12 +251,15 @@ h1 {
 
 /* ==================== INPUTS ==================== */
 .input {
-    background: var(--bg-secondary);
-    border-radius: var(--radius-lg);
-    padding: 12px 15px;
     border: none;
-    font-size: var(--font-base);
+    font-size: var(--font-md);
     font-family: 'Figtree';
+    width: 100%;
+    background: transparent;
+}
+
+.input:focus {
+    outline: none;
 }
 
 .input::placeholder {
@@ -452,7 +455,7 @@ select option {
     filter: brightness(1.05);
 }
 
-.panel-card h3 {
+.panel-card h4 {
     margin: 0 0 10px 0;
     font-size: var(--font-lg);
     color: var(--blue-900);
@@ -513,6 +516,7 @@ select option {
 
 .item-card .item-text {
     height: 100%;
+    gap: 0px;
 }
 
 .item-card .item-text h3,
@@ -657,20 +661,6 @@ select option {
     display: none;
     background: none;
     border: none;
-}
-
-.skip-link {
-    position: absolute;
-    top: -40px;
-    left: 0;
-    background: black;
-    color: white;
-    padding: 8px;
-    z-index: 100;
-}
-
-.skip-link:focus {
-    top: 10px;
 }
 
 
@@ -878,6 +868,9 @@ select option {
     align-items: center;
     gap: 12px;
     width: 100%;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: 12px 15px;
 }
 
 .search-filter .input:first-child {
@@ -951,7 +944,7 @@ select option {
     position: absolute;
     top: 20px;
     right: 20px;
-    background: var(--bg);
+    background: var(--bg-secondary);
     width: 32px;
     height: 32px;
     border: none;
@@ -959,6 +952,12 @@ select option {
     font-size: var(--font-lg);
     cursor: pointer;
     font-weight: 300;
+    box-shadow: var(--text-secondary) 0px 0px 10px;
+}
+
+.image-modal-close img {
+    width: 16px;
+    height: 16px;
 }
 
 #modal-img {
@@ -1677,6 +1676,8 @@ body.a11y-dyslexia-font * {
 }
 
 /* ── Line spacing ────────────────────────────────── */
+
+/* All readable text elements */
 body.a11y-line-spacing-1 p,
 body.a11y-line-spacing-1 li,
 body.a11y-line-spacing-1 h1,
@@ -1685,10 +1686,22 @@ body.a11y-line-spacing-1 h3,
 body.a11y-line-spacing-1 h4,
 body.a11y-line-spacing-1 label,
 body.a11y-line-spacing-1 .subtitle,
+body.a11y-line-spacing-1 .hero-sub,
 body.a11y-line-spacing-1 .form-hint,
+body.a11y-line-spacing-1 .form-label,
 body.a11y-line-spacing-1 .a11y-desc,
+body.a11y-line-spacing-1 .a11y-label,
+body.a11y-line-spacing-1 .stat-info p,
+body.a11y-line-spacing-1 .panel-card p,
+body.a11y-line-spacing-1 .feature-card p,
+body.a11y-line-spacing-1 .notification-content h4,
 body.a11y-line-spacing-1 .notification-content p,
-body.a11y-line-spacing-1 .dashboard-item-info p { line-height: 1.4 !important; }
+body.a11y-line-spacing-1 .dashboard-item-info h4,
+body.a11y-line-spacing-1 .dashboard-item-info p,
+body.a11y-line-spacing-1 .dashboard-item-info .item-location,
+body.a11y-line-spacing-1 .details-info p,
+body.a11y-line-spacing-1 .comparison-info p,
+body.a11y-line-spacing-1 .auth-header p { line-height: 1.4 !important; }
 
 body.a11y-line-spacing-2 p,
 body.a11y-line-spacing-2 li,
@@ -1698,10 +1711,22 @@ body.a11y-line-spacing-2 h3,
 body.a11y-line-spacing-2 h4,
 body.a11y-line-spacing-2 label,
 body.a11y-line-spacing-2 .subtitle,
+body.a11y-line-spacing-2 .hero-sub,
 body.a11y-line-spacing-2 .form-hint,
+body.a11y-line-spacing-2 .form-label,
 body.a11y-line-spacing-2 .a11y-desc,
+body.a11y-line-spacing-2 .a11y-label,
+body.a11y-line-spacing-2 .stat-info p,
+body.a11y-line-spacing-2 .panel-card p,
+body.a11y-line-spacing-2 .feature-card p,
+body.a11y-line-spacing-2 .notification-content h4,
 body.a11y-line-spacing-2 .notification-content p,
-body.a11y-line-spacing-2 .dashboard-item-info p { line-height: 1.8 !important; }
+body.a11y-line-spacing-2 .dashboard-item-info h4,
+body.a11y-line-spacing-2 .dashboard-item-info p,
+body.a11y-line-spacing-2 .dashboard-item-info .item-location,
+body.a11y-line-spacing-2 .details-info p,
+body.a11y-line-spacing-2 .comparison-info p,
+body.a11y-line-spacing-2 .auth-header p { line-height: 1.8 !important; }
 
 body.a11y-line-spacing-3 p,
 body.a11y-line-spacing-3 li,
@@ -1711,24 +1736,44 @@ body.a11y-line-spacing-3 h3,
 body.a11y-line-spacing-3 h4,
 body.a11y-line-spacing-3 label,
 body.a11y-line-spacing-3 .subtitle,
+body.a11y-line-spacing-3 .hero-sub,
 body.a11y-line-spacing-3 .form-hint,
+body.a11y-line-spacing-3 .form-label,
 body.a11y-line-spacing-3 .a11y-desc,
+body.a11y-line-spacing-3 .a11y-label,
+body.a11y-line-spacing-3 .stat-info p,
+body.a11y-line-spacing-3 .panel-card p,
+body.a11y-line-spacing-3 .feature-card p,
+body.a11y-line-spacing-3 .notification-content h4,
 body.a11y-line-spacing-3 .notification-content p,
-body.a11y-line-spacing-3 .dashboard-item-info p { line-height: 2.4 !important; }
+body.a11y-line-spacing-3 .dashboard-item-info h4,
+body.a11y-line-spacing-3 .dashboard-item-info p,
+body.a11y-line-spacing-3 .dashboard-item-info .item-location,
+body.a11y-line-spacing-3 .details-info p,
+body.a11y-line-spacing-3 .comparison-info p,
+body.a11y-line-spacing-3 .auth-header p { line-height: 2.4 !important; }
 
-/* UI elements that should never stretch */
+/* UI elements that must never stretch */
+body[class*="a11y-line-spacing"] h1,
 body[class*="a11y-line-spacing"] .btn,
 body[class*="a11y-line-spacing"] .nav-link,
 body[class*="a11y-line-spacing"] .tab,
-body[class*="a11y-line-spacing"] .tag,
 body[class*="a11y-line-spacing"] .tab-btn,
+body[class*="a11y-line-spacing"] .tag,
 body[class*="a11y-line-spacing"] .badge,
+body[class*="a11y-line-spacing"] .tag-blue,
+body[class*="a11y-line-spacing"] .tag-gray,
+body[class*="a11y-line-spacing"] .tag-orange,
+body[class*="a11y-line-spacing"] .tab-count,
 body[class*="a11y-line-spacing"] .input,
 body[class*="a11y-line-spacing"] input,
-body[class*="a11y-line-spacing"] select { line-height: 1 !important; }
+body[class*="a11y-line-spacing"] select,
+body[class*="a11y-line-spacing"] .a11y-toggle,
+body[class*="a11y-line-spacing"] .stat-info h3 { line-height: 1 !important; }
 
 
 /* ── Letter spacing ──────────────────────────────── */
+
 body.a11y-letter-spacing-1 p,
 body.a11y-letter-spacing-1 li,
 body.a11y-letter-spacing-1 h1,
@@ -1737,8 +1782,20 @@ body.a11y-letter-spacing-1 h3,
 body.a11y-letter-spacing-1 h4,
 body.a11y-letter-spacing-1 label,
 body.a11y-letter-spacing-1 .subtitle,
+body.a11y-letter-spacing-1 .hero-sub,
 body.a11y-letter-spacing-1 .form-hint,
-body.a11y-letter-spacing-1 .a11y-desc { letter-spacing: -0.02em !important; }
+body.a11y-letter-spacing-1 .form-label,
+body.a11y-letter-spacing-1 .a11y-desc,
+body.a11y-letter-spacing-1 .a11y-label,
+body.a11y-letter-spacing-1 .item-name,
+body.a11y-letter-spacing-1 .item-desc,
+body.a11y-letter-spacing-1 .notification-content h4,
+body.a11y-letter-spacing-1 .notification-content p,
+body.a11y-letter-spacing-1 .dashboard-item-info h4,
+body.a11y-letter-spacing-1 .dashboard-item-info p,
+body.a11y-letter-spacing-1 .dashboard-item-info .item-location,
+body.a11y-letter-spacing-1 .details-info p,
+body.a11y-letter-spacing-1 .auth-header p { letter-spacing: -0.02em !important; }
 
 body.a11y-letter-spacing-2 p,
 body.a11y-letter-spacing-2 li,
@@ -1748,8 +1805,20 @@ body.a11y-letter-spacing-2 h3,
 body.a11y-letter-spacing-2 h4,
 body.a11y-letter-spacing-2 label,
 body.a11y-letter-spacing-2 .subtitle,
+body.a11y-letter-spacing-2 .hero-sub,
 body.a11y-letter-spacing-2 .form-hint,
-body.a11y-letter-spacing-2 .a11y-desc { letter-spacing: 0em !important; }
+body.a11y-letter-spacing-2 .form-label,
+body.a11y-letter-spacing-2 .a11y-desc,
+body.a11y-letter-spacing-2 .a11y-label,
+body.a11y-letter-spacing-2 .item-name,
+body.a11y-letter-spacing-2 .item-desc,
+body.a11y-letter-spacing-2 .notification-content h4,
+body.a11y-letter-spacing-2 .notification-content p,
+body.a11y-letter-spacing-2 .dashboard-item-info h4,
+body.a11y-letter-spacing-2 .dashboard-item-info p,
+body.a11y-letter-spacing-2 .dashboard-item-info .item-location,
+body.a11y-letter-spacing-2 .details-info p,
+body.a11y-letter-spacing-2 .auth-header p { letter-spacing: 0em !important; }
 
 body.a11y-letter-spacing-3 p,
 body.a11y-letter-spacing-3 li,
@@ -1759,15 +1828,35 @@ body.a11y-letter-spacing-3 h3,
 body.a11y-letter-spacing-3 h4,
 body.a11y-letter-spacing-3 label,
 body.a11y-letter-spacing-3 .subtitle,
+body.a11y-letter-spacing-3 .hero-sub,
 body.a11y-letter-spacing-3 .form-hint,
-body.a11y-letter-spacing-3 .a11y-desc { letter-spacing: 0.08em !important; }
+body.a11y-letter-spacing-3 .form-label,
+body.a11y-letter-spacing-3 .a11y-desc,
+body.a11y-letter-spacing-3 .a11y-label,
+body.a11y-letter-spacing-3 .item-name,
+body.a11y-letter-spacing-3 .item-desc,
+body.a11y-letter-spacing-3 .notification-content h4,
+body.a11y-letter-spacing-3 .notification-content p,
+body.a11y-letter-spacing-3 .dashboard-item-info h4,
+body.a11y-letter-spacing-3 .dashboard-item-info p,
+body.a11y-letter-spacing-3 .dashboard-item-info .item-location,
+body.a11y-letter-spacing-3 .details-info p,
+body.a11y-letter-spacing-3 .auth-header p { letter-spacing: 0.08em !important; }
 
-/* UI elements that should never have letter spacing changed */
+/* UI elements that must never have letter spacing changed */
+body[class*="a11y-letter-spacing"] h1 {
+    letter-spacing: -0.05em !important;
+}
+
 body[class*="a11y-letter-spacing"] .btn,
 body[class*="a11y-letter-spacing"] .nav-link,
 body[class*="a11y-letter-spacing"] .tab,
-body[class*="a11y-letter-spacing"] .tag,
 body[class*="a11y-letter-spacing"] .tab-btn,
+body[class*="a11y-letter-spacing"] .tag,
+body[class*="a11y-letter-spacing"] .tag-blue,
+body[class*="a11y-letter-spacing"] .tag-gray,
+body[class*="a11y-letter-spacing"] .tag-orange,
+body[class*="a11y-letter-spacing"] .tab-count,
 body[class*="a11y-letter-spacing"] input,
 body[class*="a11y-letter-spacing"] select { letter-spacing: normal !important; }
 
