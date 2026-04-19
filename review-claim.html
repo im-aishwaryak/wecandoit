@@ -101,6 +101,7 @@
         </div>
     </main>
 
+    <script src="scripts/notif.js"></script>
     <script type="module" src="scripts/review_item.js"></script>
     <script type="module" src="scripts/protect-auth.js"></script>
     <script type="module">
@@ -149,6 +150,30 @@
         </div>
     </footer>
     <div class="a11y-reading-guide-line"></div>
+
+    <div id="confirm-modal" class="confirm-modal hidden">
+        <div class="confirm-box">
+          <p id="confirm-message">Are you sure?</p>
+          <div class="confirm-actions">
+            <button id="confirm-yes" class = "btn-orange">Yes</button>
+            <button id="confirm-no" class = "btn-blue">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="reason-modal" class="confirm-modal hidden">
+        <div class="confirm-box">
+          <p>Enter reason for rejection (optional):</p>
+      
+          <input id="reason-input" type="text" placeholder="Type reason..." />
+      
+          <div class="confirm-actions">
+            <button id="reason-submit" class = "btn-orange">Submit</button>
+            <button id="reason-cancel" class = "btn-blue">Cancel</button>
+          </div>
+        </div>
+      </div>
+
 </body>
 
 <svg style="position:absolute;width:0;height:0" aria-hidden="true">

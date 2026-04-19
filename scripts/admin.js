@@ -337,7 +337,8 @@ async function loadReunitedItems() {
 
 // Approve item submission
 async function approveItem(itemId) {
-    if (!confirm('Approve this item submission?')) return;
+    const confirmed = await showConfirm("Approve this item submission?");
+    if (!confirmed) return; 
 
     try {
         const user = auth.currentUser;
@@ -348,19 +349,20 @@ async function approveItem(itemId) {
             approved_at: new Date().toISOString(),
         });
 
-        alert('Item approved and now visible to students!');
+        showNotif("Item approved and now visible to students!", "success");
         loadAdminDashboard(); // Reload dashboard
 
     } catch (error) {
         console.error("Error approving item:", error);
-        alert('Failed to approve item. Please try again.');
+        showNotif("Failed to approve item. Please try again.", "error"); 
     }
 }
 
 
 // Mark item as retrieved
 async function markItemRetrieved(claimId) {
-    if (!confirm('Mark this item as retrieved?')) return;
+    const confirmed = await showConfirm("Mark this item as retrieved?");
+    if (!confirmed) return; 
 
     try {
         const itemRef = doc(db, "Item_Data", claimId);
@@ -369,12 +371,13 @@ async function markItemRetrieved(claimId) {
             retrieved_at: new Date().toISOString()
         });
 
-        alert('Item marked as retrieved!');
+     
+        showNotif('Item marked as retrieved', 'success'); 
         loadAdminDashboard(); // Reload dashboard
 
     } catch (error) {
         console.error("Error marking item as retrieved:", error);
-        alert('Failed to update item status. Please try again.');
+        showNotif("Failed to update item status. Please try again.", "error"); 
     }
 }
 

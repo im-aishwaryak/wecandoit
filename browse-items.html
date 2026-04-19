@@ -249,6 +249,8 @@
 
     </main>
 
+    <script src="scripts/notif.js"></script>
+    <script type="module" src="scripts/protect-auth.js"></script>
     <script>
         document.addEventListener("mousemove", (e) => {
             const guide = document.querySelector(".a11y-reading-guide-line");
@@ -256,6 +258,7 @@
         });
     </script>
     <script type="module">
+    
         import { auth } from './scripts/firebaseModule.js';
 
         document.addEventListener('DOMContentLoaded', () => {

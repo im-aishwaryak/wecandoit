@@ -54,21 +54,35 @@ const uploadData = async() => {
    
     if (!currentUser) {
         console.error("No user is logged in!");
-        alert("You must be logged in to submit an item.");
-        return;
+        showNotif("You must be logged in to submit an item.", "error");
+        return false;
     }
    
     var category = document.getElementById("category").value;
     var item_name = document.getElementById("item").value;
-    var public_desc = ""; //document.getElementById("public_desc").value;
-    var private_desc = ""; //document.getElementById("private_desc").value;
+    var public_desc = ""
+    var private_desc = ""
     var location = document.getElementById("location").value;
     var date = document.getElementById("date").value;
     var time = document.getElementById("time").value;
 
+    if (
+        !item_name.trim() ||
+        !location.trim() ||
+        !date ||
+        category === "Select a category"
+    ) {
+        showNotif("Please fill in all required fields.", "error");
+        return false; 
+    }
+    
+
 
     var image_url = await uploadImage()
-
+    if(!image_url){
+        showNotif("Please upload an image", "error"); 
+        return false; 
+    }
 
     var q1 = getQuestionValue(1);
     var a1 = document.getElementById("answer1").value
@@ -80,42 +94,56 @@ const uploadData = async() => {
     var q3 = getQuestionValue(3);
     var a3 = document.getElementById("answer3").value
 
+    if(!a1 || !a2 || !a3){
+        showNotif("Please fill in all verification questions.", "error"); 
+        return false; 
+    }
 
     var verifications = {[q1]:a1, [q2]:a2, [q3]:a3}
-    console.log(verifications)
 
 
     var ref = collection(db, "Item_Data")
     console.log(ref)
     console.log(localStorage.getItem("user_logged_in"))
    
-    await addDoc(
-        ref, {
-            category: category,
-            item_name: item_name,
-            image_url: image_url,
-            public_description: public_desc,
-            private_description: private_desc,
-            location_found: location,
-            date_found: date,
-            time_found: time,
-            verification_qs: verifications,
-            status: "pending submission",
-            retrieval_date: "",
-            // Add user tracking fields
-            submitter_id: currentUser.uid,
-            submitter_email: currentUser.email,
-            submitted_at: new Date().toISOString()
+    const data = {
+        category: category,
+        item_name: item_name,
+        image_url: image_url,
+        public_description: public_desc,
+        private_description: private_desc,
+        location_found: location,
+        date_found: date,
+        time_found: time,
+        verification_qs: verifications,
+        status: "pending submission",
+        retrieval_date: "",
+        // Add user tracking fields
+        submitter_id: currentUser.uid,
+        submitter_email: currentUser.email,
+        submitted_at: new Date().toISOString()
         }
-    );
+
+    if (time && time.trim() !== "") {
+        data.time_found = time;
+    }
+    await addDoc(ref, data);
+    return true; 
 }
 
 
 report_button.addEventListener("click", async (e) => {
     e.preventDefault();   // 🔥 stops page reload
-    await uploadData();
-    alert("Item Report Submitted!")
-    window.location.reload();
+    showNotif("Submitting item...", "info");
+    
+    const success = await uploadData();
+    if(success){ 
+        showNotif("Item Report Submitted!", "success");
+
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
+    } 
 });
 
 

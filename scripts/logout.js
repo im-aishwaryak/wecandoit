@@ -21,7 +21,7 @@ if (logoutBtn) {
             
         } catch (error) {
             console.error("Error signing out:", error);
-            alert("Failed to log out. Please try again.");
+            showNotif("Failed to log out. Please try again.", "error");
         }
     });
 }

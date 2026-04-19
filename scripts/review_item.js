@@ -18,7 +18,7 @@ console.log(itemId)
 // Load claim and item details
 async function loadReviewData() {
     if (!itemId) {
-        alert("No item selected");
+        showNotif("No item selected", "error");
         window.location.href = "admin-dashboard.html";
         return;
     }
@@ -29,7 +29,7 @@ async function loadReviewData() {
         const itemSnap = await getDoc(itemRef);
        
         if (!itemSnap.exists()) {
-            alert("Item not found");
+            showNotif("Item not found", "error");
             window.location.href = "admin-dashboard.html";
             return;
         }
@@ -50,7 +50,7 @@ async function loadReviewData() {
        
     } catch (error) {
         console.error("Error loading review data:", error);
-        alert("Error loading claim details");
+        showNotif("Error loading claim details", "error");
         window.location.href = "admin-dashboard.html";
     }
 }
@@ -59,7 +59,7 @@ async function loadReviewData() {
 // Display comparison between claim and item
 function displayComparison() {
     if (!currentClaim || !currentItem) {
-        alert("Missing claim or item data");
+        showNotif("Missing claim or item data", "error");
         return;
     }
    
@@ -161,9 +161,8 @@ function displayComparison() {
 
 // Approve the claim
 async function approveClaim() {
-    if (!confirm('Approve this claim? The student will be notified to pick up the item.')) {
-        return;
-    }
+    const confirmed = await showConfirm("Approve this claim? The student will be notified to pick up the item.");
+    if (!confirmed) return; 
    
     try {
         const user = auth.currentUser;
@@ -183,23 +182,21 @@ async function approveClaim() {
             status: "claimed and ready to retrieve"
         });
        
-        alert('Claim approved! Student can now pick up the item from the main office.');
+        showNotif("Claim approved! Student can now pick up the item from the main office.", "error");
         window.location.href = "admin-dashboard.html";
        
     } catch (error) {
         console.error("Error approving claim:", error);
-        alert('Failed to approve claim. Please try again.');
+        showNotif("Failed to approve claim. Please try again.", "error");
     }
 }
 
 
 // Reject the claim
 async function rejectClaim() {
-    const reason = prompt('Enter reason for rejection (optional):');
-   
-    if (reason === null) {
-        return; // User cancelled
-    }
+    const reason = await showReasonPrompt();
+
+    if (reason === null) return; 
    
     try {
         const user = auth.currentUser;
@@ -221,13 +218,17 @@ async function rejectClaim() {
             claimed_at: null,
             claim_id: null
         });
-       
-        alert('Claim rejected. The item is now available again.');
-        window.location.href = "admin-dashboard.html";
+
+        showNotif('Claim rejected. The item is now available again.', 'info');
+
+        setTimeout(() => {
+            window.location.href = "admin-dashboard.html";
+        }, 1500);
+
        
     } catch (error) {
         console.error("Error rejecting claim:", error);
-        alert('Failed to reject claim. Please try again.');
+        showNotif('Failed to reject claim. Please try again.', 'info');
     }
 }
 
