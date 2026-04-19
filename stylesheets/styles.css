@@ -2180,8 +2180,12 @@ body.dark-mode ::-webkit-scrollbar-thumb:hover {
 #notif-container {
   position: fixed;
   top: 50px;
-  right: 500px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .toast {
