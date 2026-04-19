@@ -66,6 +66,8 @@
         });
     </script>
 
+    <script type="module" src="scripts/accessibility.js"></script>
+
     <header class="site-header">
         <div class="container header-inner">
             <a href="home.html" class="logo" aria-label="Boomerang home">
@@ -231,6 +233,13 @@
         });
     </script>
 
+    <script>
+        document.addEventListener("mousemove", (e) => {
+            const guide = document.querySelector(".a11y-reading-guide-line");
+            if (guide) guide.style.top = `${e.clientY}px`;
+        });
+    </script>
+
     <footer class="site-footer">
         <div class="container footer-inner">
             <div class="footer-brand">
@@ -239,6 +248,34 @@
             <div class="copyright">© 2025 Boomerang. All rights reserved.</div>
         </div>
     </footer>
+
+    <div class="a11y-reading-guide-line"></div>
 </body>
+
+<svg style="position:absolute;width:0;height:0" aria-hidden="true">
+    <defs>
+        <filter id="deuteranopia-filter">
+            <feColorMatrix type="matrix" values="
+        0.367 0.861 -0.228 0 0
+        0.280 0.673  0.047 0 0
+       -0.012 0.043  0.969 0 0
+        0     0      0     1 0" />
+        </filter>
+        <filter id="protanopia-filter">
+            <feColorMatrix type="matrix" values="
+        0.152 1.053 -0.205 0 0
+        0.115 0.786  0.099 0 0
+       -0.004 -0.048 1.052 0 0
+        0      0      0    1 0" />
+        </filter>
+        <filter id="tritanopia-filter">
+            <feColorMatrix type="matrix" values="
+        1.256 -0.077 -0.179 0 0
+       -0.078  0.931  0.148 0 0
+        0.005  0.691  0.304 0 0
+        0      0      0     1 0" />
+        </filter>
+    </defs>
+</svg>
 
 </html>
