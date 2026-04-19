@@ -252,10 +252,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Fill name from displayName or fallback to email prefix
         if (nameInput) {
+            console.log("lol? ")
             if (user.displayName) {
                 nameInput.value = user.displayName;
             } else {
-                const defaultName = user.email ? user.email.split('@')[0] : "";
+                const defaultName = user.full_name;
                 nameInput.value = defaultName;
             }
         }
