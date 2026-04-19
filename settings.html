@@ -16,6 +16,8 @@
 
 <body>
 
+    <div class="a11y-reading-guide-line"></div>
+
     <!-- ================== JS ================== -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
@@ -68,6 +70,8 @@
         });
     </script>
 
+    <!--<script type="module" src="scripts/dashboard-init.js"></script>-->
+    <script type="module" src="scripts/accessibility.js"></script>
     <script src="scripts/notif.js"></script>
     <script type="module" src="scripts/dashboard-init.js"></script>
 
@@ -101,107 +105,107 @@
 
         <!-- Visual -->
 
-            <div class="a11y-row">
-                <div>
-                    <div class="form-label">High contrast mode</div>
-                    <div class="form-hint">Increases contrast between text and background</div>
-                </div>
-                <label class="a11y-toggle">
-                    <input type="checkbox" id="high-contrast" />
-                    <span class="a11y-slider"></span>
-                </label>
+        <div class="a11y-row">
+            <div>
+                <div class="form-label">Dark mode</div>
+                <div class="form-hint">Easy on the eyes in low light</div>
             </div>
+            <label class="a11y-toggle">
+                <input type="checkbox" id="dark-mode" />
+                <span class="a11y-slider"></span>
+            </label>
+        </div>
 
-            <div class="a11y-row">
-                <div>
-                    <div class="form-label">Color blind mode</div>
-                </div>
-                <select id="colorblind" class="input">
-                    <option value="none">None</option>
-                    <option value="deuteranopia">Deuteranopia (red/green)</option>
-                    <option value="protanopia">Protanopia (red)</option>
-                    <option value="tritanopia">Tritanopia (blue/yellow)</option>
-                </select>
+        <div class="a11y-row">
+            <div>
+                <div class="form-label">High contrast mode</div>
+                <div class="form-hint">Increases contrast between text and background</div>
             </div>
+            <label class="a11y-toggle">
+                <input type="checkbox" id="high-contrast" />
+                <span class="a11y-slider"></span>
+            </label>
+        </div>
 
-            <div class="a11y-row a11y-range-row">
-                <div class="a11y-range-top">
-                    <div class="form-label">Font size</div>
-                    <span id="font-size-val" class="a11y-range-val">100%</span>
-                </div>
-                <input type="range" id="font-size" min="80" max="150" step="5" value="100" />
+        <div class="a11y-row">
+            <div>
+                <div class="form-label">Color blind mode</div>
             </div>
+            <select id="colorblind" class="input">
+                <option value="none">None</option>
+                <option value="deuteranopia">Deuteranopia (red/green)</option>
+                <option value="protanopia">Protanopia (red)</option>
+                <option value="tritanopia">Tritanopia (blue/yellow)</option>
+            </select>
+        </div>
 
-            <div class="a11y-row">
-                <div>
-                    <div class="form-label">Highlight links</div>
-                    <div class="form-hint">Underlines and bolds all links</div>
-                </div>
-                <label class="a11y-toggle">
-                    <input type="checkbox" id="highlight-links" />
-                    <span class="a11y-slider"></span>
-                </label>
+        <div class="a11y-row a11y-range-row">
+            <div class="a11y-range-top">
+                <div class="form-label">Font size</div>
+                <span id="font-size-val" class="a11y-range-val">100%</span>
             </div>
+            <input type="range" id="font-size" min="80" max="150" step="5" value="100" />
+        </div>
 
-            <div class="a11y-row">
-                <div>
-                    <div class="form-label">Reduce motion</div>
-                    <div class="form-hint">Minimises animations and transitions</div>
-                </div>
-                <label class="a11y-toggle">
-                    <input type="checkbox" id="reduce-motion" />
-                    <span class="a11y-slider"></span>
-                </label>
+        <div class="a11y-row">
+            <div>
+                <div class="form-label">Highlight links</div>
+                <div class="form-hint">Underlines and bolds all links</div>
             </div>
+            <label class="a11y-toggle">
+                <input type="checkbox" id="highlight-links" />
+                <span class="a11y-slider"></span>
+            </label>
+        </div>
 
-            <div class="a11y-row">
-                <div>
-                    <div class="form-label">Disable parallax</div>
-                    <div class="form-hint">Prevents scroll-based depth effects</div>
-                </div>
-                <label class="a11y-toggle">
-                    <input type="checkbox" id="disable-parallax" />
-                    <span class="a11y-slider"></span>
-                </label>
+        <div class="a11y-row">
+            <div>
+                <div class="form-label">Reduce motion</div>
+                <div class="form-hint">Minimises animations and transitions</div>
             </div>
-        
-            <div class="a11y-row">
-                <div>
-                    <div class="form-label">Dyslexia-friendly font</div>
-                    <div class="form-hint">Uses a specialised font to aid reading</div>
-                </div>
-                <label class="a11y-toggle">
-                    <input type="checkbox" id="dyslexia-font" />
-                    <span class="a11y-slider"></span>
-                </label>
-            </div>
+            <label class="a11y-toggle">
+                <input type="checkbox" id="reduce-motion" />
+                <span class="a11y-slider"></span>
+            </label>
+        </div>
 
-            <div class="a11y-row a11y-range-row">
-                <div class="a11y-range-top">
-                    <div class="form-label">Line spacing</div>
-                    <span id="line-spacing-val" class="a11y-range-val">Normal</span>
-                </div>
-                <input type="range" id="line-spacing" min="1" max="3" step="1" value="2" />
+        <div class="a11y-row">
+            <div>
+                <div class="form-label">Dyslexia-friendly font</div>
+                <div class="form-hint">Uses a specialised font to aid reading</div>
             </div>
+            <label class="a11y-toggle">
+                <input type="checkbox" id="dyslexia-font" />
+                <span class="a11y-slider"></span>
+            </label>
+        </div>
 
-            <div class="a11y-row a11y-range-row">
-                <div class="a11y-range-top">
-                    <div class="form-label">Letter spacing</div>
-                    <span id="letter-spacing-val" class="a11y-range-val">Normal</span>
-                </div>
-                <input type="range" id="letter-spacing" min="1" max="3" step="1" value="2" />
+        <div class="a11y-row a11y-range-row">
+            <div class="a11y-range-top">
+                <div class="form-label">Line spacing</div>
+                <span id="line-spacing-val" class="a11y-range-val">Normal</span>
             </div>
+            <input type="range" id="line-spacing" min="1" max="3" step="1" value="2" />
+        </div>
 
-            <div class="a11y-row">
-                <div>
-                    <div class="form-label">Reading guide</div>
-                    <div class="form-hint">Highlights the line under your cursor</div>
-                </div>
-                <label class="a11y-toggle">
-                    <input type="checkbox" id="reading-guide" />
-                    <span class="a11y-slider"></span>
-                </label>
+        <div class="a11y-row a11y-range-row">
+            <div class="a11y-range-top">
+                <div class="form-label">Letter spacing</div>
+                <span id="letter-spacing-val" class="a11y-range-val">Normal</span>
             </div>
+            <input type="range" id="letter-spacing" min="1" max="3" step="1" value="2" />
+        </div>
+
+        <div class="a11y-row">
+            <div>
+                <div class="form-label">Reading guide</div>
+                <div class="form-hint">Highlights the line under your cursor</div>
+            </div>
+            <label class="a11y-toggle">
+                <input type="checkbox" id="reading-guide" />
+                <span class="a11y-slider"></span>
+            </label>
+        </div>
 
         </div>
 
@@ -212,7 +216,6 @@
         </div>
         <p id="saved-msg" class="a11y-saved-msg" aria-live="polite"></p>
 
-        <script src="accessibility-settings.js"></script>
 
     </main>
 
@@ -229,6 +232,13 @@
             <div class="copyright">© 2025 Boomerang. All rights reserved.</div>
         </div>
     </footer>
+
+    <script>
+        document.addEventListener("mousemove", (e) => {
+            const guide = document.querySelector(".a11y-reading-guide-line");
+            if (guide) guide.style.top = `${e.clientY}px`;
+        });
+    </script>
 
     <script type="module">
         import { auth } from './scripts/firebaseModule.js';
@@ -260,5 +270,31 @@
         });
     </script>
 </body>
+
+<svg style="position:absolute;width:0;height:0" aria-hidden="true">
+    <defs>
+        <filter id="deuteranopia-filter">
+            <feColorMatrix type="matrix" values="
+        0.367 0.861 -0.228 0 0
+        0.280 0.673  0.047 0 0
+       -0.012 0.043  0.969 0 0
+        0     0      0     1 0" />
+        </filter>
+        <filter id="protanopia-filter">
+            <feColorMatrix type="matrix" values="
+        0.152 1.053 -0.205 0 0
+        0.115 0.786  0.099 0 0
+       -0.004 -0.048 1.052 0 0
+        0      0      0    1 0" />
+        </filter>
+        <filter id="tritanopia-filter">
+            <feColorMatrix type="matrix" values="
+        1.256 -0.077 -0.179 0 0
+       -0.078  0.931  0.148 0 0
+        0.005  0.691  0.304 0 0
+        0      0      0     1 0" />
+        </filter>
+    </defs>
+</svg>
 
 </html>
