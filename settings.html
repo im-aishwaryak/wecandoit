@@ -93,6 +93,17 @@
                 <a class="nav-link nav-pill" id="nav-current" href="dashboard.html">Dashboard</a>
                 <a class="nav-link nav-cta" href="log-in.html">Log out <span id="log-in-email"
                         class="log-in-email-placeholder">0000000@apps.nsd.org</span></a>
+
+                <script>
+                    const userStatus = localStorage.getItem("user_identity")
+                    const dashboardLink = document.getElementById("nav-current");
+        
+                    if (userStatus === "admin") {
+                        dashboardLink.href = "admin-dashboard.html";
+                    } else {
+                        dashboardLink.href = "dashboard.html";
+                    }   
+                </script>
             </nav>
         </div>
     </header>
