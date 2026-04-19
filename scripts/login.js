@@ -91,20 +91,20 @@ const userEmailLogIn = async () => {
     console.log(errorCode)
     switch (errorCode) {
       case "auth/user-not-found":
-        alert("No account found with that email.");
+        showNotif("No account found with that email.", "error")
         break;
   
       case "auth/invalid-credential":
-        alert("Incorrect email or password. Try again.");
+        showNotif("Incorrect email or password. Try again.", "error");
         break;
   
   
       case "auth/too-many-requests":
-        alert("Too many attempts. Try again later.");
+        showNotif("Too many attempts. Try again later.", "error");
         break;
   
       default:
-        alert("Login failed. Please try again.");
+        showNotif("Login failed. Please try again.", "error");
     }
   });
 }
@@ -132,7 +132,7 @@ async function AddUser() {
       user_status = "Admin"
     }
     else{
-      alert("email must be tied to North Creek High School")
+      showNotif("Email must be tied to North Creek High School", "error"); 
       return;
     }
     var ref = doc(db, "User_Data", user.email);

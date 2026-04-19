@@ -198,8 +198,9 @@
         </div>
     </div>
 
+    <script src="scripts/notif.js"></script>
     <script type="module" src="scripts/admin.js"></script>
-    <script type="module" src="scripts/logout.js"></script> <!-- Add this -->
+    <script type="module" src="scripts/logout.js"></script> 
 
     <script type="module">
         import { auth } from './scripts/firebaseModule.js';
@@ -239,6 +240,17 @@
             <div class="copyright">© 2025 Boomerang. All rights reserved.</div>
         </div>
     </footer>
+
+    <div id="confirm-modal" class="confirm-modal hidden">
+        <div class="confirm-box">
+          <p id="confirm-message">Are you sure?</p>
+          <div class="confirm-actions">
+            <button id="confirm-yes" class = "btn-orange">Yes</button>
+            <button id="confirm-no" class = "btn-blue">Cancel</button>
+          </div>
+        </div>
+      </div>
+
 </body>
 
 </html>

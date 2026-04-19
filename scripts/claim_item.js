@@ -17,7 +17,7 @@ console.log(itemId)
 // Load item details on page load
 async function loadItemDetails() {
     if (!itemId) {
-        alert("No item selected");
+        showNotif("No item selected", "error")
         window.location.href = "browse-items.html";
         return;
     }
@@ -27,7 +27,7 @@ async function loadItemDetails() {
         const itemSnap = await getDoc(itemRef);
        
         if (!itemSnap.exists()) {
-            alert("Item not found");
+            showNotif("Item not found", "error")
             window.location.href = "browse-items.html";
             return;
         }
@@ -43,7 +43,7 @@ async function loadItemDetails() {
        
     } catch (error) {
         console.error("Error loading item:", error);
-        alert("Error loading item details");
+        showNotif("Error loading item details", "error")
         window.location.href = "browse-items.html";
     }
 }
@@ -130,13 +130,13 @@ async function submitClaim(e) {
    
     const user = auth.currentUser;
     if (!user) {
-        alert("You must be logged in to claim an item");
+        showNotif("You must be logged in to claim an item", "error")
         window.location.href = "log-in.html";
         return;
     }
    
     if (!currentItem) {
-        alert("No item selected");
+        showNotif("No item selected", "error"); 
         return;
     }
    
@@ -149,13 +149,14 @@ async function submitClaim(e) {
    
     // Validate required fields
     if (!studentName || !studentEmail || !lostDate) {
-        alert("Please fill in all required fields");
+        showNotif("Please fill in all required fields", "error"); 
         return;
     }
    
     // Validate email matches logged-in user
     if (studentEmail !== user.email) {
-        alert("Email must match your logged-in account");
+        showNotif("Email must match your logged-in account", "error"); 
+
         return;
     }
    
@@ -166,7 +167,7 @@ async function submitClaim(e) {
     for (let i = 0; i < questions.length; i++) {
         const answerInput = document.getElementById(`answer${i + 1}`);
         if (!answerInput || !answerInput.value.trim()) {
-            alert("Please answer all verification questions");
+            showNotif("Please answer all verification questions", "error"); 
             return;
         }
         answers[questions[i]] = answerInput.value.trim().toLowerCase();
@@ -212,12 +213,13 @@ async function submitClaim(e) {
             items_claimed: increment(1)
         });
        
-        alert("Claim submitted successfully! An administrator will review your request.");
+        
+        showNotif("Claim submitted successfully! An administrator will review your request.", "success"); 
         window.location.href = "dashboard.html";
        
     } catch (error) {
         console.error("Error submitting claim:", error);
-        alert("Failed to submit claim. Please try again.");
+        showNotif("Failed to submit claim. Please try again.", "error"); 
        
         // Re-enable button
         submitBtn.disabled = false;

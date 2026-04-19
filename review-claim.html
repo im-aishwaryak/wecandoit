@@ -99,6 +99,7 @@
         </div>
     </main>
 
+    <script src="scripts/notif.js"></script>
     <script type="module" src="scripts/review_item.js"></script>
     <script type="module" src="scripts/protect-auth.js"></script>
     <script type="module">
@@ -139,6 +140,30 @@
             <div class="copyright">© 2025 Boomerang. All rights reserved.</div>
         </div>
     </footer>
+
+    <div id="confirm-modal" class="confirm-modal hidden">
+        <div class="confirm-box">
+          <p id="confirm-message">Are you sure?</p>
+          <div class="confirm-actions">
+            <button id="confirm-yes" class = "btn-orange">Yes</button>
+            <button id="confirm-no" class = "btn-blue">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="reason-modal" class="confirm-modal hidden">
+        <div class="confirm-box">
+          <p>Enter reason for rejection (optional):</p>
+      
+          <input id="reason-input" type="text" placeholder="Type reason..." />
+      
+          <div class="confirm-actions">
+            <button id="reason-submit" class = "btn-orange">Submit</button>
+            <button id="reason-cancel" class = "btn-blue">Cancel</button>
+          </div>
+        </div>
+      </div>
+
 </body>
 
 </html>
