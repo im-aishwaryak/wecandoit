@@ -215,7 +215,10 @@ async function submitClaim(e) {
        
         
         showNotif("Claim submitted successfully! An administrator will review your request.", "success"); 
-        window.location.href = "dashboard.html";
+        setTimeout(() => {
+            window.location.href = "dashboard.html";
+        }, 1500);
+
        
     } catch (error) {
         console.error("Error submitting claim:", error);
