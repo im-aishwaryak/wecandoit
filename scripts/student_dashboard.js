@@ -1,6 +1,6 @@
 import {
     db, auth,
-    collection, query, where, getDocs, doc, updateDoc
+    collection, query, where, getDoc, getDocs, doc, updateDoc
 } from './firebaseModule.js';
 
 let user = "";
@@ -75,7 +75,7 @@ async function loadReadyToClaim() {
                 <p class="item-location" style="padding-bottom: 5px;"></p>
                 <p class="item-location" style="padding-bottom: 5px;">Approved on ${formatDate(claim.reviewed_at)}</p>
             </div>
-            <!--<button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>-->
+            <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
         `;
 
         card.dataset.claimData = JSON.stringify(claim);
@@ -130,7 +130,7 @@ async function loadPendingRetrievalRequests() {
                 <h4>${claim.item_name}</h4>
                 <p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(claim.lost_date)}</p>
             </div>
-            <!--<button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>-->
+            <button class="btn btn-orange btn-sm" data-modal="claimed">View Details</button>
         `;
 
         card.dataset.claimData = JSON.stringify(claim);
@@ -183,9 +183,10 @@ async function loadPendingSubmissions() {
                 <p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(item.date_found)} </p>
                 <p class="item-location">Found in ${item.location_found}</p>
             </div>
-            <!--<button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>-->
+            <button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>
         `;
 
+        console.log("FULL ITEM DATA:", item);
         card.dataset.itemData = JSON.stringify(item);
         container.appendChild(card);
     });
@@ -237,7 +238,7 @@ async function loadFoundItems() {
                 <p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(item.date_found)} </p>
                 <p class="item-location">Found in ${item.location_found}</p>
             </div>
-            <!--<button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>-->
+            <button class="btn btn-orange btn-sm" data-modal="reported">View Details</button>
         `;
 
         card.dataset.itemData = JSON.stringify(item);
@@ -265,6 +266,92 @@ auth.onAuthStateChanged((user) => {
     }
 });
 
+
+
+
+
+
+
+
+window.populateReportedModal = function (itemData, itemId) {
+    
+    const modal = document.getElementById("reported-details-modal");
+    if (!modal) return;
+
+    document.getElementById("reported-img").src = itemData.image_url || 'assets/placeholders/lost-item1.jpg';
+    document.getElementById("reported-title").textContent = itemData.item_name || itemData.category || 'Unknown Item';
+    document.getElementById("reported-location").innerHTML = `<img src="assets/icons/location.svg">${itemData.location_found || 'Unknown'}`;
+    document.getElementById("reported-date").innerHTML = `<img src="assets/icons/clock.svg">${formatDate(itemData.date_found)}`;
+
+    // Populate verification questions
+    const questionsContainer = document.getElementById("reported-questions");
+    questionsContainer.innerHTML = "";
+
+    if (itemData.verification_qs && typeof itemData.verification_qs === 'object') {
+        Object.entries(itemData.verification_qs).forEach(([question, answer], i) => {
+            questionsContainer.innerHTML += `
+            <div class="input-field">
+                <label>Question ${i + 1}: ${question}</label>
+                <p>${answer}</p>
+            </div>
+        `;
+        });
+    } else {
+        questionsContainer.innerHTML = `<p class="subtitle">No verification questions.</p>`;
+    }
+};
+
+window.populateClaimedModal = async function (claimData, claimId) {
+    const modal = document.getElementById("claimed-details-modal");
+    if (!modal) return;
+
+    document.getElementById("claimed-img").src = claimData.item_image || claimData.image_url || 'assets/placeholders/lost-item1.jpg';
+    document.getElementById("claimed-title").textContent = claimData.item_name || 'Unknown Item';
+    document.getElementById("claimed-date").innerHTML = `<img src="assets/icons/clock.svg">${formatDate(claimData.lost_date || claimData.date_found)}`;
+    document.getElementById("claimed-finder-email").textContent = claimData.claimant_email || claimData.submitter_email || 'N/A';
+    document.getElementById("claimed-additional").textContent = claimData.additional_info || claimData.additional_notes || 'No additional notes.';
+
+    // Fetch location from Item_Data
+    if (claimData.item_id) {
+        try {
+            const itemDoc = await getDoc(doc(db, "Item_Data", claimData.item_id));
+            if (itemDoc.exists()) {
+                const itemData = itemDoc.data();
+                document.getElementById("claimed-location").innerHTML =
+                    `<img src="assets/icons/location.svg">${itemData.location_found || 'N/A'}`;
+                document.getElementById("claimed-finder-email").textContent = itemData.submitter_email || 'N/A';
+            }
+        } catch (err) {
+            console.error("Failed to fetch item data:", err);
+        }
+    }
+
+    // Verification answers
+    const questionsContainer = document.getElementById("claimed-questions");
+    questionsContainer.innerHTML = "";
+
+    if (claimData.verification_answers && !Array.isArray(claimData.verification_answers)) {
+        Object.entries(claimData.verification_answers).forEach(([question, answer], i) => {
+            questionsContainer.innerHTML += `
+                <div class="input-field">
+                    <label>Question ${i + 1}: ${question}</label>
+                    <p>${answer}</p>
+                </div>
+            `;
+        });
+    } else if (Array.isArray(claimData.verification_answers)) {
+        claimData.verification_answers.forEach((qa, i) => {
+            questionsContainer.innerHTML += `
+                <div class="input-field">
+                    <label>Question ${i + 1}: ${qa.question || 'N/A'}</label>
+                    <p>${qa.answer || 'N/A'}</p>
+                </div>
+            `;
+        });
+    } else {
+        questionsContainer.innerHTML = `<p class="subtitle">No verification questions provided.</p>`;
+    }
+};
 
 
 /* import { db, auth, collection, query, where, getDocs } from './firebaseModule.js';

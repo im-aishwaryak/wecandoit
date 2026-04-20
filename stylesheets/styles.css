@@ -135,6 +135,10 @@ h1 {
     padding-bottom: 10px;
 }
 
+h3 {
+    margin: 0px;
+}
+
 .section-title {
     text-align: center;
     font-size: var(--font-2xl);
@@ -256,6 +260,17 @@ h1 {
     font-family: 'Figtree';
     width: 100%;
     background: transparent;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: 12px 15px;
+}
+
+.search-input {
+    border: none;
+    font-size: var(--font-md);
+    font-family: 'Figtree';
+    width: 100%;
+    background: transparent;
 }
 
 .input:focus {
@@ -280,6 +295,7 @@ h1 {
     flex-direction: column;
     gap: 5px;
     position: relative;
+    width: 100%;
 }
 
 .input-field label {
@@ -351,8 +367,8 @@ select option {
 }
 
 .tag-blue {
-    background: var(--blue-200);
-    color: var(--blue-900);
+    background: var(--blue-tag-bg);
+    color: var(--blue-tag-text);
 }
 
 .tag-gray {
@@ -361,7 +377,13 @@ select option {
 }
 
 .tag-orange {
-    background: var(--orange-400);
+    background: var(--orange-tag-bg);
+    color: var(--orange-tag-text);
+}
+
+.tag-yellow {
+    background: var(--yellow-tag-bg);
+    color: var(--yellow-tag-text);
 }
 
 .tag-transparent {
@@ -814,6 +836,7 @@ select option {
     font-size: var(--font-sm);
     color: var(--text-secondary);
     line-height: 13px;
+    margin-top: 0px;
 }
 
 .form-row {
@@ -863,6 +886,10 @@ select option {
 
 
 /* ==================== SEARCH & FILTER ==================== */
+#colorblind {
+    width: fit-content;
+}
+
 .search-filter {
     display: flex;
     align-items: center;
@@ -955,7 +982,8 @@ select option {
     box-shadow: var(--text-secondary) 0px 0px 10px;
 }
 
-.image-modal-close img {
+.image-modal-close img, 
+.details-modal-close img {
     width: 16px;
     height: 16px;
 }
@@ -997,6 +1025,7 @@ select option {
     background: var(--bg);
     border-radius: var(--radius-lg);
     padding: 25px;
+    padding-right: 40px;
     width: 100%;
     max-width: 650px;
     position: relative;
@@ -1007,8 +1036,8 @@ select option {
 
 .details-modal-close {
     position: absolute;
-    top: 12px;
-    right: 12px;
+    top: 7px;
+    right: 7px;
     background: transparent;
     border: none;
     font-size: var(--font-xl);
@@ -1018,19 +1047,27 @@ select option {
 .details-item-header {
     display: flex;
     gap: 20px;
+    align-items: flex-start;
 }
 
 .details-img {
-    width: 170px;
-    height: 170px;
+    width: 40%;
+    max-width: 220px;
+    aspect-ratio: 1;
     object-fit: cover;
     border-radius: var(--radius-lg);
+    flex-shrink: 0;
 }
 
 .details-info {
     display: flex;
     flex-direction: column;
     gap: 5px;
+    width: 100%;
+}
+
+.details-info h2 {
+    line-height: -20px;
 }
 
 .details-info p {
@@ -2115,14 +2152,14 @@ body.dark-mode ::-webkit-scrollbar-thumb:hover {
         border-bottom: none;
         border: 1.5px solid var(--border-medium);
         border-radius: 999px;
-        padding: 6px 14px;
+        padding: 10px 14px;
         font-size: var(--font-sm);
     }
 
     .tab.active {
-        background: var(--text);
-        color: var(--bg);
-        border-color: var(--text);
+        color: var(--text);
+        background: var(--bg);
+        border: 2px solid var(--text);
     }
 }
 

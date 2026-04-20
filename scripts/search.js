@@ -85,8 +85,7 @@ function createItemCard(item) {
         </div>
 
         <div class="item-text">
-            <h3 class="item-name">${item.item_name}</h3> 
-            
+            <h3 class="item-name">${item.item_name}</h3>             
             <p class="item-desc">${item.public_description}</p>
         </div>
 

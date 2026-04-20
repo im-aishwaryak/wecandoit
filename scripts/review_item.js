@@ -126,9 +126,7 @@ function displayComparison() {
                     <p><b>Item Name:</b> ${currentItem.item_name || currentItem.category}</p>
                     <p><b>Found on:</b> ${currentItem.date_found}${currentItem.time_found ? ' at ' + currentItem.time_found : ''}</p>
                     <p><b>Location Found:</b> ${currentItem.location_found}</p>
-                    <p><b>Reporter Email:</b> ${currentItem.submitted_by}</p>
-                    <p><b>Public Description:</b> ${currentItem.public_description}</p>
-                    <p><b>Private Description:</b> ${currentItem.private_description}</p>
+                    <p><b>Reporter Email:</b> ${currentItem.submitter_email}</p>
                     <br>
                     <p><b>Verification Questions & Correct Answers:</b></p>
                     ${Object.entries(itemQuestions).map(([q, a], i) =>

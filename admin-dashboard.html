@@ -15,6 +15,8 @@
 </head>
 
 <body>
+    <div class="a11y-reading-guide-line"></div>
+
     <script>
         document.addEventListener("DOMContentLoaded", () => {
 
@@ -40,24 +42,39 @@
                 nav.classList.toggle("show");
             });
 
-            /* ========= MODAL LOGIC ========= */
+            /* ========= MODAL LOGIC WITH EVENT DELEGATION ========= */
             const reportedModal = document.getElementById("reported-details-modal");
             const claimedModal = document.getElementById("claimed-details-modal");
 
-            // Any "View Details" buttons
-            document.querySelectorAll("[data-modal='reported']").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    reportedModal.classList.remove("hidden");
-                });
+            // Use event delegation on the document
+            document.addEventListener("click", (e) => {
+                if (e.target.matches("[data-modal='reported']")) {
+                    if (reportedModal) {
+                        const card = e.target.closest('.dashboard-item-card');
+                        if (card && card.dataset.itemData) {
+                            window.populateReportedModal(JSON.parse(card.dataset.itemData), card.dataset.itemId);
+                        }
+                        reportedModal.classList.remove("hidden");
+                    }
+                }
+
+                if (e.target.matches("[data-modal='claimed']")) {
+                    if (claimedModal) {
+                        const card = e.target.closest('.dashboard-item-card');
+                        if (card) {
+                            const rawData = card.dataset.claimData || card.dataset.itemData;
+                            
+                            const rawId = card.dataset.claimId || card.dataset.itemId;
+                            if (rawData) {
+                                window.populateClaimedModal(JSON.parse(rawData), rawId);
+                            }
+                        }
+                        claimedModal.classList.remove("hidden");
+                    }
+                }
             });
 
-            document.querySelectorAll("[data-modal='claimed']").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    claimedModal.classList.remove("hidden");
-                });
-            });
-
-            // Close Buttons
+            /* Close Buttons */
             document.querySelectorAll(".details-modal-close").forEach(btn => {
                 btn.addEventListener("click", () => {
                     btn.closest(".details-modal").classList.add("hidden");
@@ -126,7 +143,8 @@
 
         <div class="tab-panel" id="panel-catalog">
             <p class="tab-desc">These are lost items approved by you and brought to the office. They're displayed in the
-                <u>Browse items</u> tab for students.</p>
+                <u>Browse items</u> tab for students.
+            </p>
             <div id="catalogContainer"><!-- cards --></div>
         </div>
 
@@ -138,34 +156,37 @@
 
     </main>
 
+    <script>
+        document.addEventListener("mousemove", (e) => {
+            const guide = document.querySelector(".a11y-reading-guide-line");
+            if (guide) guide.style.top = `${e.clientY}px`;
+        });
+    </script>
+
     <!-- REPORTED DETAILS MODAL -->
     <div id="reported-details-modal" class="details-modal hidden">
         <div class="details-modal-content">
-            <button class="details-modal-close">&times;</button>
+            <button class="details-modal-close"><img src="assets/icons/x.svg" alt="X"></button>
             <div class="details-item-header">
-                <img class="details-img" src="assets/placeholders/lost-item1.jpg">
                 <div class="details-info">
-                    <h2>Gray Backpack</h2>
                     <div class="details-tags">
-                        <span class="tag tag-orange">Item Submission</span>
+                        <span class="tag tag-yellow">Item turned in</span>
                     </div>
-                    <span class="tag tag-transparent"><img src="assets/icons/location.svg">Library</span>
-                    <span class="tag tag-transparent"><img src="assets/icons/clock.svg">11/15/2025 9:20 AM</span>
-                    <br>
-                    <p><b>Submitter Information</b></p>
-                    <p><b>Student Name:</b> Jill Smith</p>
-                    <p><b>Student Email:</b> 0000000@apps.nsd.org</p>
-                    <br>
-                    <p><b>Public description:</b> Dark colored backpack</p>
-                    <p><b>Private description:</b> Gray North Face backpack</p>
-                    <br>
-                    <p><b>Verification Questions</b></p>
-                    <p>Q1: What color is the inside lining?</p>
-                    <p>A1: blue</p>
-                    <p>Q2: What brand is it?</p>
-                    <p>A2: north face</p>
-                    <p>Q3: What's in the front pocket?</p>
-                    <p>A3: kpop photocards</p>
+                    <h2 id="reported-title">Gray Backpack</h2>
+                    <span class="tag tag-transparent" id="reported-location"><img
+                            src="assets/icons/location.svg">Library</span>
+                    <span class="tag tag-transparent" id="reported-date"><img src="assets/icons/clock.svg">11/15/2025
+                        9:20 AM</span>
+                    <p><b>Finder name:</b> <span id="reported-student-email">John Doe</span></p>
+                    <p><b>Finder email:</b> <span id="reported-finder-email">0000000@apps.nsd.org</span></p>
+                </div>
+                <img class="details-img" id="reported-img" src="assets/placeholders/lost-item1.jpg">
+            </div>
+
+            <div class="details-info">
+                <h3>Verification Questions</h3>
+                <div id="reported-questions" class="input-field">
+                    <!-- populated by JS -->
                 </div>
             </div>
         </div>
@@ -174,35 +195,41 @@
     <!-- CLAIMED DETAILS MODAL -->
     <div id="claimed-details-modal" class="details-modal hidden">
         <div class="details-modal-content">
-            <button class="details-modal-close">&times;</button>
+            <button class="details-modal-close"><img src="assets/icons/x.svg" alt="X"></button>
             <div class="details-item-header">
-                <img class="details-img" src="assets/placeholders/lost-item1.jpg">
                 <div class="details-info">
-                    <h2>Water Bottle</h2>
+                    <div class="details-tags">
+                        <span class="tag tag-orange">Item you're claiming</span>
+                    </div>
+                    <h2 id="claimed-title">Gray Backpack</h2>
+                    <span class="tag tag-transparent" id="claimed-location"><img
+                            src="assets/icons/location.svg">Library</span>
+                    <span class="tag tag-transparent" id="claimed-date"><img src="assets/icons/clock.svg">11/15/2025
+                        9:20 AM</span>
                     <br>
-                    <p><b>Student Name:</b> Jill Smith</p>
-                    <p><b>Student Email:</b> 0000000@apps.nsd.org</p>
-                    <br>
-                    <p><b>Lost on:</b> 11/17/2025 at 4:20 PM</p>
-                    <br>
-                    <p><b>Verification Questions</b></p>
-                    <p>Q1: (Your answer…)</p>
-                    <p>A1: ___</p>
-                    <p>Q2: (Your answer…)</p>
-                    <p>A2: ___</p>
-                    <p>Q3: (Your answer…)</p>
-                    <p>A3: ___</p>
-                    <br>
-                    <p><b>Additional Information</b></p>
-                    <p>No additional notes.</p>
+                    <p><b>Finder email:</b> <span id="claimed-finder-email">0000000@apps.nsd.org</span></p>
+                    <p><b>Claimer email:</b> <span id="claimed-claimer-email">1000000@apps.nsd.org</span></p>
+                </div>
+                <img class="details-img" id="claimed-img" src="assets/placeholders/lost-item1.jpg">
+            </div>
+
+            <div class="details-info">
+                <h3>Verification Questions</h3>
+                <div id="claimed-questions" class="input-field">
+                    <!-- populated by JS -->
+                </div>
+                <div class="input-field">
+                    <label>Additional Information</label>
+                    <p id="claimed-additional">No additional notes.</p>
                 </div>
             </div>
+
         </div>
     </div>
 
     <script src="scripts/notif.js"></script>
     <script type="module" src="scripts/admin.js"></script>
-    <script type="module" src="scripts/logout.js"></script> 
+    <script type="module" src="scripts/logout.js"></script>
 
     <script type="module">
         import { auth } from './scripts/firebaseModule.js';
@@ -252,13 +279,13 @@
 
     <div id="confirm-modal" class="confirm-modal hidden">
         <div class="confirm-box">
-          <p id="confirm-message">Are you sure?</p>
-          <div class="confirm-actions">
-            <button id="confirm-yes" class = "btn-orange">Yes</button>
-            <button id="confirm-no" class = "btn-blue">Cancel</button>
-          </div>
+            <p id="confirm-message">Are you sure?</p>
+            <div class="confirm-actions">
+                <button id="confirm-yes" class="btn btn-orange">Yes</button>
+                <button id="confirm-no" class="btn btn-blue">Cancel</button>
+            </div>
         </div>
-      </div>
+    </div>
 
 
     <div class="a11y-reading-guide-line"></div>

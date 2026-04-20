@@ -75,7 +75,7 @@ function displayItemDetails() {
 
                 <div class="item-text">
                     <h3 class="item-name">${currentItem.item_name || currentItem.category || 'Unknown Item'}</h3>
-                    <p class="item-desc">${currentItem.public_description || 'No description available'}</p>
+                    <p class="item-desc" style="margin-top: -15px;">${currentItem.public_description || 'No description available'}</p>
                 </div>
 
 
