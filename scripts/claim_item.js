@@ -215,7 +215,10 @@ async function submitClaim(e) {
        
         
         showNotif("Claim submitted successfully! An administrator will review your request.", "success"); 
-        window.location.href = "dashboard.html";
+        setTimeout(() => {
+            window.location.href = "dashboard.html";
+        }, 1500);
+
        
     } catch (error) {
         console.error("Error submitting claim:", error);
@@ -249,10 +252,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Fill name from displayName or fallback to email prefix
         if (nameInput) {
+            console.log("lol? ")
             if (user.displayName) {
                 nameInput.value = user.displayName;
             } else {
-                const defaultName = user.email ? user.email.split('@')[0] : "";
+                const defaultName = user.full_name;
                 nameInput.value = defaultName;
             }
         }

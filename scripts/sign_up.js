@@ -1,7 +1,7 @@
 import {
     db, auth, provider, signInWithPopup, createUserWithEmailAndPassword, signOut,
     doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc,
-    deleteField, storage, ref, uploadBytes, getDownloadURL
+    deleteField, storage, ref, uploadBytes, getDownloadURL, updateProfile
 } from './firebaseModule.js';
 
 
@@ -45,6 +45,7 @@ const userEmailSignIn = async () => {
     var email = document.getElementById("email").value;
     var password = document.getElementById("password").value;
     var confirm_pass = document.getElementById("confirm-password").value; 
+    var name = document.getElementById("fullname").value; 
 
     if(password != confirm_pass){
       showNotif("Passwords must match.", "error")
@@ -59,7 +60,10 @@ const userEmailSignIn = async () => {
   .then(async (userCredential) => {
     // Signed up
     user = userCredential.user;
-    const success = await AddUser()
+    await updateProfile(user, {
+      displayName: name
+    });
+    const success = await AddUser(name)
     if(!success){
       return; 
     }
@@ -95,11 +99,12 @@ signInEmailButton.addEventListener('click', (e) => {
 }); 
 
 
-async function AddUser() {
+async function AddUser(name) {
     if (!user) {
         console.log("no user ")
         return false; 
     }
+
     if (auth.currentUser.email.includes("@apps.nsd.org")){
       user_status = "Student"
     }
@@ -110,7 +115,8 @@ async function AddUser() {
     await setDoc(
       ref, {
       items_posted: 0,
-      status: user_status
+      status: user_status,
+      full_name:name
     }); 
     return true; 
 }
