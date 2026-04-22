@@ -1,3 +1,34 @@
+/**
+ * @file claim_item.js
+ * @description
+ * Handles item claim functionality for the Lost & Found system.
+ *
+ * This module manages:
+ * - Loading selected item details
+ * - Displaying item verification questions
+ * - Collecting claim form data
+ * - Submitting claim requests to Firebase
+ * - Updating item and user records
+ *
+ * Claim Workflow:
+ * 1. Student selects item
+ * 2. Item details load from Firebase
+ * 3. Student answers verification questions
+ * 4. Claim is submitted
+ * 5. Item status updates to "pending retrieval"
+ * 6. Admin reviews claim request
+ *
+ * Firebase collections used:
+ * - Item_Data
+ * - Claims
+ * - User_Data
+ *
+ * @author Aadhya Goyal. Aishwarya Kumaran, Aanya Rawal
+ * @version 1.0
+ */
+
+
+
 // scripts/claim_item.js
 import {
     db, auth,
@@ -5,6 +36,12 @@ import {
 } from './firebaseModule.js';
 
 
+
+/**
+ * Stores the currently selected item data.
+ *
+ * @type {ItemData|null}
+ */
 let currentItem = null;
 
 
@@ -14,7 +51,19 @@ const itemId = urlParams.get('id');
 console.log(itemId)
 
 
-// Load item details on page load
+/**
+ * Loads item details from Firebase based on URL parameter.
+ *
+ * Retrieves item data and initializes:
+ * - Item display section
+ * - Verification question inputs
+ *
+ * Redirects user if item is missing or invalid.
+ *
+ * @async
+ * @function loadItemDetails
+ * @returns {Promise<void>}
+ */ 
 async function loadItemDetails() {
     if (!itemId) {
         showNotif("No item selected", "error")
@@ -49,7 +98,21 @@ async function loadItemDetails() {
 }
 
 
-// Display item details in the form
+/**
+ * Displays selected item details on the claim form.
+ *
+ * Populates:
+ * - Item image
+ * - Item name
+ * - Description
+ * - Location
+ * - Date/time found
+ *
+ * Uses fallback values if fields are missing.
+ *
+ * @function displayItemDetails
+ * @returns {void}
+ */
 function displayItemDetails() {
     const itemCard = document.querySelector('.item-card');
    
@@ -89,7 +152,15 @@ function displayItemDetails() {
 }
 
 
-// Display verification questions from the item
+/**
+ * Dynamically generates verification question inputs.
+ *
+ * Uses stored verification questions from the item
+ * and creates required text input fields.
+ *
+ * @function displayVerificationQuestions
+ * @returns {void}
+ */
 function displayVerificationQuestions() {
     const verificationSection = document.querySelector('.form-group');
    
@@ -124,7 +195,27 @@ function displayVerificationQuestions() {
 }
 
 
-// Submit claim
+/**
+ * Submits a claim request for the selected item.
+ *
+ * Performs:
+ * - Form validation
+ * - Email verification
+ * - Verification answer collection
+ * - Firebase claim document creation
+ * - Item status update
+ * - User statistics update
+ *
+ * Updates item status to:
+ * "pending retrieval"
+ *
+ * @async
+ * @function submitClaim
+ *
+ * @param {Event} e - Form submission event.
+ *
+ * @returns {Promise<void>}
+ */
 async function submitClaim(e) {
     e.preventDefault();
    
@@ -230,8 +321,16 @@ async function submitClaim(e) {
     }
 }
 
-
-// Initialize
+/**
+ * Initializes claim page behavior when DOM is ready.
+ *
+ * Performs:
+ * - Item loading
+ * - Submit button event binding
+ * - Autofill of student name and email
+ *
+ * @event DOMContentLoaded
+ */
 document.addEventListener('DOMContentLoaded', () => {
     loadItemDetails();
 
@@ -241,6 +340,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------- Autofill name & email ----------------------
+
+    /**
+         * Firebase authentication state listener.
+         *
+         * Autofills:
+         * - Student email
+         * - Student name
+         *
+         * Uses displayName if available,
+         * otherwise falls back to stored user data.
+         *
+         * @callback AuthStateChangeHandler
+         *
+         * @param {Object|null} user - Firebase authenticated user.
+         *
+         * @returns {void}
+     */
     auth.onAuthStateChanged(user => {
         if (!user) return; // no user logged in
 

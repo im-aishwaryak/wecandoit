@@ -1,3 +1,52 @@
+/**
+ * @file admin_dashboard.js
+ * @description
+ * Handles administrator dashboard functionality for the Lost & Found system.
+ *
+ * This module manages:
+ * - Approval of found item submissions
+ * - Approval of claim retrieval requests
+ * - Display of available found items
+ * - Tracking of reunited items
+ * - Status updates for item lifecycle management
+ *
+ * Item Status Flow:
+ * pending submission → available to claim → pending retrieval →
+ * claimed and ready to retrieve → claimed and retrieved
+ *
+ * Firebase collections used:
+ * - Item_Data
+ * - Claims
+ *
+ * Dashboard Sections:
+ * - Pending Submissions
+ * - Pending Retrieval Requests
+ * - Ready to Claim Items
+ * - Available Found Items
+ * - Reunited Items History
+ *
+ * @author Aanya Rawal, Aishwarya Kumaran, Aadhya Goyal
+ * @version 1.0
+ */
+
+
+
+/**
+ * @typedef {(
+ *  "pending submission" |
+ *  "available to claim" |
+ *  "pending retrieval" |
+ *  "claimed and ready to retrieve" |
+ *  "claimed and retrieved"
+ * )} ItemStatus
+ *
+ * Represents the lifecycle status of a lost-and-found item.
+ */
+
+
+
+
+
 //admin roles:
 //approves found item submissions
 //approves lost item claims
@@ -36,7 +85,20 @@ import {
 } from './firebaseModule.js';
 
 
-// Load admin dashboard data
+/**
+ * Loads all data required for the admin dashboard.
+ *
+ * Fetches and renders:
+ * - Items ready for pickup
+ * - Pending retrieval approvals
+ * - Pending item submissions
+ * - Available found items
+ * - Reunited items history
+ *
+ * @async
+ * @function loadAdminDashboard
+ * @returns {Promise<void>}
+ */
 async function loadAdminDashboard() {
     const user = auth.currentUser;
     if (!user) {
@@ -60,7 +122,18 @@ async function loadAdminDashboard() {
 }
 
 
-//Load items ready to claim (approved claims waiting pickup)
+/**
+ * Loads items that have been approved and are ready for pickup.
+ *
+ * Displays items with status:
+ * "claimed and ready to retrieve"
+ *
+ * Also attaches event listeners to mark items as retrieved.
+ *
+ * @async
+ * @function loadReadyToClaim
+ * @returns {Promise<void>}
+ */
 async function loadReadyToClaim() {
     const claimsRef = collection(db, "Item_Data");
     const q = query(claimsRef, where("status", "==", "claimed and ready to retrieve"));
@@ -124,8 +197,18 @@ async function loadReadyToClaim() {
 
 
 
-
-// Load pending retrieval requests (claims waiting approval)
+/**
+ * Loads claim requests awaiting admin approval.
+ *
+ * Displays items with status:
+ * "pending retrieval"
+ *
+ * Allows navigation to claim review pages.
+ *
+ * @async
+ * @function loadPendingRetrievalRequests
+ * @returns {Promise<void>}
+ */
 async function loadPendingRetrievalRequests() {
     const claimsRef = collection(db, "Item_Data");
     const q = query(claimsRef, where("status", "==", "pending retrieval"));
@@ -174,7 +257,18 @@ async function loadPendingRetrievalRequests() {
 }
 
 
-// Load pending item submissions (items waiting approval)
+/**
+ * Loads newly submitted found items awaiting approval.
+ *
+ * Displays items with status:
+ * "pending submission"
+ *
+ * Adds approval button listeners for each item.
+ *
+ * @async
+ * @function loadPendingSubmissions
+ * @returns {Promise<void>}
+ */
 async function loadPendingSubmissions() {
     const itemsRef = collection(db, "Item_Data");
     const q = query(itemsRef, where("status", "==", "pending submission"));
@@ -230,8 +324,16 @@ async function loadPendingSubmissions() {
     });
 }
 
-
-// Load found items (approved and available)
+/**
+ * Loads approved found items available to claim.
+ *
+ * Displays items with status:
+ * "available to claim"
+ *
+ * @async
+ * @function loadFoundItems
+ * @returns {Promise<void>}
+ */
 async function loadFoundItems() {
     const itemsRef = collection(db, "Item_Data");
     const q = query(itemsRef, where("status", "==", "available to claim"));
@@ -287,7 +389,18 @@ async function loadFoundItems() {
 }
 
 
-// Load reunited items (completed claims)
+/**
+ * Loads recently reunited items.
+ *
+ * Displays items with status:
+ * "claimed and retrieved"
+ *
+ * Shows most recent completed claims.
+ *
+ * @async
+ * @function loadReunitedItems
+ * @returns {Promise<void>}
+ */
 async function loadReunitedItems() {
     const claimsRef = collection(db, "Item_Data");
     const q = query(claimsRef, where("status", "==", "claimed and retrieved"));
@@ -335,7 +448,19 @@ async function loadReunitedItems() {
 }
 
 
-// Approve item submission
+/**
+ * Approves a pending item submission.
+ *
+ * Updates item status to:
+ * "available to claim"
+ *
+ * Records approval timestamp.
+ *
+ * @async
+ * @function approveItem
+ * @param {string} itemId - Firestore document ID of the item.
+ * @returns {Promise<void>}
+ */
 async function approveItem(itemId) {
     const confirmed = await showConfirm("Approve this item submission?");
     if (!confirmed) return;
@@ -359,7 +484,19 @@ async function approveItem(itemId) {
 }
 
 
-// Mark item as retrieved
+/**
+ * Marks an item as retrieved by its owner.
+ *
+ * Updates item status to:
+ * "claimed and retrieved"
+ *
+ * Records retrieval timestamp.
+ *
+ * @async
+ * @function markItemRetrieved
+ * @param {string} claimId - Firestore document ID of the claim.
+ * @returns {Promise<void>}
+ */
 async function markItemRetrieved(claimId) {
     const confirmed = await showConfirm("Mark this item as retrieved?");
     if (!confirmed) return;
@@ -382,7 +519,13 @@ async function markItemRetrieved(claimId) {
 }
 
 
-// Helper: Format date
+/**
+ * Formats an ISO date string into MM/DD/YYYY format.
+ *
+ * @function formatDate
+ * @param {string} isoString - ISO formatted date string.
+ * @returns {string} Formatted date string.
+ */
 function formatDate(isoString) {
     if (!isoString) return 'Unknown date';
     const date = new Date(isoString);
@@ -390,7 +533,16 @@ function formatDate(isoString) {
 }
 
 
-// Initialize when auth is ready
+/**
+ * Firebase authentication state listener.
+ *
+ * Initializes the admin dashboard once
+ * the user authentication state is confirmed.
+ *
+ * @callback AuthStateChangeHandler
+ * @param {Object|null} user - Firebase authenticated user.
+ * @returns {void}
+ */
 auth.onAuthStateChanged((user) => {
     if (user) {
         loadAdminDashboard();
@@ -398,6 +550,21 @@ auth.onAuthStateChanged((user) => {
 });
 
 
+
+/**
+ * Populates the reported item details modal.
+ *
+ * Displays detailed information about a found item
+ * including verification questions.
+ *
+ * @function populateReportedModal
+ * @memberof window
+ *
+ * @param {Object} itemData - Item data object.
+ * @param {string} itemId - Firestore document ID of the item.
+ *
+ * @returns {void}
+ */
 window.populateReportedModal = function (itemData, itemId) {
 
     const modal = document.getElementById("reported-details-modal");
@@ -428,6 +595,30 @@ window.populateReportedModal = function (itemData, itemId) {
     }
 };
 
+
+
+
+/**
+ * Populates the claimed item details modal.
+ *
+ * Displays claim information and retrieves
+ * additional data from related Firebase documents.
+ *
+ * Includes:
+ * - Claim details
+ * - Finder information
+ * - Verification questions
+ * - Claimer email lookup
+ *
+ * @async
+ * @function populateClaimedModal
+ * @memberof window
+ *
+ * @param {Object} claimData - Claim data object.
+ * @param {string} claimId - Firestore document ID of the claim.
+ *
+ * @returns {Promise<void>}
+ */
 window.populateClaimedModal = async function (claimData, claimId) {
     const modal = document.getElementById("claimed-details-modal");
     if (!modal) return;

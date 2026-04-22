@@ -1,9 +1,50 @@
+/**
+ * @file accessibility_settings.js
+ * @description
+ * Manages accessibility settings for the application.
+ *
+ * Features include:
+ * - Dark mode
+ * - High contrast mode
+ * - Colorblind filters
+ * - Font scaling
+ * - Line and letter spacing adjustments
+ * - Reading guide support
+ *
+ * Settings are stored and retrieved from Firebase Firestore
+ * and applied dynamically to the UI.
+ *
+ * @author Aishwarya Kumaran
+ * @version 1.0
+ */
+
+
+
 import { db, auth, doc, getDoc, setDoc } from "./firebaseModule.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 
+/**
+ * Mapping of numeric line spacing values to human-readable labels.
+ * @type {Object<number, string>}
+ */
 const lineLabels = { 1: "Compact", 2: "Normal", 3: "Relaxed" };
+
+/**
+ * Mapping of numeric letter spacing values to human-readable labels.
+ * @type {Object<number, string>}
+ */
 const letterLabels = { 1: "Tight", 2: "Normal", 3: "Wide" };
 
+
+/**
+ * Updates the UI elements related to line and letter spacing.
+ * Adjusts slider values and text labels to match current settings.
+ *
+ * @function updateSpacingUI
+ * @param {number} lineSpacing - Numeric line spacing level (1–3).
+ * @param {number} letterSpacing - Numeric letter spacing level (1–3).
+ * @returns {void}
+ */
 function updateSpacingUI(lineSpacing, letterSpacing) {
     const lineVal = document.getElementById("line-spacing-val");
     const letterVal = document.getElementById("letter-spacing-val");
@@ -16,6 +57,26 @@ function updateSpacingUI(lineSpacing, letterSpacing) {
     if (letterSlider) letterSlider.value = letterSpacing;
 }
 
+
+
+/**
+ * Applies accessibility settings to the page.
+ * Updates CSS classes and font scaling based on user preferences.
+ *
+ * @function applySettings
+ * @param {Object} settings - Accessibility settings object.
+ * @param {boolean} [settings.highContrast=false] - Enables high contrast mode.
+ * @param {string} [settings.colorBlindMode="none"] - Colorblind mode type.
+ * @param {number} [settings.fontSize=100] - Font size percentage.
+ * @param {boolean} [settings.darkMode=false] - Enables dark mode.
+ * @param {boolean} [settings.highlightLinks=false] - Highlights hyperlinks.
+ * @param {boolean} [settings.reduceMotion=false] - Reduces animations.
+ * @param {boolean} [settings.dyslexiaFont=false] - Enables dyslexia-friendly font.
+ * @param {number} [settings.lineSpacing=2] - Line spacing level.
+ * @param {number} [settings.letterSpacing=2] - Letter spacing level.
+ * @param {boolean} [settings.readingGuide=false] - Enables reading guide.
+ * @returns {void}
+ */
 function applySettings(settings) {
     const {
         highContrast = false,
@@ -53,6 +114,14 @@ function applySettings(settings) {
     updateSpacingUI(lineSpacing, letterSpacing);
 }
 
+
+/**
+ * Updates the font size slider and label display.
+ *
+ * @function updateSliderUI
+ * @param {number} value - Font size percentage.
+ * @returns {void}
+ */
 function updateSliderUI(value) {
     const slider = document.getElementById("font-size");
     const label = document.getElementById("font-size-val");
@@ -60,6 +129,17 @@ function updateSliderUI(value) {
     if (label) label.textContent = `${value}%`;
 }
 
+
+/**
+ * Loads accessibility settings from Firebase Firestore.
+ *
+ * Retrieves user-specific accessibility preferences and applies them.
+ *
+ * @async
+ * @function loadSettings
+ * @param {string} email - User email used as document ID.
+ * @returns {Promise<Object>} Resolves to the loaded settings object.
+ */
 async function loadSettings(email) {
     try {
         const ref = doc(db, "User_Data", email);
@@ -76,6 +156,20 @@ async function loadSettings(email) {
     return {};
 }
 
+
+
+/**
+ * Saves a single accessibility setting to Firebase Firestore.
+ *
+ * Uses merge mode to update only the specified setting.
+ *
+ * @async
+ * @function saveSetting
+ * @param {string} email - User email used as document ID.
+ * @param {string} key - Name of the setting to update.
+ * @param {*} value - Value to store for the setting.
+ * @returns {Promise<void>}
+ */
 async function saveSetting(email, key, value) {
     try {
         const ref = doc(db, "User_Data", email);
@@ -87,6 +181,17 @@ async function saveSetting(email, key, value) {
     }
 }
 
+
+/**
+ * Initializes UI control event listeners for accessibility settings.
+ *
+ * Attaches change and input listeners to form controls and
+ * saves updates to Firebase when values change.
+ *
+ * @function initControls
+ * @param {string} email - User email used for saving settings.
+ * @returns {void}
+ */
 function initControls(email) {
     document.getElementById("dark-mode")?.addEventListener("change", (e) => {
         document.body.classList.toggle("dark-mode", e.target.checked);
@@ -198,6 +303,17 @@ function initControls(email) {
     });
 }
 
+
+/**
+ * Synchronizes UI control values with stored accessibility settings.
+ *
+ * Updates checkboxes, dropdowns, and spacing labels
+ * to reflect the current settings state.
+ *
+ * @function syncControls
+ * @param {Object} settings - Accessibility settings object.
+ * @returns {void}
+ */
 function syncControls(settings) {
     const {
         highContrast = false, colorBlindMode = "none", fontSize = 100,
@@ -218,6 +334,18 @@ function syncControls(settings) {
     updateSpacingUI(lineSpacing, letterSpacing);
 }
 
+
+/**
+ * Firebase authentication state listener.
+ *
+ * Loads accessibility settings when a user logs in,
+ * synchronizes UI controls, and initializes event handlers.
+ *
+ * @async
+ * @callback AuthStateChangeHandler
+ * @param {Object|null} user - Firebase authenticated user object.
+ * @returns {Promise<void>}
+ */
 onAuthStateChanged(auth, async (user) => {
     if (!user) return;
     const settings = await loadSettings(user.email);
