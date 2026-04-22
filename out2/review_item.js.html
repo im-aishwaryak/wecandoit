@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: review_item.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: review_item.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// scripts/review_claim.js
+
+
+/**
+ * @file review_claim.js
+ * @description Handles administrator review of item retrieval claims.
+ *
+ * This module allows administrators to:
+ * - Load item and claim data from Firestore
+ * - Compare verification answers
+ * - Approve or reject retrieval claims
+ * - Update item and claim status accordingly
+ *
+ * The comparison view displays both:
+ * - Original item submission details
+ * - Student retrieval request details
+ *
+ * @module reviewClaim
+ * @author Aadhya Goyal, Aanya Rawal, Aishwarya Kumaran
+ * @version 1.0
+ */
+
+
+import {
+    db, auth,
+    doc, getDoc, updateDoc
+} from './firebaseModule.js';
+
+/**
+ * @file review_claim.js
+ * @description Handles administrator review of item retrieval claims.
+ *
+ * This module allows administrators to:
+ * - Load item and claim data from Firestore
+ * - Compare verification answers
+ * - Approve or reject retrieval claims
+ * - Update item and claim status accordingly
+ *
+ * The comparison view displays both:
+ * - Original item submission details
+ * - Student retrieval request details
+ *
+ * @module reviewClaim
+ * @author Aadhya Goyal
+ * @version 1.0
+ */
+let currentClaim = null;
+
+/**
+ * Stores the currently loaded item data.
+ *
+ * Contains original item submission details.
+ *
+ * @type {Object|null}
+ */
+let currentItem = null;
+
+
+/**
+ * Stores the currently loaded item data.
+ *
+ * Contains original item submission details.
+ *
+ * @type {Object|null}
+ */
+const urlParams = new URLSearchParams(window.location.search);
+
+/**
+ * Extracted item ID from URL parameters.
+ *
+ * @type {string|null}
+ */
+const itemId = urlParams.get('id');
+console.log(itemId)
+
+
+/**
+ * Loads item and claim data from Firestore.
+ *
+ * Steps:
+ * 1. Validate item ID from URL
+ * 2. Retrieve item data
+ * 3. Retrieve associated claim data
+ * 4. Store results in memory
+ * 5. Display comparison interface
+ *
+ * Redirects to the admin dashboard
+ * if the item or claim is missing.
+ *
+ * @async
+ * @function loadReviewData
+ * @returns {Promise&lt;void>}
+ */
+async function loadReviewData() {
+    if (!itemId) {
+        alert("No item selected");
+        window.location.href = "admin-dashboard.html";
+        return;
+    }
+   
+    try {
+        // Load claim
+        const itemRef = doc(db, "Item_Data", itemId);
+        const itemSnap = await getDoc(itemRef);
+       
+        if (!itemSnap.exists()) {
+            alert("Item not found");
+            window.location.href = "admin-dashboard.html";
+            return;
+        }
+       
+        currentItem = { id: itemSnap.id, ...itemSnap.data() };
+       
+        // Load associated retrieval claim
+        if (currentItem.claim_id) {
+            const claimRef = doc(db, "Claims", currentItem.claim_id);
+            const claimSnap = await getDoc(claimRef);
+           
+            if (claimSnap.exists()) {
+                currentClaim = { id: claimSnap.id, ...claimSnap.data() };
+            }
+        }
+       
+        displayComparison();
+       
+    } catch (error) {
+        console.error("Error loading review data:", error);
+        alert("Error loading claim details");
+        window.location.href = "admin-dashboard.html";
+    }
+}
+
+
+/**
+ * Displays comparison between item data
+ * and claim data.
+ *
+ * Builds a visual comparison interface showing:
+ * - Original item submission
+ * - Retrieval request information
+ * - Verification answers comparison
+ *
+ * Correct answers are highlighted:
+ * - Green = Match
+ * - Red = Mismatch
+ *
+ * Adds approve/reject buttons dynamically.
+ *
+ * @function displayComparison
+ * @returns {void}
+ */
+function displayComparison() {
+    if (!currentClaim || !currentItem) {
+        alert("Missing claim or item data");
+        return;
+    }
+   
+    const comparisonCard = document.querySelector('.comparison-card');
+   
+    if (!comparisonCard) {
+        console.error("Comparison card container not found");
+        return;
+    }
+   
+    // Build verification questions comparison
+    let verificationHTML = '';
+    const itemQuestions = currentItem.verification_qs || {};
+    const claimAnswers = currentClaim.verification_answers || {};
+   
+    Object.keys(itemQuestions).forEach((question, index) => {
+        const correctAnswer = itemQuestions[question];
+        const claimAnswer = claimAnswers[question] || 'No answer provided';
+       
+        // Check if answers match (case-insensitive, trimmed)
+        const isMatch = correctAnswer.toLowerCase().trim() === claimAnswer.toLowerCase().trim();
+        const matchClass = isMatch ? 'style="color: green; font-weight: bold;"' : 'style="color: red;"';
+       
+        verificationHTML += `
+            &lt;p>&lt;b>Q${index + 1}:&lt;/b> ${question}&lt;/p>
+            &lt;p>&lt;b>Correct A${index + 1}:&lt;/b> ${correctAnswer}&lt;/p>
+            &lt;p ${matchClass}>&lt;b>Claimant A${index + 1}:&lt;/b> ${claimAnswer} ${isMatch ? '✓' : '✗'}&lt;/p>
+            &lt;br>
+        `;
+    });
+   
+    comparisonCard.innerHTML = `
+        &lt;img src="${currentItem.image_url || 'assets/placeholders/lost-item1.jpg'}" alt="Item">
+
+
+        &lt;div class="comparison-info">
+            &lt;div class="comparison-columns">
+
+
+                &lt;!-- Retrieval Request Column -->
+                &lt;div class="comparison-column">
+                    &lt;h2>Retrieval Request (Claim)&lt;/h2>
+                    &lt;br>
+                    &lt;p>&lt;b>Item Name:&lt;/b> ${currentClaim.item_name}&lt;/p>
+                    &lt;p>&lt;b>Submitted on:&lt;/b> ${formatDate(currentClaim.submitted_at)}&lt;/p>
+                    &lt;p>&lt;b>Claimant Name:&lt;/b> ${currentClaim.claimant_name}&lt;/p>
+                    &lt;p>&lt;b>Student Email:&lt;/b> ${currentClaim.claimant_email}&lt;/p>
+                    &lt;p>&lt;b>Lost on:&lt;/b> ${currentClaim.lost_date}${currentClaim.lost_time ? ' at ' + currentClaim.lost_time : ''}&lt;/p>
+                    &lt;br>
+                    &lt;p>&lt;b>Verification Answers:&lt;/b>&lt;/p>
+                    ${Object.entries(claimAnswers).map(([q, a], i) =>
+                        `&lt;p>Q${i + 1}: ${q}&lt;/p>&lt;p>A${i + 1}: ${a}&lt;/p>`
+                    ).join('')}
+                    &lt;br>
+                    &lt;p>&lt;b>Additional Information:&lt;/b>&lt;/p>
+                    &lt;p>${currentClaim.additional_info || 'None provided'}&lt;/p>
+                &lt;/div>
+
+
+                &lt;!-- Submission Request Column -->
+                &lt;div class="comparison-column">
+                    &lt;h2>Item Submission (Original)&lt;/h2>
+                    &lt;br>
+                    &lt;p>&lt;b>Item Name:&lt;/b> ${currentItem.item_name || currentItem.category}&lt;/p>
+                    &lt;p>&lt;b>Found on:&lt;/b> ${currentItem.date_found}${currentItem.time_found ? ' at ' + currentItem.time_found : ''}&lt;/p>
+                    &lt;p>&lt;b>Location Found:&lt;/b> ${currentItem.location_found}&lt;/p>
+                    &lt;p>&lt;b>Reporter Email:&lt;/b> ${currentItem.submitted_by}&lt;/p>
+                    &lt;p>&lt;b>Public Description:&lt;/b> ${currentItem.public_description}&lt;/p>
+                    &lt;p>&lt;b>Private Description:&lt;/b> ${currentItem.private_description}&lt;/p>
+                    &lt;br>
+                    &lt;p>&lt;b>Verification Questions &amp; Correct Answers:&lt;/b>&lt;/p>
+                    ${Object.entries(itemQuestions).map(([q, a], i) =>
+                        `&lt;p>Q${i + 1}: ${q}&lt;/p>&lt;p>A${i + 1}: ${a}&lt;/p>`
+                    ).join('')}
+                &lt;/div>
+
+
+            &lt;/div>
+
+
+            &lt;br>
+           
+            &lt;div style="background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                &lt;h3 style="margin: 0 0 10px 0;">Verification Check&lt;/h3>
+                ${verificationHTML}
+            &lt;/div>
+
+
+            &lt;button class="btn btn-orange btn-sm full-width" id="approve-btn">Approve Match&lt;/button>
+            &lt;button class="btn btn-blue btn-sm full-width" id="reject-btn">Reject Match&lt;/button>
+        &lt;/div>
+    `;
+   
+    // Add event listeners
+    document.getElementById('approve-btn').addEventListener('click', approveClaim);
+    document.getElementById('reject-btn').addEventListener('click', rejectClaim);
+}
+
+
+/**
+ * Approves a retrieval claim.
+ *
+ * Updates:
+ * - Claim status → "approved"
+ * - Item status → "claimed and ready to retrieve"
+ * - Review metadata (admin email + timestamp)
+ *
+ * Redirects administrator back
+ * to the admin dashboard after completion.
+ *
+ * @async
+ * @function approveClaim
+ * @returns {Promise&lt;void>}
+ */
+async function approveClaim() {
+    if (!confirm('Approve this claim? The student will be notified to pick up the item.')) {
+        return;
+    }
+   
+    try {
+        const user = auth.currentUser;
+       
+        // Update claim status
+        const claimRef = doc(db, "Claims", currentClaim.id);
+        await updateDoc(claimRef, {
+            status: "approved",
+            reviewed_at: new Date().toISOString(),
+            reviewed_by: user.email,
+            review_notes: "Approved - verification successful"
+        });
+       
+        // Update item status
+        const itemRef = doc(db, "Item_Data", currentItem.id);
+        await updateDoc(itemRef, {
+            status: "claimed and ready to retrieve"
+        });
+       
+        alert('Claim approved! Student can now pick up the item from the main office.');
+        window.location.href = "admin-dashboard.html";
+       
+    } catch (error) {
+        console.error("Error approving claim:", error);
+        alert('Failed to approve claim. Please try again.');
+    }
+}
+
+
+/**
+ * Rejects a retrieval claim.
+ *
+ * Updates:
+ * - Claim status → "rejected"
+ * - Item status → "available to claim"
+ * - Clears claim tracking data
+ *
+ * Allows administrator to enter
+ * an optional rejection reason.
+ *
+ * @async
+ * @function rejectClaim
+ * @returns {Promise&lt;void>}
+ */
+async function rejectClaim() {
+    const reason = prompt('Enter reason for rejection (optional):');
+   
+    if (reason === null) {
+        return; // User cancelled
+    }
+   
+    try {
+        const user = auth.currentUser;
+       
+        // Update claim status
+        const claimRef = doc(db, "Claims", currentClaim.id);
+        await updateDoc(claimRef, {
+            status: "rejected",
+            reviewed_at: new Date().toISOString(),
+            reviewed_by: user.email,
+            review_notes: reason || "Rejected - verification failed"
+        });
+       
+        // Update item status back to available
+        const itemRef = doc(db, "Item_Data", currentItem.id);
+        await updateDoc(itemRef, {
+            status: "available to claim",
+            claimed_by: null,
+            claimed_at: null,
+            claim_id: null
+        });
+       
+        alert('Claim rejected. The item is now available again.');
+        window.location.href = "admin-dashboard.html";
+       
+    } catch (error) {
+        console.error("Error rejecting claim:", error);
+        alert('Failed to reject claim. Please try again.');
+    }
+}
+
+/**
+ * Formats an ISO date string
+ * into readable US date format.
+ *
+ * Example:
+ * 2026-04-21T18:00:00Z → 04/21/2026
+ *
+ * @function formatDate
+ * @param {string} isoString - ISO date string
+ * @returns {string}
+ * Formatted date string.
+ */
+function formatDate(isoString) {
+    if (!isoString) return 'Unknown date';
+    const date = new Date(isoString);
+    return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+}
+
+
+/**
+ * Initializes claim review page.
+ *
+ * Loads claim and item data
+ * when the page finishes loading.
+ *
+ * @listens DOMContentLoaded
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    loadReviewData();
+});
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-adminDashboard.html">adminDashboard</a></li><li><a href="module-claimItem.html">claimItem</a></li><li><a href="module-firebaseModule.html">firebaseModule</a></li><li><a href="module-logout.html">logout</a></li><li><a href="module-reportItem.html">reportItem</a></li><li><a href="module-reviewClaim.html">reviewClaim</a></li><li><a href="module-search.html">search</a></li></ul><h3>Events</h3><ul><li><a href="module-claimItem.html#~event:DOMContentLoaded">DOMContentLoaded</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AddUser">AddUser</a></li><li><a href="global.html#createDashboardCard">createDashboardCard</a></li><li><a href="global.html#formatDate">formatDate</a></li><li><a href="global.html#formatRelativeDate">formatRelativeDate</a></li><li><a href="global.html#loadPendingRetrievalRequests">loadPendingRetrievalRequests</a></li><li><a href="global.html#loadPendingSubmissions">loadPendingSubmissions</a></li><li><a href="global.html#loadReadyToClaim">loadReadyToClaim</a></li><li><a href="global.html#loadRetrievedItems">loadRetrievedItems</a></li><li><a href="global.html#signInEmailButton">signInEmailButton</a></li><li><a href="global.html#signInGoogleButton">signInGoogleButton</a></li><li><a href="global.html#user">user</a></li><li><a href="global.html#userEmailSignIn">userEmailSignIn</a></li><li><a href="global.html#userGoogleSignIn">userGoogleSignIn</a></li><li><a href="global.html#user_status">user_status</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Tue Apr 21 2026 07:30:32 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

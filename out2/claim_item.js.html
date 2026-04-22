@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: claim_item.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: claim_item.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file claim_item.js
+ * @description Item claim submission functionality.
+ *
+ * This module allows users to submit a claim request
+ * for a found item. It retrieves item data from Firebase,
+ * dynamically displays verification questions, validates
+ * user input, and submits claim information to Firestore.
+ *
+ * Features:
+ * - Loads selected item details
+ * - Displays verification questions dynamically
+ * - Validates user identity and answers
+ * - Submits claim requests
+ * - Updates item and user records
+ *
+ * @module claimItem
+ * @author Aadhya Goyal, Aanya Rawal, Aishwarya Kumaran
+ * @version 1.0
+ */
+import {
+    db, auth,
+    doc, getDoc, collection, addDoc, updateDoc, increment
+} from './firebaseModule.js';
+
+/**
+ * Stores the currently selected item data.
+ *
+ * This object contains all retrieved item
+ * information from Firestore and is used
+ * throughout the claim process.
+ *
+ * @type {Object|null}
+ */
+let currentItem = null;
+
+
+// Get item ID from URL
+/**
+ * Parses URL query parameters to retrieve the selected item ID.
+ *
+ * Expected URL format:
+ * claim-item.html?id=ITEM_ID
+ *
+ * @constant {URLSearchParams} urlParams
+ */
+const urlParams = new URLSearchParams(window.location.search);
+/**
+ * Stores the ID of the selected item
+ * retrieved from the URL parameters.
+ *
+ * @constant {string|null} itemId
+ */
+const itemId = urlParams.get('id');
+console.log(itemId)
+
+
+
+
+/**
+ * Loads item details from Firestore.
+ *
+ * Retrieves the selected item using the
+ * item ID from the URL. If the item exists,
+ * it stores the data in the global
+ * currentItem object and displays item
+ * details and verification questions.
+ *
+ * Redirects to the browse page if
+ * no item is found.
+ *
+ * @async
+ * @function loadItemDetails
+ * @returns {Promise&lt;void>}
+ */
+async function loadItemDetails() {
+    if (!itemId) {
+        alert("No item selected");
+        window.location.href = "browse-items.html";
+        return;
+    }
+   
+    try {
+        const itemRef = doc(db, "Item_Data", itemId);
+        const itemSnap = await getDoc(itemRef);
+       
+        if (!itemSnap.exists()) {
+            alert("Item not found");
+            window.location.href = "browse-items.html";
+            return;
+        }
+       
+        currentItem = { id: itemSnap.id, ...itemSnap.data() };
+       
+        console.log(currentItem.item_name)
+        console.log(currentItem.image_url)
+
+
+        displayItemDetails();
+        displayVerificationQuestions();
+       
+    } catch (error) {
+        console.error("Error loading item:", error);
+        alert("Error loading item details");
+        window.location.href = "browse-items.html";
+    }
+}
+
+
+/**
+ * Displays item details on the claim page.
+ *
+ * Dynamically updates the item card
+ * with the selected item's image,
+ * description, category, location,
+ * and found date.
+ *
+ * @function displayItemDetails
+ * @returns {void}
+ */
+function displayItemDetails() {
+    const itemCard = document.querySelector('.item-card');
+   
+    if (itemCard &amp;&amp; currentItem) {
+        let dateDisplay = currentItem.date_found || "Unknown date";
+        if (currentItem.time_found) {
+            dateDisplay += ` ${currentItem.time_found}`;
+        }
+       
+       
+        itemCard.innerHTML = `
+            &lt;img class="item-img" style="width: 150px; height: 150px"
+                src="${currentItem.image_url|| 'assets/placeholders/lost-item2.jpg'}"
+                alt="${currentItem.item_name || 'Item'}">
+
+
+            &lt;div class="item-info">
+                &lt;div class="item-tags">
+                    &lt;span class="tag tag-blue">Available&lt;/span>
+                    &lt;span class="tag tag-orange">&lt;img src="assets/icons/tag-right.svg">${currentItem.category || 'Other'}&lt;/span>
+                &lt;/div>
+
+
+                &lt;div class="item-text">
+                    &lt;h3 class="item-name">${currentItem.item_name || currentItem.category || 'Unknown Item'}&lt;/h3>
+                    &lt;p class="item-desc">${currentItem.public_description || 'No description available'}&lt;/p>
+                &lt;/div>
+
+
+                &lt;div class="item-tags">
+                    &lt;span class="tag tag-transparent">&lt;img src="assets/icons/location.svg">${currentItem.location_found || 'Unknown'}&lt;/span>
+                    &lt;span class="tag tag-transparent">&lt;img src="assets/icons/clock.svg">${dateDisplay}&lt;/span>
+                &lt;/div>
+            &lt;/div>
+        `;
+    }
+}
+
+
+/**
+ * Displays verification questions dynamically.
+ *
+ * Retrieves verification questions from the
+ * current item data and generates input
+ * fields for user responses.
+ *
+ * Each question is converted into a
+ * required text input field.
+ *
+ * @function displayVerificationQuestions
+ * @returns {void}
+ */
+function displayVerificationQuestions() {
+    const verificationSection = document.querySelector('.form-group');
+   
+    if (!currentItem || !currentItem.verification_qs) {
+        return;
+    }
+   
+    const questions = currentItem.verification_qs;
+    const questionKeys = Object.keys(questions);
+   
+    // Find the verification questions container
+    const container = Array.from(document.querySelectorAll('.form-group')).find(group =>
+        group.querySelector('label')?.textContent.includes('Verification Questions')
+    );
+   
+    if (container &amp;&amp; questionKeys.length > 0) {
+        // Clear existing inputs (keep the label and hint)
+        const inputFields = container.querySelectorAll('.input-field');
+        inputFields.forEach(field => field.remove());
+       
+        // Add question inputs dynamically
+        questionKeys.forEach((question, index) => {
+            const inputField = document.createElement('div');
+            inputField.className = 'input-field';
+            inputField.innerHTML = `
+                &lt;label for="answer${index + 1}">${question} &lt;span class="required">*&lt;/span>&lt;/label>
+                &lt;input type="text" id="answer${index + 1}" placeholder="Your answer ..." required>
+            `;
+            container.appendChild(inputField);
+        });
+    }
+}
+
+
+/**
+ * Submits an item claim request.
+ *
+ * Validates user input, ensures the user
+ * is authenticated, collects verification
+ * answers, and creates a new claim record
+ * in Firestore.
+ *
+ * Also updates:
+ * - Item status to "pending retrieval"
+ * - User claim count
+ *
+ * Redirects the user after successful submission.
+ *
+ * @async
+ * @function submitClaim
+ * @param {Event} e - Form submission event.
+ * @returns {Promise&lt;void>}
+ *
+ * @throws Will display alerts if validation fails
+ * or database operations encounter errors.
+ */
+async function submitClaim(e) {
+    e.preventDefault();
+   
+    const user = auth.currentUser;
+    if (!user) {
+        alert("You must be logged in to claim an item");
+        window.location.href = "log-in.html";
+        return;
+    }
+   
+    if (!currentItem) {
+        alert("No item selected");
+        return;
+    }
+   
+    // Get form values
+    const studentName = document.querySelector('input[placeholder="First and Last Name"]').value.trim();
+    const studentEmail = document.querySelector('input[placeholder="0000000@apps.nsd.org"]').value.trim();
+    const lostDate = document.querySelector('input[type="date"]').value;
+    const lostTime = document.querySelector('input[type="time"]').value;
+    const additionalInfo = document.querySelector('textarea').value.trim();
+   
+    // Validate required fields
+    if (!studentName || !studentEmail || !lostDate) {
+        alert("Please fill in all required fields");
+        return;
+    }
+   
+    // Validate email matches logged-in user
+    if (studentEmail !== user.email) {
+        alert("Email must match your logged-in account");
+        return;
+    }
+   
+    // Get verification answers
+    const answers = {};
+    const questions = Object.keys(currentItem.verification_qs);
+   
+    for (let i = 0; i &lt; questions.length; i++) {
+        const answerInput = document.getElementById(`answer${i + 1}`);
+        if (!answerInput || !answerInput.value.trim()) {
+            alert("Please answer all verification questions");
+            return;
+        }
+        answers[questions[i]] = answerInput.value.trim().toLowerCase();
+    }
+   
+    // Disable submit button
+    const submitBtn = document.querySelector('button.btn-orange');
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting...";
+   
+    try {
+        // Create claim document
+        const claimRef = collection(db, "Claims");
+        const claimDoc = await addDoc(claimRef, {
+            item_id: currentItem.id,
+            item_name: currentItem.item_name,
+            item_image: currentItem.image_url,
+            claimant_name: studentName,
+            claimant_email: studentEmail,
+            lost_date: lostDate,
+            lost_time: lostTime || "",
+            verification_answers: answers,
+            additional_info: additionalInfo,
+            status: "pending",
+            submitted_at: new Date().toISOString(),
+            reviewed_at: null,
+            reviewed_by: null,
+            review_notes: ""
+        });
+       
+        // Update item status to "claimed_pending"
+        const itemRef = doc(db, "Item_Data", currentItem.id);
+        await updateDoc(itemRef, {
+            status: "pending retrieval",
+            claim_id: claimDoc.id,
+            //claimed_by: studentEmail,
+            //claimed_at: new Date().toISOString()
+        });
+       
+        // Update user's items_claimed count
+        const userRef = doc(db, "User_Data", user.email);
+        await updateDoc(userRef, {
+            items_claimed: increment(1)
+        });
+       
+        alert("Claim submitted successfully! An administrator will review your request.");
+        window.location.href = "dashboard.html";
+       
+    } catch (error) {
+        console.error("Error submitting claim:", error);
+        alert("Failed to submit claim. Please try again.");
+       
+        // Re-enable button
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit for review";
+    }
+}
+
+
+/**
+ * Initializes the claim page.
+ *
+ * Automatically loads item details
+ * when the page finishes loading and
+ * attaches the submit event listener
+ * to the claim button.
+ *
+ * @event DOMContentLoaded
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    loadItemDetails();
+   
+    const submitBtn = document.querySelector('button.btn-orange');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', submitClaim);
+    }
+});
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-adminDashboard.html">adminDashboard</a></li><li><a href="module-claimItem.html">claimItem</a></li><li><a href="module-firebaseModule.html">firebaseModule</a></li><li><a href="module-logout.html">logout</a></li><li><a href="module-reportItem.html">reportItem</a></li><li><a href="module-reviewClaim.html">reviewClaim</a></li><li><a href="module-search.html">search</a></li></ul><h3>Events</h3><ul><li><a href="module-claimItem.html#~event:DOMContentLoaded">DOMContentLoaded</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AddUser">AddUser</a></li><li><a href="global.html#createDashboardCard">createDashboardCard</a></li><li><a href="global.html#formatDate">formatDate</a></li><li><a href="global.html#formatRelativeDate">formatRelativeDate</a></li><li><a href="global.html#loadPendingRetrievalRequests">loadPendingRetrievalRequests</a></li><li><a href="global.html#loadPendingSubmissions">loadPendingSubmissions</a></li><li><a href="global.html#loadReadyToClaim">loadReadyToClaim</a></li><li><a href="global.html#loadRetrievedItems">loadRetrievedItems</a></li><li><a href="global.html#signInEmailButton">signInEmailButton</a></li><li><a href="global.html#signInGoogleButton">signInGoogleButton</a></li><li><a href="global.html#user">user</a></li><li><a href="global.html#userEmailSignIn">userEmailSignIn</a></li><li><a href="global.html#userGoogleSignIn">userGoogleSignIn</a></li><li><a href="global.html#user_status">user_status</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Tue Apr 21 2026 07:30:32 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

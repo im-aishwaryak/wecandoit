@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: student_dashboard.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: student_dashboard.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file student_dashboard.js
+ * @description Handles loading and rendering of student dashboard data.
+ * 
+ * This script:
+ * - Listens for Firebase authentication state changes
+ * - Loads student-specific dashboard data
+ * - Creates dashboard item cards dynamically
+ * - Formats date information
+ * - Populates modal windows for item details
+ * 
+ * Dashboard Sections:
+ * - Ready to Claim Items
+ * - Pending Retrieval Requests
+ * - Pending Submissions
+ * - Retrieved Items History
+ * 
+ * @author Aadhya Goyal, Aanya Rawal, Aishwarya Kumaran
+ * @version 1.0
+ */
+
+
+
+
+import { db, auth, collection, query, where, getDocs } from './firebaseModule.js';
+
+// Wait for auth state
+// Wait for auth to be ready, then load data
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        // User is logged in, load their dashboard data
+        loadReadyToClaim(user.uid);
+        loadPendingRetrievalRequests(user.uid);
+        loadPendingSubmissions(user.uid);
+        loadRetrievedItems(user.uid);
+    }
+    // Don't redirect here - let protect-student.js handle it
+});
+
+
+
+
+/**
+ * Creates a dashboard item card element.
+ *
+ * This function dynamically builds a reusable
+ * dashboard card containing item information,
+ * tags, details, and buttons.
+ *
+ * @param {Object} options Configuration object
+ * @param {string} options.image Item image URL
+ * @param {string} options.title Item title
+ * @param {Array&lt;Object>} [options.tags] Tag list
+ * @param {Array&lt;string>} options.details Detail text
+ * @param {Array&lt;Object>} options.buttons Button config
+ * @param {Object} [options.itemData] Item metadata
+ * @param {string} [options.itemId] Firestore item ID
+ * @param {Object} [options.claimData] Claim metadata
+ * @param {string} [options.claimId] Firestore claim ID
+ *
+ * @returns {HTMLElement} Generated dashboard card
+ */
+function createDashboardCard({ image, title, tags, details, buttons, itemData, itemId, claimData, claimId }) {
+    const card = document.createElement('div');
+    card.className = 'dashboard-item-card';
+
+    // Store data attributes for modal
+    if (itemData) {
+        card.dataset.itemData = JSON.stringify(itemData);
+        card.dataset.itemId = itemId;
+    }
+    if (claimData) {
+        card.dataset.claimData = JSON.stringify(claimData);
+        card.dataset.claimId = claimId;
+    }
+
+    card.innerHTML = `
+    &lt;img src="${image}" class="dashboard-item-img" alt="${title}">
+    &lt;div class="dashboard-item-info">
+        &lt;h4>${title}&lt;/h4>
+        ${tags ? tags.map(tag => `&lt;span class="tag ${tag.class}">${tag.text}&lt;/span>`).join('') : ''}
+        ${claimData?.claimant_email ? `&lt;p class="item-location" style="padding-bottom: 5px;">Claimed by &lt;span class="tag tag-gray">${claimData.claimant_email}&lt;/span>&lt;/p>` : ''}
+        ${itemData?.receiver_email ? `&lt;p class="item-location" style="padding-bottom: 5px;">Claimed by &lt;span class="tag tag-gray">${itemData.receiver_email}&lt;/span>&lt;/p>` : ''}
+        ${details.map(detail => `&lt;p class="item-location">${detail}&lt;/p>`).join('')}
+    &lt;/div>
+    ${buttons.map(btn => `&lt;button class="btn ${btn.class} btn-sm" data-modal="${btn.modal}">${btn.text}&lt;/button>`).join('')}
+`;
+
+
+    return card;
+}
+
+/**
+ * Formats a date into MM/DD/YYYY format.
+ *
+ * @param {string} dateString Raw date string
+ * @returns {string} Formatted date
+ */
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+}
+
+
+
+/**
+ * Converts a date into relative time format.
+ *
+ * Examples:
+ * - today
+ * - 1 day ago
+ * - X days ago
+ *
+ * @param {string} dateString Raw date string
+ * @returns {string} Relative date text
+ */
+function formatRelativeDate(dateString) {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now - date);
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return 'today';
+    if (diffDays === 1) return '1 day ago';
+    return `${diffDays} days ago`;
+}
+
+
+
+
+/**
+ * Loads items that are ready for pickup.
+ *
+ * Queries Firestore for items that have
+ * been approved and are ready for retrieval.
+ *
+ * Displays results inside the
+ * "ready-to-claim-section" container.
+ *
+ * @async
+ * @param {string} userId Current user ID
+ * @returns {Promise&lt;void>}
+ */
+async function loadReadyToClaim(userId) {
+    console.log("🎯 [READY_TO_CLAIM] Starting loadReadyToClaim...");
+    console.log("🎯 [READY_TO_CLAIM] User ID:", userId);
+    
+    const claimsRef = collection(db, "Item_Data");
+    console.log("🎯 [READY_TO_CLAIM] Collection reference created: Item_Data");
+    
+    const q = query(
+        claimsRef,
+        where("reciever_id", "==", userId),
+        where("status", "==", "claimed and ready to retrieve")
+    );
+    console.log("🎯 [READY_TO_CLAIM] Query created with filters:", {
+        reciever_id: userId,
+        status: "claimed and ready to retrieve"
+    });
+
+    console.log("🎯 [READY_TO_CLAIM] Executing query...");
+    const snapshot = await getDocs(q);
+    console.log("🎯 [READY_TO_CLAIM] Query results:", {
+        totalDocs: snapshot.size,
+        empty: snapshot.empty
+    });
+    
+    // Debug: Log all documents found
+    if (!snapshot.empty) {
+        console.log("🎯 [READY_TO_CLAIM] Documents found:");
+        snapshot.docs.forEach((doc, index) => {
+            const data = doc.data();
+            console.log(`🎯 [READY_TO_CLAIM] Doc ${index + 1}:`, {
+                id: doc.id,
+                item_name: data.item_name,
+                reciever_id: data.reciever_id,
+                receiver_id: data.receiver_id,
+                status: data.status,
+                reviewed_at: data.reviewed_at
+            });
+        });
+    }
+
+    const container = document.getElementById('ready-to-claim-section');
+    console.log("🎯 [READY_TO_CLAIM] Container found:", !!container);
+
+    if (!container) {
+        console.error("❌ [READY_TO_CLAIM] Container 'ready-to-claim-section' not found!");
+        return;
+    }
+
+    // Clear existing cards (keep the heading and subtitle)
+    const existingCards = container.querySelectorAll('.dashboard-item-card');
+    console.log("🎯 [READY_TO_CLAIM] Clearing existing cards:", existingCards.length);
+    existingCards.forEach(card => card.remove());
+
+    if (snapshot.empty) {
+        console.log("⚠️ [READY_TO_CLAIM] No items found - showing empty message");
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'subtitle';
+        emptyMsg.textContent = 'No items ready for pickup yet.';
+        container.appendChild(emptyMsg);
+        return;
+    }
+
+    console.log("🎯 [READY_TO_CLAIM] Creating cards for", snapshot.size, "items...");
+
+    for (const claimDoc of snapshot.docs) {
+        const claim = claimDoc.data();
+        
+        console.log("📋 [READY_TO_CLAIM] Processing item:", {
+            id: claimDoc.id,
+            item_name: claim.item_name,
+            reviewed_at: claim.reviewed_at,
+            image_url: claim.image_url ? "present" : "missing"
+        });
+
+        // ADD SAFETY CHECKS HERE
+        let approvedDateStr = 'N/A';
+        let pickupDeadlineStr = 'N/A';
+        
+        if (claim.reviewed_at) {
+            try {
+                const approvedDate = new Date(claim.reviewed_at);
+                if (!isNaN(approvedDate.getTime())) {
+                    approvedDateStr = formatDate(claim.reviewed_at);
+                    
+                    const pickupDeadline = new Date(approvedDate);
+                    pickupDeadline.setDate(pickupDeadline.getDate() + 7);
+                    pickupDeadlineStr = formatDate(pickupDeadline.toISOString());
+                }
+            } catch (error) {
+                console.error("📋 [READY_TO_CLAIM] Error parsing date:", error);
+            }
+        }
+        
+        console.log("📋 [READY_TO_CLAIM] Creating card...");
+        const card = createDashboardCard({
+            image: claim.image_url,
+            title: claim.item_name,
+            details: [
+                `Approved by ${claim.approver_email || 'Unknown'} on ${approvedDateStr}`,
+                `Pick up by ${pickupDeadlineStr}`
+            ],
+            buttons: [
+                { text: 'View Details', class: 'btn-orange', modal: 'claimed' }
+            ],
+            claimData: claim,
+            claimId: claimDoc.id
+        });
+
+        console.log("📋 [READY_TO_CLAIM] Card created, appending to container");
+        container.appendChild(card);
+    }
+    
+    console.log("✅ [READY_TO_CLAIM] Function complete!");
+}
+
+/**
+ * Loads pending retrieval requests.
+ *
+ * Queries Firestore for pending claims
+ * submitted by the current user.
+ *
+ * Displays results inside the
+ * "pending-retrieval-section".
+ *
+ * @async
+ * @param {string} userId Current user ID
+ * @returns {Promise&lt;void>}
+ */
+async function loadPendingRetrievalRequests(userId) {
+    const claimsRef = collection(db, "Claims");
+    const q = query(
+        claimsRef,
+        where("claimant_id", "==", userId),
+        where("status", "==", "pending")
+    );
+
+    const snapshot = await getDocs(q);
+    const container = document.getElementById('pending-retrieval-section');
+
+    if (!container) return;
+
+    container.querySelectorAll('.dashboard-item-card').forEach(card => card.remove());
+
+    if (snapshot.empty) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'subtitle';
+        emptyMsg.textContent = 'No pending retrieval requests.';
+        emptyMsg.style.marginTop = '10px';
+        container.appendChild(emptyMsg);
+        return;
+    }
+
+    snapshot.docs.forEach(claimDoc => {
+        const claim = claimDoc.data();
+
+        const card = createDashboardCard({
+            image: claim.item_image,
+            title: claim.item_name,
+            details: [`Submitted on ${formatDate(claim.submitted_at)}`],
+            buttons: [{ text: 'View Details', class: 'btn-orange', modal: 'claimed' }],
+            claimData: claim,
+            claimId: claimDoc.id
+        });
+
+        container.appendChild(card);
+    });
+}
+
+/**
+ * Loads pending item submissions.
+ *
+ * Retrieves items submitted by the
+ * current user that are still under review.
+ *
+ * Displays results inside the
+ * "pending-submissions-section".
+ *
+ * @async
+ * @param {string} userId Current user ID
+ * @returns {Promise&lt;void>}
+ */
+async function loadPendingSubmissions(userId) {
+    const itemsRef = collection(db, "Item_Data");
+    const q = query(
+        itemsRef,
+        where("submitter_id", "==", userId),
+        where("status", "==", "pending submission")
+    );
+
+
+
+    const snapshot = await getDocs(q);
+    const container = document.getElementById('pending-submissions-section');
+
+    if (!container) return;
+
+    container.querySelectorAll('.dashboard-item-card').forEach(card => card.remove());
+
+    if (snapshot.empty) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'subtitle';
+        emptyMsg.textContent = 'No pending item submissions.';
+        emptyMsg.style.marginTop = '10px';
+        container.appendChild(emptyMsg);
+        return;
+    }
+
+    snapshot.docs.forEach(itemDoc => {
+        const item = itemDoc.data();
+
+        const card = createDashboardCard({
+            image: item.image_url,
+            title: item.item_name || item.category,
+            details: [
+                `Submitted on ${formatDate(item.submitted_at)}`,
+                `Found in ${item.location_found}`
+            ],
+            buttons: [{ text: 'View Details', class: 'btn-orange', modal: 'reported' }],
+            itemData: item,
+            itemId: itemDoc.id
+        });
+
+        container.appendChild(card);
+    });
+}
+
+/**
+ * Loads retrieved or submitted items.
+ *
+ * Queries Firestore for items where
+ * the user is either:
+ * - The submitter
+ * - The receiver
+ *
+ * Combines both datasets and removes duplicates.
+ *
+ * Displays results inside the
+ * "your-items-section".
+ *
+ * @async
+ * @param {string} userId Current user ID
+ * @returns {Promise&lt;void>}
+ */
+async function loadRetrievedItems(userId) {
+    const claimsRef = collection(db, "Item_Data");
+
+    // Query 1: Items where user is the submitter
+    const q1 = query(
+        claimsRef,
+        where("submitter_id", "==", userId)
+    );
+
+    // Query 2: Items where user is the recipient/claimant
+    const q2 = query(
+        claimsRef,
+        where("reciever_id", "==", userId)
+    );
+
+    // Execute both queries
+    const [snapshot1, snapshot2] = await Promise.all([
+        getDocs(q1),
+        getDocs(q2)
+    ]);
+
+    const container = document.getElementById('your-items-section');
+
+    if (!container) return;
+
+    container.querySelectorAll('.dashboard-item-card').forEach(card => card.remove());
+
+    // Combine results from both queries
+    const allDocs = [...snapshot1.docs, ...snapshot2.docs];
+
+    if (allDocs.length === 0) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'subtitle';
+        emptyMsg.textContent = 'No items yet.';
+        container.appendChild(emptyMsg);
+        return;
+    }
+
+    // Remove duplicates (in case an item appears in both queries)
+    const uniqueDocs = new Map();
+    allDocs.forEach(doc => {
+        uniqueDocs.set(doc.id, doc);
+    });
+
+    uniqueDocs.forEach((claimDoc) => {
+        const claim = claimDoc.data();
+
+        // Determine if user was submitter or recipient
+        const isSubmitter = claim.submitter_id === userId;
+        const tagText = isSubmitter ? 'Item Submission' : 'Item Retrieval';
+        const tagClass = isSubmitter ? 'tag-blue' : 'tag-orange';
+
+        const card = createDashboardCard({
+            image: claim.image_url,
+            title: claim.item_name,
+            tags: [{ text: tagText, class: tagClass }],
+            details: [`Status: ${claim.status || 'N/A'}`],
+            buttons: [{ text: 'View Details', class: 'btn-orange', modal: 'claimed' }],
+            claimData: claim,
+            claimId: claimDoc.id
+        });
+
+        container.appendChild(card);
+    });
+}
+
+
+
+// VIEW DETAILS POP UP
+
+/**
+ * Populates the reported item modal.
+ *
+ * Updates modal elements using
+ * reported item data.
+ *
+ * Displays:
+ * - Item image
+ * - Item title
+ * - Location found
+ * - Submitter details
+ * - Verification questions
+ *
+ * @param {Object} itemData Reported item data
+ * @param {string} itemId Firestore item ID
+ */
+window.populateReportedModal = function(itemData, itemId) {
+    console.log("Populating reported modal:", itemData);
+    
+    const modal = document.getElementById("reported-details-modal");
+    if (!modal) return;
+    
+    // Update image
+    const img = modal.querySelector('.details-img');
+    if (img) img.src = itemData.image_url || 'assets/placeholders/lost-item1.jpg';
+    
+    // Update title
+    const title = modal.querySelector('h2');
+    if (title) title.textContent = itemData.item_name || itemData.category || 'Unknown Item';
+    
+    // Update tag if exists
+    const tag = modal.querySelector('.tag-orange');
+    if (tag) tag.textContent = 'Item Submission';
+    
+    // Update location and time tags
+    const tags = modal.querySelectorAll('.tag-transparent');
+    if (tags[0]) tags[0].innerHTML = `&lt;img src="assets/icons/location.svg">${itemData.location_found || 'Unknown'}`;
+    if (tags[1]) tags[1].innerHTML = `&lt;img src="assets/icons/clock.svg">${formatDate(itemData.submitted_at) || 'Unknown'}`;
+    
+    // Update submitter info
+    const paragraphs = modal.querySelectorAll('p');
+    paragraphs.forEach(p => {
+        if (p.innerHTML.includes('Student Name:')) {
+            p.innerHTML = `&lt;b>Student Name:&lt;/b> ${itemData.submitter_name || 'N/A'}`;
+        }
+        if (p.innerHTML.includes('Student Email:')) {
+            p.innerHTML = `&lt;b>Student Email:&lt;/b> ${itemData.submitter_email || 'N/A'}`;
+        }
+        if (p.innerHTML.includes('Public description:')) {
+            p.innerHTML = `&lt;b>Public description:&lt;/b> ${itemData.public_description || 'N/A'}`;
+        }
+        if (p.innerHTML.includes('Private description:')) {
+            p.innerHTML = `&lt;b>Private description:&lt;/b> ${itemData.private_description || 'N/A'}`;
+        }
+    });
+    
+    // Update verification questions
+    const verificationSection = Array.from(paragraphs).find(p => p.textContent.includes('Verification Questions'));
+    if (verificationSection &amp;&amp; itemData.verification_questions) {
+        let html = '&lt;p>&lt;b>Verification Questions&lt;/b>&lt;/p>';
+        itemData.verification_questions.forEach((q, index) => {
+            html += `&lt;p>Q${index + 1}: ${q.question || 'N/A'}&lt;/p>`;
+            html += `&lt;p>A${index + 1}: ${q.answer || 'N/A'}&lt;/p>`;
+        });
+        verificationSection.outerHTML = html;
+    }
+};
+
+/**
+ * Populates the claimed item modal.
+ *
+ * Updates modal elements using
+ * claim submission data.
+ *
+ * Displays:
+ * - Claimant information
+ * - Lost date
+ * - Verification answers
+ * - Additional notes
+ *
+ * @param {Object} claimData Claim data object
+ * @param {string} claimId Firestore claim ID
+ */
+window.populateClaimedModal = function(claimData, claimId) {
+    console.log("Populating claimed modal:", claimData);
+    
+    const modal = document.getElementById("claimed-details-modal");
+    if (!modal) return;
+    
+    // Update image
+    const img = modal.querySelector('.details-img');
+    if (img) img.src = claimData.image_url || claimData.item_image || 'assets/placeholders/lost-item1.jpg';
+    
+    // Update title
+    const title = modal.querySelector('h2');
+    if (title) title.textContent = claimData.item_name || 'Unknown Item';
+    
+    // Update all paragraphs
+    const paragraphs = modal.querySelectorAll('p');
+    paragraphs.forEach(p => {
+        if (p.innerHTML.includes('Student Name:')) {
+            p.innerHTML = `&lt;b>Student Name:&lt;/b> ${claimData.claimant_name || claimData.receiver_name || 'N/A'}`;
+        }
+        if (p.innerHTML.includes('Student Email:')) {
+            p.innerHTML = `&lt;b>Student Email:&lt;/b> ${claimData.claimant_email || claimData.receiver_email || 'N/A'}`;
+        }
+        if (p.innerHTML.includes('Lost on:')) {
+            p.innerHTML = `&lt;b>Lost on:&lt;/b> ${formatDate(claimData.submitted_at) || 'N/A'}`;
+        }
+    });
+    
+    // Update verification questions if they exist
+    if (claimData.verification_answers) {
+        const verificationSection = Array.from(paragraphs).find(p => p.textContent.includes('Verification Questions'));
+        if (verificationSection) {
+            let html = '&lt;p>&lt;b>Verification Questions&lt;/b>&lt;/p>';
+            claimData.verification_answers.forEach((qa, index) => {
+                html += `&lt;p>Q${index + 1}: ${qa.question || 'N/A'}&lt;/p>`;
+                html += `&lt;p>A${index + 1}: ${qa.answer || 'N/A'}&lt;/p>`;
+            });
+            verificationSection.outerHTML = html;
+        }
+    }
+    
+    // Update additional information
+    const additionalInfo = Array.from(paragraphs).find(p => p.previousElementSibling?.textContent?.includes('Additional Information'));
+    if (additionalInfo) {
+        additionalInfo.textContent = claimData.additional_notes || 'No additional notes.';
+    }
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-adminDashboard.html">adminDashboard</a></li><li><a href="module-claimItem.html">claimItem</a></li><li><a href="module-firebaseModule.html">firebaseModule</a></li><li><a href="module-logout.html">logout</a></li><li><a href="module-reportItem.html">reportItem</a></li><li><a href="module-reviewClaim.html">reviewClaim</a></li><li><a href="module-search.html">search</a></li></ul><h3>Events</h3><ul><li><a href="module-claimItem.html#~event:DOMContentLoaded">DOMContentLoaded</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AddUser">AddUser</a></li><li><a href="global.html#createDashboardCard">createDashboardCard</a></li><li><a href="global.html#formatDate">formatDate</a></li><li><a href="global.html#formatRelativeDate">formatRelativeDate</a></li><li><a href="global.html#loadPendingRetrievalRequests">loadPendingRetrievalRequests</a></li><li><a href="global.html#loadPendingSubmissions">loadPendingSubmissions</a></li><li><a href="global.html#loadReadyToClaim">loadReadyToClaim</a></li><li><a href="global.html#loadRetrievedItems">loadRetrievedItems</a></li><li><a href="global.html#signInEmailButton">signInEmailButton</a></li><li><a href="global.html#signInGoogleButton">signInGoogleButton</a></li><li><a href="global.html#user">user</a></li><li><a href="global.html#userEmailSignIn">userEmailSignIn</a></li><li><a href="global.html#userGoogleSignIn">userGoogleSignIn</a></li><li><a href="global.html#user_status">user_status</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Tue Apr 21 2026 07:30:32 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
