@@ -1,6 +1,26 @@
 // search.js (include as: <script type="module" src="search.js"></script>)
 // search.js
 
+/**
+ * @file search.js
+ * @description Handles loading, searching, and displaying available items.
+ *
+ * This module retrieves available items from Firestore,
+ * renders them into interactive cards, and provides
+ * real-time search functionality including fuzzy matching
+ * using the Levenshtein distance algorithm.
+ *
+ * Features:
+ * - Load available items from Firestore
+ * - Render item cards dynamically
+ * - Real-time search filtering
+ * - Fuzzy search for typo tolerance
+ * - Levenshtein distance matching
+ *
+ * @module search
+ * @author Aadhya Goyal, Aanya Rawal, Aishwarya Kumaran
+ * @version 1.0
+ */
 
 import {
   db, auth, provider, signInWithPopup, signOut,
@@ -9,10 +29,31 @@ import {
   getAllItems, listenToItems, getItemById   // <- ADD THESE
 } from './firebaseModule.js';
 
+
+/**
+ * Stores all loaded available items.
+ *
+ * Each object represents an item retrieved
+ * from Firestore with selected display fields.
+ *
+ * @type {Array<Object>}
+ */
 const lostThings = [
 ];
 
-
+/**
+ * Loads available items from Firestore.
+ *
+ * Retrieves all items using getAllItems(),
+ * filters only items available for claiming,
+ * and stores them in the lostThings array.
+ *
+ * After loading, renders items to the UI.
+ *
+ * @async
+ * @function load
+ * @returns {Promise<void>}
+ */
 async function load() {
     try {
         const items = await getAllItems();
@@ -52,9 +93,25 @@ async function load() {
 
 load()
 
-
+/**
+ * Search input field element.
+ *
+ * Triggers search filtering
+ * whenever the user types.
+ *
+ * @type {HTMLElement}
+ */
 const searchInput = document.getElementById('search-input');
 searchInput.addEventListener('keyup', search);
+
+/**
+ * Item grid container element.
+ *
+ * Holds dynamically generated
+ * item cards.
+ *
+ * @type {HTMLElement}
+ */
 const itemGrid = document.getElementById("item-grid");
 
 
@@ -63,7 +120,25 @@ const itemGrid = document.getElementById("item-grid");
 /*______________________________________________________________________________*/
 
 
-
+/**
+ * Creates a visual item card element.
+ *
+ * Generates HTML content displaying:
+ * - Item image
+ * - Item name
+ * - Category
+ * - Status
+ * - Location
+ * - Date found
+ *
+ * Also includes a link to
+ * claim the selected item.
+ *
+ * @function createItemCard
+ * @param {Object} item - Item data object
+ * @returns {HTMLElement}
+ * Generated item card element.
+ */
 function createItemCard(item) {
   const card = document.createElement("div");
   card.classList.add("item-card");
@@ -74,7 +149,7 @@ function createItemCard(item) {
   card.innerHTML = `
     <div class="image-wrapper">
         <img class="item-img" src="${item.image_url}" alt="Chromebook charger">
-        <button class="img-expand-btn" onclick="openImageModal('${item.image_url}')">
+        <button class="img-expand-btn" onclick="openImageModal('assets/placeholders/lost-item3.jpg')">
             <img src="assets/icons/expand.svg" alt="expand">
         </button>
     </div>
@@ -85,7 +160,8 @@ function createItemCard(item) {
         </div>
 
         <div class="item-text">
-            <h3 class="item-name">${item.item_name}</h3>             
+            <h3 class="item-name">${item.item_name}</h3> 
+            
             <p class="item-desc">${item.public_description}</p>
         </div>
 
@@ -106,8 +182,19 @@ function createItemCard(item) {
 
 
 
-
-//this function handles all the searching
+/**
+ * Performs search filtering on items.
+ *
+ * Uses two search methods:
+ * 1. Direct substring matching
+ * 2. Fuzzy matching for typo tolerance
+ *
+ * Updates UI with filtered results
+ * and displays match count.
+ *
+ * @function search
+ * @returns {void}
+ */
 function search() {
     // first we get the value from the search bar
     const searchValue = document.getElementById("search-input").value.toLowerCase();
@@ -141,6 +228,18 @@ function search() {
 }
 
 
+/**
+ * Renders item cards into the grid.
+ *
+ * Clears existing content and
+ * inserts updated item cards.
+ *
+ * @function renderItems
+ * @param {Array<Object>} items
+ * List of items to display.
+ *
+ * @returns {void}
+ */
 function renderItems(items) {
   itemGrid.innerHTML = ""; // clear previous content
   items.forEach(item => {
@@ -153,8 +252,19 @@ function renderItems(items) {
 
 
 
-//this function basically searches by the value that the user types in
-//specifically not the catory dropdown search
+/**
+ * Filters items using direct substring matching.
+ *
+ * Matches search input against
+ * item names in a case-insensitive manner.
+ *
+ * @function searchByValue
+ * @param {string} searchValue
+ * User search query.
+ *
+ * @returns {Array<Object>}
+ * Filtered list of matching items.
+ */
 function searchByValue(searchValue){
     // console.log()
     
@@ -168,7 +278,28 @@ function searchByValue(searchValue){
 
 
 
-// searches a list with typos
+/**
+ * Performs fuzzy matching on items.
+ *
+ * Uses Levenshtein distance to detect
+ * approximate matches when typos occur.
+ *
+ * Items with distance below threshold
+ * are included as possible matches.
+ *
+ * @function fuzzySearch
+ * @param {string} query
+ * Search query string.
+ *
+ * @param {Array<Object>} list
+ * List of items to search.
+ *
+ * @param {number} [threshold=4]
+ * Maximum allowed edit distance.
+ *
+ * @returns {Array<Object>}
+ * List of fuzzy-matched items.
+ */
 function fuzzySearch(query, list, threshold = 4) {
     // Convert the search query to lowercase so comparisons
     // are case-insensitive.
@@ -219,7 +350,29 @@ function fuzzySearch(query, list, threshold = 4) {
 
 
 
-// returns the number of edits needed to turn string a into string b
+/**
+ * Calculates Levenshtein distance
+ * between two strings.
+ *
+ * The distance represents the minimum
+ * number of single-character edits
+ * required to change one string
+ * into another.
+ *
+ * Supported operations:
+ * - Insertion
+ * - Deletion
+ * - Substitution
+ *
+ * Used for typo-tolerant searching.
+ *
+ * @function levenshtein
+ * @param {string} a - First string
+ * @param {string} b - Second string
+ *
+ * @returns {number}
+ * Edit distance between strings.
+ */
 function levenshtein(a, b) {
     // Create a 2D matrix (dp) where:
     // dp[i][j] represents the minimum number of edits needed
