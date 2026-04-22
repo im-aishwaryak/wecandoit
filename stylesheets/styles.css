@@ -687,6 +687,20 @@ select option {
 
 
 /* ==================== HERO ==================== */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: black;
+    color: white;
+    padding: 8px;
+    z-index: 100;
+}
+
+.skip-link:focus {
+    top: 10px;
+}
+
 .hero-container {
     width: 560px;
     max-width: 50%;
@@ -1015,6 +1029,7 @@ select option {
     justify-content: center;
     z-index: 999;
     padding: 20px;
+    max-height: 100vh;
 }
 
 .details-modal.hidden {
@@ -1032,6 +1047,10 @@ select option {
     display: flex;
     flex-direction: column;
     gap: 20px;
+
+    max-height: 95vh;
+    overflow-y: auto;
+    box-sizing: border-box;
 }
 
 .details-modal-close {
