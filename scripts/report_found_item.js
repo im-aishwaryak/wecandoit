@@ -164,7 +164,6 @@ const uploadData = async() => {
 
 report_button.addEventListener("click", async (e) => {
     e.preventDefault();   // 🔥 stops page reload
-    showNotif("Submitting item...", "info");
     
     const success = await uploadData();
     if(success){ 
