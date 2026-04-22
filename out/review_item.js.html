@@ -1,4 +1,32 @@
-// scripts/review_claim.js
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: review_item.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: review_item.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// scripts/review_claim.js
 
 
 /**
@@ -89,7 +117,7 @@ console.log(itemId)
  *
  * @async
  * @function loadReviewData
- * @returns {Promise<void>}
+ * @returns {Promise&lt;void>}
  */
 async function loadReviewData() {
     if (!itemId) {
@@ -176,73 +204,73 @@ function displayComparison() {
         const matchClass = isMatch ? 'style="color: green; font-weight: bold;"' : 'style="color: red;"';
        
         verificationHTML += `
-            <p><b>Q${index + 1}:</b> ${question}</p>
-            <p><b>Correct A${index + 1}:</b> ${correctAnswer}</p>
-            <p ${matchClass}><b>Claimant A${index + 1}:</b> ${claimAnswer} ${isMatch ? '✓' : '✗'}</p>
-            <br>
+            &lt;p>&lt;b>Q${index + 1}:&lt;/b> ${question}&lt;/p>
+            &lt;p>&lt;b>Correct A${index + 1}:&lt;/b> ${correctAnswer}&lt;/p>
+            &lt;p ${matchClass}>&lt;b>Claimant A${index + 1}:&lt;/b> ${claimAnswer} ${isMatch ? '✓' : '✗'}&lt;/p>
+            &lt;br>
         `;
     });
    
     comparisonCard.innerHTML = `
-        <img src="${currentItem.image_url || 'assets/placeholders/lost-item1.jpg'}" alt="Item">
+        &lt;img src="${currentItem.image_url || 'assets/placeholders/lost-item1.jpg'}" alt="Item">
 
 
-        <div class="comparison-info">
-            <div class="comparison-columns">
+        &lt;div class="comparison-info">
+            &lt;div class="comparison-columns">
 
 
-                <!-- Retrieval Request Column -->
-                <div class="comparison-column">
-                    <h2>Retrieval Request (Claim)</h2>
-                    <br>
-                    <p><b>Item Name:</b> ${currentClaim.item_name}</p>
-                    <p><b>Submitted on:</b> ${formatDate(currentClaim.submitted_at)}</p>
-                    <p><b>Claimant Name:</b> ${currentClaim.claimant_name}</p>
-                    <p><b>Student Email:</b> ${currentClaim.claimant_email}</p>
-                    <p><b>Lost on:</b> ${currentClaim.lost_date}${currentClaim.lost_time ? ' at ' + currentClaim.lost_time : ''}</p>
-                    <br>
-                    <p><b>Verification Answers:</b></p>
+                &lt;!-- Retrieval Request Column -->
+                &lt;div class="comparison-column">
+                    &lt;h2>Retrieval Request (Claim)&lt;/h2>
+                    &lt;br>
+                    &lt;p>&lt;b>Item Name:&lt;/b> ${currentClaim.item_name}&lt;/p>
+                    &lt;p>&lt;b>Submitted on:&lt;/b> ${formatDate(currentClaim.submitted_at)}&lt;/p>
+                    &lt;p>&lt;b>Claimant Name:&lt;/b> ${currentClaim.claimant_name}&lt;/p>
+                    &lt;p>&lt;b>Student Email:&lt;/b> ${currentClaim.claimant_email}&lt;/p>
+                    &lt;p>&lt;b>Lost on:&lt;/b> ${currentClaim.lost_date}${currentClaim.lost_time ? ' at ' + currentClaim.lost_time : ''}&lt;/p>
+                    &lt;br>
+                    &lt;p>&lt;b>Verification Answers:&lt;/b>&lt;/p>
                     ${Object.entries(claimAnswers).map(([q, a], i) =>
-                        `<p>Q${i + 1}: ${q}</p><p>A${i + 1}: ${a}</p>`
+                        `&lt;p>Q${i + 1}: ${q}&lt;/p>&lt;p>A${i + 1}: ${a}&lt;/p>`
                     ).join('')}
-                    <br>
-                    <p><b>Additional Information:</b></p>
-                    <p>${currentClaim.additional_info || 'None provided'}</p>
-                </div>
+                    &lt;br>
+                    &lt;p>&lt;b>Additional Information:&lt;/b>&lt;/p>
+                    &lt;p>${currentClaim.additional_info || 'None provided'}&lt;/p>
+                &lt;/div>
 
 
-                <!-- Submission Request Column -->
-                <div class="comparison-column">
-                    <h2>Item Submission (Original)</h2>
-                    <br>
-                    <p><b>Item Name:</b> ${currentItem.item_name || currentItem.category}</p>
-                    <p><b>Found on:</b> ${currentItem.date_found}${currentItem.time_found ? ' at ' + currentItem.time_found : ''}</p>
-                    <p><b>Location Found:</b> ${currentItem.location_found}</p>
-                    <p><b>Reporter Email:</b> ${currentItem.submitted_by}</p>
-                    <p><b>Public Description:</b> ${currentItem.public_description}</p>
-                    <p><b>Private Description:</b> ${currentItem.private_description}</p>
-                    <br>
-                    <p><b>Verification Questions & Correct Answers:</b></p>
+                &lt;!-- Submission Request Column -->
+                &lt;div class="comparison-column">
+                    &lt;h2>Item Submission (Original)&lt;/h2>
+                    &lt;br>
+                    &lt;p>&lt;b>Item Name:&lt;/b> ${currentItem.item_name || currentItem.category}&lt;/p>
+                    &lt;p>&lt;b>Found on:&lt;/b> ${currentItem.date_found}${currentItem.time_found ? ' at ' + currentItem.time_found : ''}&lt;/p>
+                    &lt;p>&lt;b>Location Found:&lt;/b> ${currentItem.location_found}&lt;/p>
+                    &lt;p>&lt;b>Reporter Email:&lt;/b> ${currentItem.submitted_by}&lt;/p>
+                    &lt;p>&lt;b>Public Description:&lt;/b> ${currentItem.public_description}&lt;/p>
+                    &lt;p>&lt;b>Private Description:&lt;/b> ${currentItem.private_description}&lt;/p>
+                    &lt;br>
+                    &lt;p>&lt;b>Verification Questions &amp; Correct Answers:&lt;/b>&lt;/p>
                     ${Object.entries(itemQuestions).map(([q, a], i) =>
-                        `<p>Q${i + 1}: ${q}</p><p>A${i + 1}: ${a}</p>`
+                        `&lt;p>Q${i + 1}: ${q}&lt;/p>&lt;p>A${i + 1}: ${a}&lt;/p>`
                     ).join('')}
-                </div>
+                &lt;/div>
 
 
-            </div>
+            &lt;/div>
 
 
-            <br>
+            &lt;br>
            
-            <div style="background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                <h3 style="margin: 0 0 10px 0;">Verification Check</h3>
+            &lt;div style="background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                &lt;h3 style="margin: 0 0 10px 0;">Verification Check&lt;/h3>
                 ${verificationHTML}
-            </div>
+            &lt;/div>
 
 
-            <button class="btn btn-orange btn-sm full-width" id="approve-btn">Approve Match</button>
-            <button class="btn btn-blue btn-sm full-width" id="reject-btn">Reject Match</button>
-        </div>
+            &lt;button class="btn btn-orange btn-sm full-width" id="approve-btn">Approve Match&lt;/button>
+            &lt;button class="btn btn-blue btn-sm full-width" id="reject-btn">Reject Match&lt;/button>
+        &lt;/div>
     `;
    
     // Add event listeners
@@ -264,7 +292,7 @@ function displayComparison() {
  *
  * @async
  * @function approveClaim
- * @returns {Promise<void>}
+ * @returns {Promise&lt;void>}
  */
 async function approveClaim() {
     if (!confirm('Approve this claim? The student will be notified to pick up the item.')) {
@@ -312,7 +340,7 @@ async function approveClaim() {
  *
  * @async
  * @function rejectClaim
- * @returns {Promise<void>}
+ * @returns {Promise&lt;void>}
  */
 async function rejectClaim() {
     const reason = prompt('Enter reason for rejection (optional):');
@@ -382,3 +410,26 @@ document.addEventListener('DOMContentLoaded', () => {
     loadReviewData();
 });
 
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-adminDashboard.html">adminDashboard</a></li><li><a href="module-claimItem.html">claimItem</a></li><li><a href="module-firebaseModule.html">firebaseModule</a></li><li><a href="module-logout.html">logout</a></li><li><a href="module-reportItem.html">reportItem</a></li><li><a href="module-reviewClaim.html">reviewClaim</a></li><li><a href="module-search.html">search</a></li></ul><h3>Events</h3><ul><li><a href="module-claimItem.html#~event:DOMContentLoaded">DOMContentLoaded</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AddUser">AddUser</a></li><li><a href="global.html#createDashboardCard">createDashboardCard</a></li><li><a href="global.html#formatDate">formatDate</a></li><li><a href="global.html#formatRelativeDate">formatRelativeDate</a></li><li><a href="global.html#loadPendingRetrievalRequests">loadPendingRetrievalRequests</a></li><li><a href="global.html#loadPendingSubmissions">loadPendingSubmissions</a></li><li><a href="global.html#loadReadyToClaim">loadReadyToClaim</a></li><li><a href="global.html#loadRetrievedItems">loadRetrievedItems</a></li><li><a href="global.html#signInEmailButton">signInEmailButton</a></li><li><a href="global.html#signInGoogleButton">signInGoogleButton</a></li><li><a href="global.html#user">user</a></li><li><a href="global.html#userEmailSignIn">userEmailSignIn</a></li><li><a href="global.html#userGoogleSignIn">userGoogleSignIn</a></li><li><a href="global.html#user_status">user_status</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Tue Apr 21 2026 07:30:32 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

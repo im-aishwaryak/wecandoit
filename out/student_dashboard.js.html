@@ -1,4 +1,32 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: student_dashboard.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: student_dashboard.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * @file student_dashboard.js
  * @description Handles loading and rendering of student dashboard data.
  * 
@@ -50,9 +78,9 @@ auth.onAuthStateChanged((user) => {
  * @param {Object} options Configuration object
  * @param {string} options.image Item image URL
  * @param {string} options.title Item title
- * @param {Array<Object>} [options.tags] Tag list
- * @param {Array<string>} options.details Detail text
- * @param {Array<Object>} options.buttons Button config
+ * @param {Array&lt;Object>} [options.tags] Tag list
+ * @param {Array&lt;string>} options.details Detail text
+ * @param {Array&lt;Object>} options.buttons Button config
  * @param {Object} [options.itemData] Item metadata
  * @param {string} [options.itemId] Firestore item ID
  * @param {Object} [options.claimData] Claim metadata
@@ -75,15 +103,15 @@ function createDashboardCard({ image, title, tags, details, buttons, itemData, i
     }
 
     card.innerHTML = `
-    <img src="${image}" class="dashboard-item-img" alt="${title}">
-    <div class="dashboard-item-info">
-        <h4>${title}</h4>
-        ${tags ? tags.map(tag => `<span class="tag ${tag.class}">${tag.text}</span>`).join('') : ''}
-        ${claimData?.claimant_email ? `<p class="item-location" style="padding-bottom: 5px;">Claimed by <span class="tag tag-gray">${claimData.claimant_email}</span></p>` : ''}
-        ${itemData?.receiver_email ? `<p class="item-location" style="padding-bottom: 5px;">Claimed by <span class="tag tag-gray">${itemData.receiver_email}</span></p>` : ''}
-        ${details.map(detail => `<p class="item-location">${detail}</p>`).join('')}
-    </div>
-    ${buttons.map(btn => `<button class="btn ${btn.class} btn-sm" data-modal="${btn.modal}">${btn.text}</button>`).join('')}
+    &lt;img src="${image}" class="dashboard-item-img" alt="${title}">
+    &lt;div class="dashboard-item-info">
+        &lt;h4>${title}&lt;/h4>
+        ${tags ? tags.map(tag => `&lt;span class="tag ${tag.class}">${tag.text}&lt;/span>`).join('') : ''}
+        ${claimData?.claimant_email ? `&lt;p class="item-location" style="padding-bottom: 5px;">Claimed by &lt;span class="tag tag-gray">${claimData.claimant_email}&lt;/span>&lt;/p>` : ''}
+        ${itemData?.receiver_email ? `&lt;p class="item-location" style="padding-bottom: 5px;">Claimed by &lt;span class="tag tag-gray">${itemData.receiver_email}&lt;/span>&lt;/p>` : ''}
+        ${details.map(detail => `&lt;p class="item-location">${detail}&lt;/p>`).join('')}
+    &lt;/div>
+    ${buttons.map(btn => `&lt;button class="btn ${btn.class} btn-sm" data-modal="${btn.modal}">${btn.text}&lt;/button>`).join('')}
 `;
 
 
@@ -141,7 +169,7 @@ function formatRelativeDate(dateString) {
  *
  * @async
  * @param {string} userId Current user ID
- * @returns {Promise<void>}
+ * @returns {Promise&lt;void>}
  */
 async function loadReadyToClaim(userId) {
     console.log("🎯 [READY_TO_CLAIM] Starting loadReadyToClaim...");
@@ -269,7 +297,7 @@ async function loadReadyToClaim(userId) {
  *
  * @async
  * @param {string} userId Current user ID
- * @returns {Promise<void>}
+ * @returns {Promise&lt;void>}
  */
 async function loadPendingRetrievalRequests(userId) {
     const claimsRef = collection(db, "Claims");
@@ -322,7 +350,7 @@ async function loadPendingRetrievalRequests(userId) {
  *
  * @async
  * @param {string} userId Current user ID
- * @returns {Promise<void>}
+ * @returns {Promise&lt;void>}
  */
 async function loadPendingSubmissions(userId) {
     const itemsRef = collection(db, "Item_Data");
@@ -384,7 +412,7 @@ async function loadPendingSubmissions(userId) {
  *
  * @async
  * @param {string} userId Current user ID
- * @returns {Promise<void>}
+ * @returns {Promise&lt;void>}
  */
 async function loadRetrievedItems(userId) {
     const claimsRef = collection(db, "Item_Data");
@@ -492,33 +520,33 @@ window.populateReportedModal = function(itemData, itemId) {
     
     // Update location and time tags
     const tags = modal.querySelectorAll('.tag-transparent');
-    if (tags[0]) tags[0].innerHTML = `<img src="assets/icons/location.svg">${itemData.location_found || 'Unknown'}`;
-    if (tags[1]) tags[1].innerHTML = `<img src="assets/icons/clock.svg">${formatDate(itemData.submitted_at) || 'Unknown'}`;
+    if (tags[0]) tags[0].innerHTML = `&lt;img src="assets/icons/location.svg">${itemData.location_found || 'Unknown'}`;
+    if (tags[1]) tags[1].innerHTML = `&lt;img src="assets/icons/clock.svg">${formatDate(itemData.submitted_at) || 'Unknown'}`;
     
     // Update submitter info
     const paragraphs = modal.querySelectorAll('p');
     paragraphs.forEach(p => {
         if (p.innerHTML.includes('Student Name:')) {
-            p.innerHTML = `<b>Student Name:</b> ${itemData.submitter_name || 'N/A'}`;
+            p.innerHTML = `&lt;b>Student Name:&lt;/b> ${itemData.submitter_name || 'N/A'}`;
         }
         if (p.innerHTML.includes('Student Email:')) {
-            p.innerHTML = `<b>Student Email:</b> ${itemData.submitter_email || 'N/A'}`;
+            p.innerHTML = `&lt;b>Student Email:&lt;/b> ${itemData.submitter_email || 'N/A'}`;
         }
         if (p.innerHTML.includes('Public description:')) {
-            p.innerHTML = `<b>Public description:</b> ${itemData.public_description || 'N/A'}`;
+            p.innerHTML = `&lt;b>Public description:&lt;/b> ${itemData.public_description || 'N/A'}`;
         }
         if (p.innerHTML.includes('Private description:')) {
-            p.innerHTML = `<b>Private description:</b> ${itemData.private_description || 'N/A'}`;
+            p.innerHTML = `&lt;b>Private description:&lt;/b> ${itemData.private_description || 'N/A'}`;
         }
     });
     
     // Update verification questions
     const verificationSection = Array.from(paragraphs).find(p => p.textContent.includes('Verification Questions'));
-    if (verificationSection && itemData.verification_questions) {
-        let html = '<p><b>Verification Questions</b></p>';
+    if (verificationSection &amp;&amp; itemData.verification_questions) {
+        let html = '&lt;p>&lt;b>Verification Questions&lt;/b>&lt;/p>';
         itemData.verification_questions.forEach((q, index) => {
-            html += `<p>Q${index + 1}: ${q.question || 'N/A'}</p>`;
-            html += `<p>A${index + 1}: ${q.answer || 'N/A'}</p>`;
+            html += `&lt;p>Q${index + 1}: ${q.question || 'N/A'}&lt;/p>`;
+            html += `&lt;p>A${index + 1}: ${q.answer || 'N/A'}&lt;/p>`;
         });
         verificationSection.outerHTML = html;
     }
@@ -557,13 +585,13 @@ window.populateClaimedModal = function(claimData, claimId) {
     const paragraphs = modal.querySelectorAll('p');
     paragraphs.forEach(p => {
         if (p.innerHTML.includes('Student Name:')) {
-            p.innerHTML = `<b>Student Name:</b> ${claimData.claimant_name || claimData.receiver_name || 'N/A'}`;
+            p.innerHTML = `&lt;b>Student Name:&lt;/b> ${claimData.claimant_name || claimData.receiver_name || 'N/A'}`;
         }
         if (p.innerHTML.includes('Student Email:')) {
-            p.innerHTML = `<b>Student Email:</b> ${claimData.claimant_email || claimData.receiver_email || 'N/A'}`;
+            p.innerHTML = `&lt;b>Student Email:&lt;/b> ${claimData.claimant_email || claimData.receiver_email || 'N/A'}`;
         }
         if (p.innerHTML.includes('Lost on:')) {
-            p.innerHTML = `<b>Lost on:</b> ${formatDate(claimData.submitted_at) || 'N/A'}`;
+            p.innerHTML = `&lt;b>Lost on:&lt;/b> ${formatDate(claimData.submitted_at) || 'N/A'}`;
         }
     });
     
@@ -571,10 +599,10 @@ window.populateClaimedModal = function(claimData, claimId) {
     if (claimData.verification_answers) {
         const verificationSection = Array.from(paragraphs).find(p => p.textContent.includes('Verification Questions'));
         if (verificationSection) {
-            let html = '<p><b>Verification Questions</b></p>';
+            let html = '&lt;p>&lt;b>Verification Questions&lt;/b>&lt;/p>';
             claimData.verification_answers.forEach((qa, index) => {
-                html += `<p>Q${index + 1}: ${qa.question || 'N/A'}</p>`;
-                html += `<p>A${index + 1}: ${qa.answer || 'N/A'}</p>`;
+                html += `&lt;p>Q${index + 1}: ${qa.question || 'N/A'}&lt;/p>`;
+                html += `&lt;p>A${index + 1}: ${qa.answer || 'N/A'}&lt;/p>`;
             });
             verificationSection.outerHTML = html;
         }
@@ -585,4 +613,26 @@ window.populateClaimedModal = function(claimData, claimId) {
     if (additionalInfo) {
         additionalInfo.textContent = claimData.additional_notes || 'No additional notes.';
     }
-};
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-adminDashboard.html">adminDashboard</a></li><li><a href="module-claimItem.html">claimItem</a></li><li><a href="module-firebaseModule.html">firebaseModule</a></li><li><a href="module-logout.html">logout</a></li><li><a href="module-reportItem.html">reportItem</a></li><li><a href="module-reviewClaim.html">reviewClaim</a></li><li><a href="module-search.html">search</a></li></ul><h3>Events</h3><ul><li><a href="module-claimItem.html#~event:DOMContentLoaded">DOMContentLoaded</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AddUser">AddUser</a></li><li><a href="global.html#createDashboardCard">createDashboardCard</a></li><li><a href="global.html#formatDate">formatDate</a></li><li><a href="global.html#formatRelativeDate">formatRelativeDate</a></li><li><a href="global.html#loadPendingRetrievalRequests">loadPendingRetrievalRequests</a></li><li><a href="global.html#loadPendingSubmissions">loadPendingSubmissions</a></li><li><a href="global.html#loadReadyToClaim">loadReadyToClaim</a></li><li><a href="global.html#loadRetrievedItems">loadRetrievedItems</a></li><li><a href="global.html#signInEmailButton">signInEmailButton</a></li><li><a href="global.html#signInGoogleButton">signInGoogleButton</a></li><li><a href="global.html#user">user</a></li><li><a href="global.html#userEmailSignIn">userEmailSignIn</a></li><li><a href="global.html#userGoogleSignIn">userGoogleSignIn</a></li><li><a href="global.html#user_status">user_status</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Tue Apr 21 2026 07:30:32 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
