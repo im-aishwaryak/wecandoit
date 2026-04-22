@@ -1,10 +1,23 @@
+/**
+ * @file Student dashboard logic. Loads and renders dashboard sections for the
+ * currently authenticated student, including items ready to claim, pending retrieval
+ * requests, pending item submissions, and found items. Also handles populating
+ * the item detail modals.
+ */
+
 import {
     db, auth,
     collection, query, where, getDoc, getDocs, doc, updateDoc
 } from './firebaseModule.js';
 
 let user = "";
-// Load student dashboard data
+
+/**
+ * Loads all sections of the student dashboard for the currently authenticated user.
+ * Runs all section loaders in parallel via Promise.all.
+ * @async
+ * @returns {Promise<void>}
+ */
 async function loadStudentDashboard() {
     user = auth.currentUser;
     if (!user) {
@@ -27,7 +40,12 @@ async function loadStudentDashboard() {
 }
 
 
-//Load items ready to claim (approved claims waiting pickup)
+/**
+ * Loads claims with status "approved" for the current user and renders them as cards
+ * in the "ready-to-claim-section" container. Updates the "ready-count" badge.
+ * @async
+ * @returns {Promise<void>}
+ */
 async function loadReadyToClaim() {
     console.log("ready to claim being loaded.... ")
     const claimsRef = collection(db, "Claims");
@@ -84,10 +102,12 @@ async function loadReadyToClaim() {
 }
 
 
-
-
-
-// Load pending retrieval requests (claims waiting approval)
+/**
+ * Loads claims with status "pending" for the current user and renders them as cards
+ * in the "pending-retrieval-section" container. Updates the "claiming-count" badge.
+ * @async
+ * @returns {Promise<void>}
+ */
 async function loadPendingRetrievalRequests() {
     const claimsRef = collection(db, "Claims");
     const q = query(
@@ -139,7 +159,13 @@ async function loadPendingRetrievalRequests() {
 }
 
 
-// Load pending item submissions (items waiting approval)
+/**
+ * Loads items from Item_Data with status "pending submission" submitted by the current
+ * user and renders them in the "pending-submissions-section" container.
+ * Updates the "turnedin-count" badge.
+ * @async
+ * @returns {Promise<void>}
+ */
 async function loadPendingSubmissions() {
     const itemsRef = collection(db, "Item_Data");
     const q = query(
@@ -194,7 +220,12 @@ async function loadPendingSubmissions() {
 }
 
 
-// Load found items (approved and available)
+/**
+ * Loads items from Item_Data where the current user is the recipient (reciever_id)
+ * and renders up to 5 as cards in the "your-items-section" container.
+ * @async
+ * @returns {Promise<void>}
+ */
 async function loadFoundItems() {
     const claimsRef = collection(db, "Item_Data");
 
@@ -250,8 +281,11 @@ async function loadFoundItems() {
 
 
 
-
-// Helper: Format date
+/**
+ * Formats an ISO date string into MM/DD/YYYY format.
+ * @param {string} isoString - An ISO 8601 date string.
+ * @returns {string} The formatted date, or "Unknown date" if the input is falsy.
+ */
 function formatDate(isoString) {
     if (!isoString) return 'Unknown date';
     const date = new Date(isoString);
@@ -271,7 +305,19 @@ auth.onAuthStateChanged((user) => {
 
 
 
-
+/**
+ * Populates the "reported-details-modal" with data from a found item submission.
+ * Renders item image, name, location, date found, and verification questions/answers.
+ * Exposed on window for use by modal trigger handlers.
+ * @param {Object} itemData - The item document data from Item_Data.
+ * @param {string} itemData.image_url - URL of the item image.
+ * @param {string} itemData.item_name - Display name of the item.
+ * @param {string} itemData.category - Fallback category if item_name is absent.
+ * @param {string} itemData.location_found - Where the item was found.
+ * @param {string} itemData.date_found - ISO date string of when the item was found.
+ * @param {Object} itemData.verification_qs - Map of verification questions to answers.
+ * @param {string} [itemId] - The Firestore document ID of the item (currently unused).
+ */
 
 window.populateReportedModal = function (itemData, itemId) {
     
@@ -300,6 +346,27 @@ window.populateReportedModal = function (itemData, itemId) {
         questionsContainer.innerHTML = `<p class="subtitle">No verification questions.</p>`;
     }
 };
+
+
+
+/**
+ * Populates the "claimed-details-modal" with data from a claim. Fetches the associated
+ * Item_Data document to display location and finder email. Handles both array and
+ * object formats for verification_answers.
+ * Exposed on window for use by modal trigger handlers.
+ * @async
+ * @param {Object} claimData - The claim document data from Claims.
+ * @param {string} claimData.item_image - URL of the item image.
+ * @param {string} claimData.item_name - Display name of the item.
+ * @param {string} claimData.lost_date - ISO date string of the lost date.
+ * @param {string} claimData.claimant_email - Email of the person who filed the claim.
+ * @param {string} claimData.additional_info - Any extra notes on the claim.
+ * @param {string} claimData.item_id - Firestore ID used to look up the parent Item_Data doc.
+ * @param {Object|Array} claimData.verification_answers - Verification Q&A, either as a
+ *     key/value object or array of `{ question, answer }` objects.
+ * @param {string} [claimId] - The Firestore document ID of the claim (currently unused).
+ * @returns {Promise<void>}
+ */
 
 window.populateClaimedModal = async function (claimData, claimId) {
     const modal = document.getElementById("claimed-details-modal");

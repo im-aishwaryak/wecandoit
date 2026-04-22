@@ -1,3 +1,10 @@
+/**
+ * @file Report found item form logic. Handles the "report a found item" submission
+ * flow, including verification question dropdowns with custom input support, form
+ * validation, image upload to Cloudinary, and writing the new item document to
+ * Firestore with a "pending submission" status.
+ */
+
 import {
     db, auth, provider, signInWithPopup, signOut,
     doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc,
@@ -5,8 +12,15 @@ import {
 } from './firebaseModule.js';
 
 
-// aishwarya changes 1/31
-
+/**
+ * Reads the selected or custom-entered value for a verification question dropdown.
+ * If the dropdown is set to "custom", returns the trimmed value of the corresponding
+ * custom text input instead.
+ * @param {number} num - The question number (1, 2, or 3), used to locate DOM elements
+ *     by ID (e.g., "question1-select", "question1-custom").
+ * @returns {string} The selected preset question string, the custom input string,
+ *     or an empty string if the element is not found.
+ */
 function getQuestionValue(num) {
   const select = document.getElementById(`question${num}-select`);
   const custom = document.getElementById(`question${num}-custom`);
@@ -19,6 +33,14 @@ function getQuestionValue(num) {
   return select.value;
 }
 
+/**
+ * Attaches a change event listener to a verification question dropdown that toggles
+ * the visibility of the associated custom text input based on whether "custom"
+ * is selected.
+ * @param {number} num - The question number (1, 2, or 3), used to locate DOM elements
+ *     by ID (e.g., "question1-select", "question1-custom").
+ * @returns {void}
+ */
 function setupQuestionDropdown(num) {
   const select = document.getElementById(`question${num}-select`);
   const custom = document.getElementById(`question${num}-custom`);
@@ -45,7 +67,15 @@ setupQuestionDropdown(3);
 
 const report_button = document.getElementById("submit-button")
 
-
+/**
+ * Reads and validates all form fields, uploads the item image to Cloudinary via
+ * uploadImage, then writes a new document to the "Item_Data" Firestore collection
+ * with a status of "pending submission". Requires an authenticated user.
+ * Shows error notifications for missing fields, missing image, or no logged-in user.
+ * @async
+ * @returns {Promise<boolean>} Resolves to true if the item was submitted successfully,
+ *     or false if validation failed or an error occurred.
+ */
 const uploadData = async() => {
     console.log("in function")
    
@@ -146,7 +176,13 @@ report_button.addEventListener("click", async (e) => {
     } 
 });
 
-
+/**
+ * Uploads the selected image file to Cloudinary using the "boomerang_uploads" preset
+ * and returns the resulting secure URL.
+ * @async
+ * @returns {Promise<string|undefined>} The secure Cloudinary URL of the uploaded image,
+ *     or undefined if the upload failed or no file was selected.
+ */
 const uploadImage = async() => {
     const data = new FormData();
     const file = document.getElementById("image_file").files[0];

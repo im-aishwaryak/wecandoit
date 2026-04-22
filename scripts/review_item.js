@@ -1,11 +1,29 @@
-// scripts/review_claim.js
+/**
+ * @file Admin claim review page logic. Loads a found item and its associated
+ * retrieval claim by item ID from the URL, renders a side-by-side comparison of
+ * the submission and claim details (including verification answer matching), and
+ * allows an admin to approve or reject the claim.
+ */
 import {
     db, auth,
     doc, getDoc, updateDoc
 } from './firebaseModule.js';
 
-
+/**
+ * @type {{id: string, item_name: string, claimant_name: string, claimant_email: string,
+ *     lost_date: string, lost_time?: string, submitted_at: string, additional_info?: string,
+ *     verification_answers: Object.<string, string>}|null}
+ * The currently loaded claim document, or null if not yet fetched.
+ */
 let currentClaim = null;
+
+/**
+ * @type {{id: string, item_name?: string, category?: string, image_url?: string,
+ *     location_found: string, date_found: string, time_found?: string,
+ *     submitter_email: string, verification_qs: Object.<string, string>,
+ *     claim_id?: string}|null}
+ * The currently loaded item document, or null if not yet fetched.
+ */
 let currentItem = null;
 
 
@@ -15,7 +33,14 @@ const itemId = urlParams.get('id');
 console.log(itemId)
 
 
-// Load claim and item details
+/**
+ * Reads the item ID from the URL query string, fetches the corresponding Item_Data
+ * document from Firestore, and then fetches its associated Claims document if a
+ * claim_id is present. Stores results in currentItem and currentClaim, then calls
+ * displayComparison. Redirects to the admin dashboard on any error or missing data.
+ * @async
+ * @returns {Promise<void>}
+ */
 async function loadReviewData() {
     if (!itemId) {
         showNotif("No item selected", "error");
@@ -56,7 +81,13 @@ async function loadReviewData() {
 }
 
 
-// Display comparison between claim and item
+/**
+ * Renders a side-by-side comparison of the current claim and item into the
+ * ".comparison-card" DOM element. Compares each verification question answer
+ * (case-insensitive) and highlights matches in green and mismatches in red.
+ * Appends approve and reject buttons and attaches their event listeners.
+ * @returns {void}
+ */
 function displayComparison() {
     if (!currentClaim || !currentItem) {
         showNotif("Missing claim or item data", "error");
@@ -157,7 +188,13 @@ function displayComparison() {
 }
 
 
-// Approve the claim
+/**
+ * Prompts the admin for confirmation, then updates the claim status to "approved"
+ * and the item status to "claimed and ready to retrieve" in Firestore. Records the
+ * reviewing admin's email and timestamp. Redirects to the admin dashboard on success.
+ * @async
+ * @returns {Promise<void>}
+ */
 async function approveClaim() {
     const confirmed = await showConfirm("Approve this claim? The student will be notified to pick up the item.");
     if (!confirmed) return; 
@@ -190,7 +227,14 @@ async function approveClaim() {
 }
 
 
-// Reject the claim
+/**
+ * Prompts the admin for a rejection reason, then updates the claim status to
+ * "rejected" and resets the item status back to "available to claim" in Firestore,
+ * clearing claim-related fields. Records the reviewing admin's email, timestamp,
+ * and reason. Redirects to the admin dashboard after a short delay.
+ * @async
+ * @returns {Promise<void>}
+ */
 async function rejectClaim() {
     const reason = await showReasonPrompt();
 
@@ -231,7 +275,11 @@ async function rejectClaim() {
 }
 
 
-// Helper: Format date
+/**
+ * Formats an ISO date string into MM/DD/YYYY format.
+ * @param {string} isoString - An ISO 8601 date string.
+ * @returns {string} The formatted date, or "Unknown date" if the input is falsy.
+ */
 function formatDate(isoString) {
     if (!isoString) return 'Unknown date';
     const date = new Date(isoString);
