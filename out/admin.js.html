@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: admin.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: admin.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file admin_dashboard.js
+ * @description
+ * Handles administrator dashboard functionality for the Lost &amp; Found system.
+ *
+ * This module manages:
+ * - Approval of found item submissions
+ * - Approval of claim retrieval requests
+ * - Display of available found items
+ * - Tracking of reunited items
+ * - Status updates for item lifecycle management
+ *
+ * Item Status Flow:
+ * pending submission → available to claim → pending retrieval →
+ * claimed and ready to retrieve → claimed and retrieved
+ *
+ * Firebase collections used:
+ * - Item_Data
+ * - Claims
+ *
+ * Dashboard Sections:
+ * - Pending Submissions
+ * - Pending Retrieval Requests
+ * - Ready to Claim Items
+ * - Available Found Items
+ * - Reunited Items History
+ *
+ * @author Aanya Rawal, Aishwarya Kumaran, Aadhya Goyal
+ * @version 1.0
+ */
+
+
+
+/**
+ * @typedef {(
+ *  "pending submission" |
+ *  "available to claim" |
+ *  "pending retrieval" |
+ *  "claimed and ready to retrieve" |
+ *  "claimed and retrieved"
+ * )} ItemStatus
+ *
+ * Represents the lifecycle status of a lost-and-found item.
+ */
+
+
+
+
+
+//admin roles:
+//approves found item submissions
+//approves lost item claims
+
+
+//student uploads found item submission
+//item status = "pending"
+
+
+//admin dashboard shows two things:
+// - found submissions that need approval (status pending submission )
+// - claim form submissions that need approval (status pending)
+
+
+//found form submmitted (pending submission)
+//admin approves found submission (available to claim status)
+//item shows up on browse items (available to claim)
+//Claim form filled out (status pending retrieval)
+//admin approves claim (claimed status)
+
+
+//statuses:
+//pending submission
+//available to claim
+//pending retrieval
+//claimed and ready to retrieve
+//claimed and retrieved
+
+
+
+
+// scripts/admin_dashboard.js
+import {
+    db, auth,
+    collection, query, where, getDoc, getDocs, doc, updateDoc
+} from './firebaseModule.js';
+
+
+/**
+ * Loads all data required for the admin dashboard.
+ *
+ * Fetches and renders:
+ * - Items ready for pickup
+ * - Pending retrieval approvals
+ * - Pending item submissions
+ * - Available found items
+ * - Reunited items history
+ *
+ * @async
+ * @function loadAdminDashboard
+ * @returns {Promise&lt;void>}
+ */
+async function loadAdminDashboard() {
+    const user = auth.currentUser;
+    if (!user) {
+        console.error("No user logged in");
+        return;
+    }
+
+    console.log("Loading admin dashboard for:", user.email);
+
+    try {
+        await Promise.all([
+            loadReadyToClaim(),
+            loadPendingRetrievalRequests(), //someone filled out claim form, admin must approve.
+            loadPendingSubmissions(), //someone filled out report found item form, admin must approve
+            loadFoundItems(), //found items available for people to claim
+            loadReunitedItems() //items that have been recently reunited with their owners
+        ]);
+    } catch (error) {
+        console.error("Error loading admin dashboard:", error);
+    }
+}
+
+
+/**
+ * Loads items that have been approved and are ready for pickup.
+ *
+ * Displays items with status:
+ * "claimed and ready to retrieve"
+ *
+ * Also attaches event listeners to mark items as retrieved.
+ *
+ * @async
+ * @function loadReadyToClaim
+ * @returns {Promise&lt;void>}
+ */
+async function loadReadyToClaim() {
+    const claimsRef = collection(db, "Item_Data");
+    const q = query(claimsRef, where("status", "==", "claimed and ready to retrieve"));
+
+    const snapshot = await getDocs(q);
+
+    const container = document.getElementById("readyToClaimContainer");
+    if (!container) { console.log("ts pmo"); return; }
+
+    // Clear existing cards
+    const existingCards = container.querySelectorAll('.dashboard-item-card');
+    existingCards.forEach(card => card.remove());
+
+    if (snapshot.empty) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'subtitle';
+        emptyMsg.textContent = 'No items waiting for pickup.';
+        container.appendChild(emptyMsg);
+        return;
+    }
+
+    const tabCount = document.getElementById("readyCount");
+    if (tabCount) {
+        tabCount.textContent = snapshot.size;
+    }
+
+
+    for (const claimDoc of snapshot.docs) {
+        const claim = claimDoc.data();
+
+        // Calculate pickup deadline
+        const approvedDate = new Date(claim.reviewed_at);
+        const pickupDeadline = new Date(approvedDate);
+        pickupDeadline.setDate(pickupDeadline.getDate() + 7);
+
+        const card = document.createElement('div');
+        card.className = 'dashboard-item-card';
+        card.innerHTML = `
+            &lt;img src="${claim.image_url || 'assets/placeholders/lost-item1.jpg'}" class="dashboard-item-img">
+            &lt;div class="dashboard-item-info">
+                &lt;h4>${claim.item_name}&lt;/h4>
+                &lt;p class="item-location" style="padding-bottom: 5px;">&lt;/p>
+                &lt;p class="item-location" style="padding-bottom: 5px;">Approved on ${formatDate(claim.approved_at)}&lt;/p>
+            &lt;/div>
+            &lt;button class="btn btn-orange btn-sm" data-modal="claimed">View Details&lt;/button>
+            &lt;button class="btn btn-blue btn-sm mark-retrieved" data-claim-id="${claimDoc.id}">Item Retrieved&lt;/button>
+        `;
+
+        card.dataset.claimData = JSON.stringify(claim);
+        container.appendChild(card);
+    }
+
+    // Add event listeners to "Item Retrieved" buttons
+    document.querySelectorAll('.mark-retrieved').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const claimId = e.target.dataset.claimId;
+            await markItemRetrieved(claimId);
+        });
+    });
+}
+
+
+
+/**
+ * Loads claim requests awaiting admin approval.
+ *
+ * Displays items with status:
+ * "pending retrieval"
+ *
+ * Allows navigation to claim review pages.
+ *
+ * @async
+ * @function loadPendingRetrievalRequests
+ * @returns {Promise&lt;void>}
+ */
+async function loadPendingRetrievalRequests() {
+    const claimsRef = collection(db, "Item_Data");
+    const q = query(claimsRef, where("status", "==", "pending retrieval"));
+
+    const snapshot = await getDocs(q);
+
+    const container = document.getElementById("pendingRetrievalContainer");
+    if (!container) { console.log("ts pmo"); return; }
+
+    // Clear existing cards
+    const existingCards = container.querySelectorAll('.dashboard-item-card');
+    existingCards.forEach(card => card.remove());
+
+    if (snapshot.empty) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'subtitle';
+        emptyMsg.textContent = 'No pending retrieval requests.';
+        emptyMsg.style.marginTop = '10px';
+        container.appendChild(emptyMsg);
+        return;
+    }
+
+    const tabCount = document.getElementById("claimingCount");
+    if (tabCount) {
+        tabCount.textContent = snapshot.size;
+    }
+
+    for (const claimDoc of snapshot.docs) {
+        const claim = claimDoc.data();
+
+        const card = document.createElement('div');
+        card.className = 'dashboard-item-card';
+        card.innerHTML = `
+            &lt;img src="${claim.image_url || 'assets/placeholders/lost-item1.jpg'}" class="dashboard-item-img">
+            &lt;div class="dashboard-item-info">
+                &lt;h4>${claim.item_name}&lt;/h4>
+                &lt;p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(claim.date_found)}&lt;/p>
+            &lt;/div>
+            &lt;button class="btn btn-orange btn-sm" data-modal="claimed">View Details&lt;/button>
+            &lt;a href="review-claim.html?id=${claimDoc.id}">&lt;button class="btn btn-blue btn-sm">Review&lt;/button>&lt;/a>
+        `;
+
+        card.dataset.claimData = JSON.stringify(claim);
+        container.appendChild(card);
+    }
+}
+
+
+/**
+ * Loads newly submitted found items awaiting approval.
+ *
+ * Displays items with status:
+ * "pending submission"
+ *
+ * Adds approval button listeners for each item.
+ *
+ * @async
+ * @function loadPendingSubmissions
+ * @returns {Promise&lt;void>}
+ */
+async function loadPendingSubmissions() {
+    const itemsRef = collection(db, "Item_Data");
+    const q = query(itemsRef, where("status", "==", "pending submission"));
+
+    const snapshot = await getDocs(q);
+    const container = document.getElementById("pendingSubmissionsContainer");
+    if (!container) { console.log("ts pmo"); return; }
+
+    // Clear existing cards
+    const existingCards = container.querySelectorAll('.dashboard-item-card');
+    existingCards.forEach(card => card.remove());
+
+    if (snapshot.empty) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'subtitle';
+        emptyMsg.textContent = 'No pending item submissions.';
+        emptyMsg.style.marginTop = '10px';
+        container.appendChild(emptyMsg);
+        return;
+    }
+
+    const tabCount = document.getElementById("turnedinCount");
+    if (tabCount) {
+        tabCount.textContent = snapshot.size;
+    }
+
+    snapshot.docs.forEach(itemDoc => {
+        const item = itemDoc.data();
+
+        const card = document.createElement('div');
+        card.className = 'dashboard-item-card';
+        card.innerHTML = `
+            &lt;img src="${item.image_url || 'assets/placeholders/lost-item1.jpg'}" class="dashboard-item-img">
+            &lt;div class="dashboard-item-info">
+                &lt;h4>${item.item_name || item.category}&lt;/h4>
+                &lt;p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(item.date_found)} &lt;/p>
+                &lt;p class="item-location">Found in ${item.location_found}&lt;/p>
+            &lt;/div>
+            &lt;button class="btn btn-orange btn-sm" data-modal="reported">View Details&lt;/button>
+            &lt;button class="btn btn-blue btn-sm approve-item" data-item-id="${itemDoc.id}">Approve&lt;/button>
+        `;
+
+        card.dataset.itemData = JSON.stringify(item);
+        container.appendChild(card);
+    });
+
+    // Add event listeners to approve buttons
+    document.querySelectorAll('.approve-item').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const itemId = e.target.dataset.itemId;
+            await approveItem(itemId);
+        });
+    });
+}
+
+/**
+ * Loads approved found items available to claim.
+ *
+ * Displays items with status:
+ * "available to claim"
+ *
+ * @async
+ * @function loadFoundItems
+ * @returns {Promise&lt;void>}
+ */
+async function loadFoundItems() {
+    const itemsRef = collection(db, "Item_Data");
+    const q = query(itemsRef, where("status", "==", "available to claim"));
+
+    const snapshot = await getDocs(q);
+    const container = document.getElementById("catalogContainer");
+    if (!container) { console.log("ts pmo"); return; }
+
+    if (!container) return;
+
+    // Clear existing cards (keep title and subtitle)
+    const existingCards = container.querySelectorAll('.dashboard-item-card');
+    existingCards.forEach(card => card.remove());
+
+    if (snapshot.empty) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'subtitle';
+        emptyMsg.textContent = 'No available items currently listed.';
+        emptyMsg.style.marginTop = '10px';
+        container.appendChild(emptyMsg);
+        return;
+    }
+
+    const tabCount = document.getElementById("catalogCount");
+    if (tabCount) {
+        tabCount.textContent = snapshot.size;
+    }
+
+    // Show only first 5 items
+    //const itemsToShow = snapshot.docs.slice(0, 5);
+
+    // Show all items
+    const itemsToShow = snapshot.docs;
+
+    itemsToShow.forEach(itemDoc => {
+        const item = itemDoc.data();
+
+        const card = document.createElement('div');
+        card.className = 'dashboard-item-card';
+        card.innerHTML = `
+            &lt;img src="${item.image_url || 'assets/placeholders/lost-item1.jpg'}" class="dashboard-item-img">
+            &lt;div class="dashboard-item-info">
+                &lt;h4>${item.item_name || item.category}&lt;/h4>
+                &lt;p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(item.date_found)} &lt;/p>
+                &lt;p class="item-location">Found in ${item.location_found}&lt;/p>
+            &lt;/div>
+            &lt;button class="btn btn-orange btn-sm" data-modal="reported">View Details&lt;/button>
+        `;
+
+        card.dataset.itemData = JSON.stringify(item);
+        container.appendChild(card);
+    });
+}
+
+
+/**
+ * Loads recently reunited items.
+ *
+ * Displays items with status:
+ * "claimed and retrieved"
+ *
+ * Shows most recent completed claims.
+ *
+ * @async
+ * @function loadReunitedItems
+ * @returns {Promise&lt;void>}
+ */
+async function loadReunitedItems() {
+    const claimsRef = collection(db, "Item_Data");
+    const q = query(claimsRef, where("status", "==", "claimed and retrieved"));
+
+    const snapshot = await getDocs(q);
+    const container = document.getElementById("historyContainer");
+    if (!container) { console.log("ts pmo"); return; }
+
+    if (!container) return;
+
+    // Clear existing cards
+    const existingCards = container.querySelectorAll('.dashboard-item-card');
+    existingCards.forEach(card => card.remove());
+
+    if (snapshot.empty) {
+        console.log("empty:(")
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'subtitle';
+        emptyMsg.textContent = 'No reunited items yet.';
+        container.appendChild(emptyMsg);
+        return;
+    }
+
+    // Show only first 5 items
+    const itemsToShow = snapshot.docs.slice(0, 5);
+
+    itemsToShow.forEach(claimDoc => {
+        const claim = claimDoc.data();
+
+        const card = document.createElement('div');
+        card.className = 'dashboard-item-card';
+        card.innerHTML = `
+            &lt;img src="${claim.image_url || 'assets/placeholders/lost-item1.jpg'}" class="dashboard-item-img">
+            &lt;div class="dashboard-item-info">
+                &lt;h4>${claim.item_name}&lt;/h4>
+                &lt;p class="item-location">Submitted on ${formatDate(claim.date_found)} &lt;/p>
+                &lt;p class="item-location">Retrieved on ${formatDate(claim.date_found)}&lt;/p>
+            &lt;/div>
+            &lt;!--&lt;button class="btn btn-orange btn-sm" data-modal="claimed">View Details&lt;/button>-->
+        `;
+
+        card.dataset.claimData = JSON.stringify(claim);
+        container.appendChild(card);
+    });
+}
+
+
+/**
+ * Approves a pending item submission.
+ *
+ * Updates item status to:
+ * "available to claim"
+ *
+ * Records approval timestamp.
+ *
+ * @async
+ * @function approveItem
+ * @param {string} itemId - Firestore document ID of the item.
+ * @returns {Promise&lt;void>}
+ */
+async function approveItem(itemId) {
+    const confirmed = await showConfirm("Approve this item submission?");
+    if (!confirmed) return;
+
+    try {
+        const user = auth.currentUser;
+        const itemRef = doc(db, "Item_Data", itemId);
+
+        await updateDoc(itemRef, {
+            status: "available to claim",
+            approved_at: new Date().toISOString(),
+        });
+
+        showNotif("Item approved and now visible to students!", "success");
+        loadAdminDashboard(); // Reload dashboard
+
+    } catch (error) {
+        console.error("Error approving item:", error);
+        showNotif("Failed to approve item. Please try again.", "error");
+    }
+}
+
+
+/**
+ * Marks an item as retrieved by its owner.
+ *
+ * Updates item status to:
+ * "claimed and retrieved"
+ *
+ * Records retrieval timestamp.
+ *
+ * @async
+ * @function markItemRetrieved
+ * @param {string} claimId - Firestore document ID of the claim.
+ * @returns {Promise&lt;void>}
+ */
+async function markItemRetrieved(claimId) {
+    const confirmed = await showConfirm("Mark this item as retrieved?");
+    if (!confirmed) return;
+
+    try {
+        const itemRef = doc(db, "Item_Data", claimId);
+        await updateDoc(itemRef, {
+            status: "claimed and retrieved",
+            retrieved_at: new Date().toISOString()
+        });
+
+
+        showNotif('Item marked as retrieved', 'success');
+        loadAdminDashboard(); // Reload dashboard
+
+    } catch (error) {
+        console.error("Error marking item as retrieved:", error);
+        showNotif("Failed to update item status. Please try again.", "error");
+    }
+}
+
+
+/**
+ * Formats an ISO date string into MM/DD/YYYY format.
+ *
+ * @function formatDate
+ * @param {string} isoString - ISO formatted date string.
+ * @returns {string} Formatted date string.
+ */
+function formatDate(isoString) {
+    if (!isoString) return 'Unknown date';
+    const date = new Date(isoString);
+    return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+}
+
+
+/**
+ * Firebase authentication state listener.
+ *
+ * Initializes the admin dashboard once
+ * the user authentication state is confirmed.
+ *
+ * @callback AuthStateChangeHandler
+ * @param {Object|null} user - Firebase authenticated user.
+ * @returns {void}
+ */
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        loadAdminDashboard();
+    }
+});
+
+
+
+/**
+ * Populates the reported item details modal.
+ *
+ * Displays detailed information about a found item
+ * including verification questions.
+ *
+ * @function populateReportedModal
+ * @memberof window
+ *
+ * @param {Object} itemData - Item data object.
+ * @param {string} itemId - Firestore document ID of the item.
+ *
+ * @returns {void}
+ */
+window.populateReportedModal = function (itemData, itemId) {
+
+    const modal = document.getElementById("reported-details-modal");
+    if (!modal) return;
+
+    document.getElementById("reported-img").src = itemData.image_url || 'assets/placeholders/lost-item1.jpg';
+    document.getElementById("reported-title").textContent = itemData.item_name || itemData.category || 'Unknown Item';
+    document.getElementById("reported-location").innerHTML = `&lt;img src="assets/icons/location.svg">${itemData.location_found || 'Unknown'}`;
+    document.getElementById("reported-date").innerHTML = `&lt;img src="assets/icons/clock.svg">${formatDate(itemData.date_found)}`;
+    document.getElementById("reported-student-email").textContent = itemData.submitter_name || 'N/A';
+    document.getElementById("reported-finder-email").textContent = itemData.submitter_email || 'N/A';
+
+    // Populate verification questions
+    const questionsContainer = document.getElementById("reported-questions");
+    questionsContainer.innerHTML = "";
+
+    if (itemData.verification_qs &amp;&amp; typeof itemData.verification_qs === 'object') {
+        Object.entries(itemData.verification_qs).forEach(([question, answer], i) => {
+            questionsContainer.innerHTML += `
+            &lt;div class="input-field">
+                &lt;label>Question ${i + 1}: ${question}&lt;/label>
+                &lt;p>${answer}&lt;/p>
+            &lt;/div>
+        `;
+        });
+    } else {
+        questionsContainer.innerHTML = `&lt;p class="subtitle">No verification questions.&lt;/p>`;
+    }
+};
+
+
+
+
+/**
+ * Populates the claimed item details modal.
+ *
+ * Displays claim information and retrieves
+ * additional data from related Firebase documents.
+ *
+ * Includes:
+ * - Claim details
+ * - Finder information
+ * - Verification questions
+ * - Claimer email lookup
+ *
+ * @async
+ * @function populateClaimedModal
+ * @memberof window
+ *
+ * @param {Object} claimData - Claim data object.
+ * @param {string} claimId - Firestore document ID of the claim.
+ *
+ * @returns {Promise&lt;void>}
+ */
+window.populateClaimedModal = async function (claimData, claimId) {
+    const modal = document.getElementById("claimed-details-modal");
+    if (!modal) return;
+
+    document.getElementById("claimed-img").src = claimData.item_image || claimData.image_url || 'assets/placeholders/lost-item1.jpg';
+    document.getElementById("claimed-title").textContent = claimData.item_name || 'Unknown Item';
+    document.getElementById("claimed-date").innerHTML = `&lt;img src="assets/icons/clock.svg">${formatDate(claimData.lost_date || claimData.date_found)}`;
+    document.getElementById("claimed-finder-email").textContent = claimData.submitter_email || 'N/A';
+    document.getElementById("claimed-additional").textContent = claimData.additional_info || claimData.additional_notes || 'No additional notes.';
+    document.getElementById("claimed-location").innerHTML = `&lt;img src="assets/icons/location.svg">${claimData.location_found || 'N/A'}`;
+    document.getElementById("claimed-claimer-email").textContent = 'N/A'; // default until fetched
+
+    // Always try to fetch claimer email from Claims doc
+    if (claimData.claim_id) {
+        try {
+            const claimDoc = await getDoc(doc(db, "Claims", claimData.claim_id));
+            if (claimDoc.exists()) {
+                const claim = claimDoc.data();
+                document.getElementById("claimed-claimer-email").textContent = claim.claimant_email || 'N/A';
+            }
+        } catch (err) {
+            console.error("Failed to fetch claim data:", err);
+        }
+    }
+
+    // Verification questions
+    const questionsContainer = document.getElementById("claimed-questions");
+    questionsContainer.innerHTML = "";
+
+    const vqs = claimData.verification_qs;
+    const vas = claimData.verification_answers;
+
+    if (vqs &amp;&amp; typeof vqs === 'object') {
+        Object.entries(vqs).forEach(([question, answer], i) => {
+            questionsContainer.innerHTML += `
+                &lt;div class="input-field">
+                    &lt;label>Question ${i + 1}: ${question}&lt;/label>
+                    &lt;p>${answer}&lt;/p>
+                &lt;/div>
+            `;
+        });
+    } else if (vas &amp;&amp; typeof vas === 'object') {
+        Object.entries(vas).forEach(([question, answer], i) => {
+            questionsContainer.innerHTML += `
+                &lt;div class="input-field">
+                    &lt;label>Question ${i + 1}: ${question}&lt;/label>
+                    &lt;p>${answer}&lt;/p>
+                &lt;/div>
+            `;
+        });
+    } else if (claimData.item_id) {
+        try {
+            const itemDoc = await getDoc(doc(db, "Item_Data", claimData.item_id));
+            if (itemDoc.exists()) {
+                const itemData = itemDoc.data();
+                document.getElementById("claimed-location").innerHTML =
+                    `&lt;img src="assets/icons/location.svg">${itemData.location_found || 'N/A'}`;
+                document.getElementById("claimed-finder-email").textContent = itemData.submitter_email || 'N/A';
+
+                if (itemData.verification_qs &amp;&amp; typeof itemData.verification_qs === 'object') {
+                    Object.entries(itemData.verification_qs).forEach(([question, answer], i) => {
+                        questionsContainer.innerHTML += `
+                            &lt;div class="input-field">
+                                &lt;label>Question ${i + 1}: ${question}&lt;/label>
+                                &lt;p>${answer}&lt;/p>
+                            &lt;/div>
+                        `;
+                    });
+                } else {
+                    questionsContainer.innerHTML = `&lt;p class="subtitle">No verification questions provided.&lt;/p>`;
+                }
+            }
+        } catch (err) {
+            console.error("Failed to fetch item data:", err);
+            questionsContainer.innerHTML = `&lt;p class="subtitle">No verification questions provided.&lt;/p>`;
+        }
+    } else {
+        questionsContainer.innerHTML = `&lt;p class="subtitle">No verification questions provided.&lt;/p>`;
+    }
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-search.html">search</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:DOMContentLoaded">DOMContentLoaded</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AddUser">AddUser</a></li><li><a href="global.html#app">app</a></li><li><a href="global.html#applySettings">applySettings</a></li><li><a href="global.html#approveClaim">approveClaim</a></li><li><a href="global.html#approveItem">approveItem</a></li><li><a href="global.html#auth">auth</a></li><li><a href="global.html#currentClaim">currentClaim</a></li><li><a href="global.html#currentItem">currentItem</a></li><li><a href="global.html#db">db</a></li><li><a href="global.html#displayComparison">displayComparison</a></li><li><a href="global.html#displayItemDetails">displayItemDetails</a></li><li><a href="global.html#displayVerificationQuestions">displayVerificationQuestions</a></li><li><a href="global.html#firebaseConfig">firebaseConfig</a></li><li><a href="global.html#formatDate">formatDate</a></li><li><a href="global.html#getAllItems">getAllItems</a></li><li><a href="global.html#getItemById">getItemById</a></li><li><a href="global.html#getQuestionValue">getQuestionValue</a></li><li><a href="global.html#initControls">initControls</a></li><li><a href="global.html#letterLabels">letterLabels</a></li><li><a href="global.html#lineLabels">lineLabels</a></li><li><a href="global.html#listenToItems">listenToItems</a></li><li><a href="global.html#loadAdminDashboard">loadAdminDashboard</a></li><li><a href="global.html#loadFoundItems">loadFoundItems</a></li><li><a href="global.html#loadItemDetails">loadItemDetails</a></li><li><a href="global.html#loadPendingRetrievalRequests">loadPendingRetrievalRequests</a></li><li><a href="global.html#loadPendingSubmissions">loadPendingSubmissions</a></li><li><a href="global.html#loadReadyToClaim">loadReadyToClaim</a></li><li><a href="global.html#loadReunitedItems">loadReunitedItems</a></li><li><a href="global.html#loadReviewData">loadReviewData</a></li><li><a href="global.html#loadSettings">loadSettings</a></li><li><a href="global.html#loadStudentDashboard">loadStudentDashboard</a></li><li><a href="global.html#logInEmailButton">logInEmailButton</a></li><li><a href="global.html#logoutBtn">logoutBtn</a></li><li><a href="global.html#markItemRetrieved">markItemRetrieved</a></li><li><a href="global.html#provider">provider</a></li><li><a href="global.html#rejectClaim">rejectClaim</a></li><li><a href="global.html#saveSetting">saveSetting</a></li><li><a href="global.html#setupQuestionDropdown">setupQuestionDropdown</a></li><li><a href="global.html#showConfirm">showConfirm</a></li><li><a href="global.html#showNotif">showNotif</a></li><li><a href="global.html#showReasonPrompt">showReasonPrompt</a></li><li><a href="global.html#storage">storage</a></li><li><a href="global.html#submitClaim">submitClaim</a></li><li><a href="global.html#syncControls">syncControls</a></li><li><a href="global.html#updateSliderUI">updateSliderUI</a></li><li><a href="global.html#updateSpacingUI">updateSpacingUI</a></li><li><a href="global.html#uploadData">uploadData</a></li><li><a href="global.html#uploadImage">uploadImage</a></li><li><a href="global.html#user">user</a></li><li><a href="global.html#userEmailLogIn">userEmailLogIn</a></li><li><a href="global.html#userEmailSignIn">userEmailSignIn</a></li><li><a href="global.html#user_status">user_status</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Tue Apr 21 2026 23:59:37 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

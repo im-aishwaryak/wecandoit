@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: sign_up.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: sign_up.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file Student/admin sign-up logic. Handles email-based account creation,
+ * validates NSD domain emails, determines user role from email domain, and
+ * writes the new user record to Firestore before redirecting to the
+ * appropriate dashboard.
+ */
+
+import {
+    db, auth, provider, signInWithPopup, createUserWithEmailAndPassword, signOut,
+    doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc,
+    deleteField, storage, ref, uploadBytes, getDownloadURL, updateProfile
+} from './firebaseModule.js';
+
+
+
+
+
+/**
+ * @type {import('firebase/auth').User|undefined}
+ * The currently authenticated Firebase user.
+ */
+let user;
+/**
+ * @type {string|undefined}
+ * Role of the current user. Either "Student" or "Admin".
+ */
+let user_status;
+//const signInGoogleButton = document.getElementById("google-auth sign-in");
+const signInEmailButton = document.getElementById("email-sign-up")
+
+
+
+
+
+/*
+const userGoogleSignIn = async () => {
+    signInWithPopup(auth, provider)
+        .then((result) => {
+            console.log("in result")
+            user = result.user;
+            console.log(user);
+            //signInButton.style.display = "none";
+            AddUser();
+            if(user_status == "Student"){
+              window.location.href = "dashboard.html";
+            // ...
+          }
+            else{
+              window.location.href = "admin-dashboard.html"
+            }
+        }).catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+        })
+}*/
+
+/**
+ * Reads email, password, confirm-password, and fullname from the DOM, validates
+ * that the passwords match and that the email belongs to an NSD domain, then
+ * creates a new Firebase Auth account. On success, sets the user's display name,
+ * calls AddUser, and redirects to the appropriate dashboard based on user_status.
+ * Shows an error notification for any validation or Firebase failure.
+ * @async
+ * @returns {Promise&lt;void>}
+ */
+const userEmailSignIn = async () => {
+    var email = document.getElementById("email").value;
+    var password = document.getElementById("password").value;
+    var confirm_pass = document.getElementById("confirm-password").value; 
+    var name = document.getElementById("fullname").value; 
+
+    if(password != confirm_pass){
+      showNotif("Passwords must match.", "error")
+      return; 
+    }
+    if (!email.includes("@apps.nsd.org") &amp;&amp; !email.includes("@nsd.org")) {
+      showNotif("Email must be tied to North Creek High School", "error");
+      return;
+  }
+
+  createUserWithEmailAndPassword(auth, email, password)
+  .then(async (userCredential) => {
+    // Signed up
+    user = userCredential.user;
+    await updateProfile(user, {
+      displayName: name
+    });
+    const success = await AddUser(name)
+    if(!success){
+      return; 
+    }
+
+    if(user_status == "Student"){
+      localStorage.setItem("user_identity", "student")
+      window.location.href = "dashboard.html";
+  }
+    else if (user_status == "Admin"){
+      localStorage.setItem("user_identity", "admin")
+      window.location.href = "admin-dashboard.html"
+    }
+    else{
+      return; 
+    }
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    showNotif(errorMessage, "error");
+  });
+}
+
+
+
+
+
+
+//signInGoogleButton.addEventListener('click', userGoogleSignIn)
+signInEmailButton.addEventListener('click', (e) => {
+  e.preventDefault(); 
+  userEmailSignIn();
+}); 
+
+/**
+ * Creates a new Firestore document in "User_Data" for the currently authenticated user,
+ * keyed by their email address. Determines user_status ("Student" or "Admin") based
+ * on the email domain (@apps.nsd.org vs @nsd.org).
+ * @async
+ * @param {string} name - The user's full name to store in Firestore.
+ * @returns {Promise&lt;boolean>} Resolves to true if the document was written successfully,
+ *     or false if no authenticated user is present.
+ */
+async function AddUser(name) {
+    if (!user) {
+        console.log("no user ")
+        return false; 
+    }
+
+    if (auth.currentUser.email.includes("@apps.nsd.org")){
+      user_status = "Student"
+    }
+    else if (auth.currentUser.email.includes("@nsd.org")){
+      user_status = "Admin"
+    }
+    var ref = doc(db, "User_Data", user.email);
+    await setDoc(
+      ref, {
+      items_posted: 0,
+      status: user_status,
+      full_name:name
+    }); 
+    return true; 
+}
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-search.html">search</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:DOMContentLoaded">DOMContentLoaded</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AddUser">AddUser</a></li><li><a href="global.html#app">app</a></li><li><a href="global.html#applySettings">applySettings</a></li><li><a href="global.html#approveClaim">approveClaim</a></li><li><a href="global.html#approveItem">approveItem</a></li><li><a href="global.html#auth">auth</a></li><li><a href="global.html#currentClaim">currentClaim</a></li><li><a href="global.html#currentItem">currentItem</a></li><li><a href="global.html#db">db</a></li><li><a href="global.html#displayComparison">displayComparison</a></li><li><a href="global.html#displayItemDetails">displayItemDetails</a></li><li><a href="global.html#displayVerificationQuestions">displayVerificationQuestions</a></li><li><a href="global.html#firebaseConfig">firebaseConfig</a></li><li><a href="global.html#formatDate">formatDate</a></li><li><a href="global.html#getAllItems">getAllItems</a></li><li><a href="global.html#getItemById">getItemById</a></li><li><a href="global.html#getQuestionValue">getQuestionValue</a></li><li><a href="global.html#initControls">initControls</a></li><li><a href="global.html#letterLabels">letterLabels</a></li><li><a href="global.html#lineLabels">lineLabels</a></li><li><a href="global.html#listenToItems">listenToItems</a></li><li><a href="global.html#loadAdminDashboard">loadAdminDashboard</a></li><li><a href="global.html#loadFoundItems">loadFoundItems</a></li><li><a href="global.html#loadItemDetails">loadItemDetails</a></li><li><a href="global.html#loadPendingRetrievalRequests">loadPendingRetrievalRequests</a></li><li><a href="global.html#loadPendingSubmissions">loadPendingSubmissions</a></li><li><a href="global.html#loadReadyToClaim">loadReadyToClaim</a></li><li><a href="global.html#loadReunitedItems">loadReunitedItems</a></li><li><a href="global.html#loadReviewData">loadReviewData</a></li><li><a href="global.html#loadSettings">loadSettings</a></li><li><a href="global.html#loadStudentDashboard">loadStudentDashboard</a></li><li><a href="global.html#logInEmailButton">logInEmailButton</a></li><li><a href="global.html#logoutBtn">logoutBtn</a></li><li><a href="global.html#markItemRetrieved">markItemRetrieved</a></li><li><a href="global.html#provider">provider</a></li><li><a href="global.html#rejectClaim">rejectClaim</a></li><li><a href="global.html#saveSetting">saveSetting</a></li><li><a href="global.html#setupQuestionDropdown">setupQuestionDropdown</a></li><li><a href="global.html#showConfirm">showConfirm</a></li><li><a href="global.html#showNotif">showNotif</a></li><li><a href="global.html#showReasonPrompt">showReasonPrompt</a></li><li><a href="global.html#storage">storage</a></li><li><a href="global.html#submitClaim">submitClaim</a></li><li><a href="global.html#syncControls">syncControls</a></li><li><a href="global.html#updateSliderUI">updateSliderUI</a></li><li><a href="global.html#updateSpacingUI">updateSpacingUI</a></li><li><a href="global.html#uploadData">uploadData</a></li><li><a href="global.html#uploadImage">uploadImage</a></li><li><a href="global.html#user">user</a></li><li><a href="global.html#userEmailLogIn">userEmailLogIn</a></li><li><a href="global.html#userEmailSignIn">userEmailSignIn</a></li><li><a href="global.html#user_status">user_status</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Tue Apr 21 2026 23:59:37 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

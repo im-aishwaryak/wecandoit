@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: notif.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: notif.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file Notification and modal dialog utilities. Provides toast notifications
+ * and promise-based confirm/prompt modals used across the application.
+ */
+
+
+/**
+ * Creates and displays a toast notification in the "#notif-container" element,
+ * creating the container if it doesn't already exist. The toast fades in shortly
+ * after being appended and is automatically removed after the specified duration.
+ * @param {string} message - The text to display in the notification.
+ * @param {"info"|"success"|"error"} [type="info"] - The notification style, applied
+ *     as a CSS class alongside "toast".
+ * @param {number} [duration=3000] - How long in milliseconds to show the notification
+ *     before it begins fading out.
+ * @returns {void}
+ */
+function showNotif(message, type = "info", duration = 3000) {
+  let container = document.getElementById("notif-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "notif-container"
+    document.body.appendChild(container);
+  }
+
+  const notif = document.createElement("div");
+  notif.classList.add("toast", type);
+  notif.textContent = message;
+
+  container.appendChild(notif);
+  console.log("printing notif")
+  setTimeout(() => notif.classList.add("show"), 10);
+
+  setTimeout(() => {
+    notif.classList.remove("show");
+    setTimeout(() => notif.remove(), 300);
+  }, duration);
+}
+
+
+/**
+ * Displays the "#confirm-modal" dialog with a custom message and waits for the
+ * user to click either the confirm or cancel button. Hides the modal on either action.
+ * @param {string} message - The confirmation prompt text to display in the modal.
+ * @returns {Promise&lt;boolean>} Resolves to true if the user confirmed, false if cancelled.
+ */
+function showConfirm(message) {
+  return new Promise((resolve) => {
+    const modal = document.getElementById("confirm-modal");
+    const msg = document.getElementById("confirm-message");
+    const yes = document.getElementById("confirm-yes");
+    const no = document.getElementById("confirm-no");
+
+    msg.textContent = message;
+    modal.classList.remove("hidden");
+
+    yes.onclick = () => {
+      modal.classList.add("hidden");
+      resolve(true);
+    };
+
+    no.onclick = () => {
+      modal.classList.add("hidden");
+      resolve(false);
+    };
+  });
+}
+
+/**
+* Displays the "#reason-modal" dialog with a text input and waits for the user
+* to either submit a reason or cancel. Clears the input field on each invocation.
+* Hides the modal on either action.
+* @returns {Promise&lt;string|null>} Resolves to the trimmed input string if submitted,
+*     or null if the user cancelled.
+*/
+function showReasonPrompt() {
+  return new Promise((resolve) => {
+    const modal = document.getElementById("reason-modal");
+    const input = document.getElementById("reason-input");
+    const submit = document.getElementById("reason-submit");
+    const cancel = document.getElementById("reason-cancel");
+
+    input.value = "";
+    modal.classList.remove("hidden");
+
+    submit.onclick = () => {
+      modal.classList.add("hidden");
+      resolve(input.value.trim()); // returns text
+    };
+
+    cancel.onclick = () => {
+      modal.classList.add("hidden");
+      resolve(null); // user cancelled
+    };
+  });
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-search.html">search</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:DOMContentLoaded">DOMContentLoaded</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AddUser">AddUser</a></li><li><a href="global.html#app">app</a></li><li><a href="global.html#applySettings">applySettings</a></li><li><a href="global.html#approveClaim">approveClaim</a></li><li><a href="global.html#approveItem">approveItem</a></li><li><a href="global.html#auth">auth</a></li><li><a href="global.html#currentClaim">currentClaim</a></li><li><a href="global.html#currentItem">currentItem</a></li><li><a href="global.html#db">db</a></li><li><a href="global.html#displayComparison">displayComparison</a></li><li><a href="global.html#displayItemDetails">displayItemDetails</a></li><li><a href="global.html#displayVerificationQuestions">displayVerificationQuestions</a></li><li><a href="global.html#firebaseConfig">firebaseConfig</a></li><li><a href="global.html#formatDate">formatDate</a></li><li><a href="global.html#getAllItems">getAllItems</a></li><li><a href="global.html#getItemById">getItemById</a></li><li><a href="global.html#getQuestionValue">getQuestionValue</a></li><li><a href="global.html#initControls">initControls</a></li><li><a href="global.html#letterLabels">letterLabels</a></li><li><a href="global.html#lineLabels">lineLabels</a></li><li><a href="global.html#listenToItems">listenToItems</a></li><li><a href="global.html#loadAdminDashboard">loadAdminDashboard</a></li><li><a href="global.html#loadFoundItems">loadFoundItems</a></li><li><a href="global.html#loadItemDetails">loadItemDetails</a></li><li><a href="global.html#loadPendingRetrievalRequests">loadPendingRetrievalRequests</a></li><li><a href="global.html#loadPendingSubmissions">loadPendingSubmissions</a></li><li><a href="global.html#loadReadyToClaim">loadReadyToClaim</a></li><li><a href="global.html#loadReunitedItems">loadReunitedItems</a></li><li><a href="global.html#loadReviewData">loadReviewData</a></li><li><a href="global.html#loadSettings">loadSettings</a></li><li><a href="global.html#loadStudentDashboard">loadStudentDashboard</a></li><li><a href="global.html#logInEmailButton">logInEmailButton</a></li><li><a href="global.html#logoutBtn">logoutBtn</a></li><li><a href="global.html#markItemRetrieved">markItemRetrieved</a></li><li><a href="global.html#provider">provider</a></li><li><a href="global.html#rejectClaim">rejectClaim</a></li><li><a href="global.html#saveSetting">saveSetting</a></li><li><a href="global.html#setupQuestionDropdown">setupQuestionDropdown</a></li><li><a href="global.html#showConfirm">showConfirm</a></li><li><a href="global.html#showNotif">showNotif</a></li><li><a href="global.html#showReasonPrompt">showReasonPrompt</a></li><li><a href="global.html#storage">storage</a></li><li><a href="global.html#submitClaim">submitClaim</a></li><li><a href="global.html#syncControls">syncControls</a></li><li><a href="global.html#updateSliderUI">updateSliderUI</a></li><li><a href="global.html#updateSpacingUI">updateSpacingUI</a></li><li><a href="global.html#uploadData">uploadData</a></li><li><a href="global.html#uploadImage">uploadImage</a></li><li><a href="global.html#user">user</a></li><li><a href="global.html#userEmailLogIn">userEmailLogIn</a></li><li><a href="global.html#userEmailSignIn">userEmailSignIn</a></li><li><a href="global.html#user_status">user_status</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Tue Apr 21 2026 23:59:37 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: student_dashboard.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: student_dashboard.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file Student dashboard logic. Loads and renders dashboard sections for the
+ * currently authenticated student, including items ready to claim, pending retrieval
+ * requests, pending item submissions, and found items. Also handles populating
+ * the item detail modals.
+ */
+
+import {
+    db, auth,
+    collection, query, where, getDoc, getDocs, doc, updateDoc
+} from './firebaseModule.js';
+
+let user = "";
+
+/**
+ * Loads all sections of the student dashboard for the currently authenticated user.
+ * Runs all section loaders in parallel via Promise.all.
+ * @async
+ * @returns {Promise&lt;void>}
+ */
+async function loadStudentDashboard() {
+    user = auth.currentUser;
+    if (!user) {
+        console.error("No user logged in");
+        return;
+    }
+
+    console.log("Loading student dashboard for:", user.email);
+
+    try {
+        await Promise.all([
+            loadReadyToClaim(),
+            loadPendingRetrievalRequests(), //someone filled out claim form, admin must approve.
+            loadPendingSubmissions(), //someone filled out report found item form, admin must approve
+            loadFoundItems(), //found items available for people to claim
+        ]);
+    } catch (error) {
+        console.error("Error loading student dashboard:", error);
+    }
+}
+
+
+/**
+ * Loads claims with status "approved" for the current user and renders them as cards
+ * in the "ready-to-claim-section" container. Updates the "ready-count" badge.
+ * @async
+ * @returns {Promise&lt;void>}
+ */
+async function loadReadyToClaim() {
+    console.log("ready to claim being loaded.... ")
+    const claimsRef = collection(db, "Claims");
+    const q = query(
+        claimsRef,
+        where("claimant_email", "==", user.email),
+        where("status", "==", "approved")
+    );
+    const snapshot = await getDocs(q);
+
+    const container = document.getElementById("ready-to-claim-section");
+    if (!container) { console.log("ts pmo"); return; }
+
+    // Clear existing cards
+    const existingCards = container.querySelectorAll('.dashboard-item-card');
+    existingCards.forEach(card => card.remove());
+
+    if (snapshot.empty) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'subtitle';
+        emptyMsg.textContent = 'No items waiting for pickup.';
+        container.appendChild(emptyMsg);
+        return;
+    }
+
+    const tabCount = document.getElementById("ready-count");
+    if (tabCount) {
+        tabCount.textContent = snapshot.size;
+    }
+
+    for (const claimDoc of snapshot.docs) {
+        const claim = claimDoc.data();
+
+        // Calculate pickup deadline
+        const approvedDate = new Date(claim.reviewed_at);
+        const pickupDeadline = new Date(approvedDate);
+        pickupDeadline.setDate(pickupDeadline.getDate() + 7);
+
+        const card = document.createElement('div');
+        card.className = 'dashboard-item-card';
+        card.innerHTML = `
+            &lt;img src="${claim.item_image || 'assets/placeholders/lost-item1.jpg'}" class="dashboard-item-img">
+            &lt;div class="dashboard-item-info">
+                &lt;h4>${claim.item_name}&lt;/h4>
+                &lt;p class="item-location" style="padding-bottom: 5px;">&lt;/p>
+                &lt;p class="item-location" style="padding-bottom: 5px;">Approved on ${formatDate(claim.reviewed_at)}&lt;/p>
+            &lt;/div>
+            &lt;button class="btn btn-orange btn-sm" data-modal="claimed">View Details&lt;/button>
+        `;
+
+        card.dataset.claimData = JSON.stringify(claim);
+        container.appendChild(card);
+    }
+}
+
+
+/**
+ * Loads claims with status "pending" for the current user and renders them as cards
+ * in the "pending-retrieval-section" container. Updates the "claiming-count" badge.
+ * @async
+ * @returns {Promise&lt;void>}
+ */
+async function loadPendingRetrievalRequests() {
+    const claimsRef = collection(db, "Claims");
+    const q = query(
+        claimsRef,
+        where("claimant_email", "==", user.email),
+        where("status", "==", "pending")
+    );
+
+    const snapshot = await getDocs(q);
+
+    const container = document.getElementById("pending-retrieval-section");
+    if (!container) { console.log("ts pmo"); return; }
+
+    // Clear existing cards
+    const existingCards = container.querySelectorAll('.dashboard-item-card');
+    existingCards.forEach(card => card.remove());
+
+    if (snapshot.empty) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'subtitle';
+        emptyMsg.textContent = 'No pending retrieval requests.';
+        emptyMsg.style.marginTop = '10px';
+        container.appendChild(emptyMsg);
+        return;
+    }
+
+    const tabCount = document.getElementById("claiming-count");
+    if (tabCount) {
+        tabCount.textContent = snapshot.size;
+    }
+
+    for (const claimDoc of snapshot.docs) {
+        const claim = claimDoc.data();
+
+        const card = document.createElement('div');
+        card.className = 'dashboard-item-card';
+        card.innerHTML = `
+            &lt;img src="${claim.item_image || 'assets/placeholders/lost-item1.jpg'}" class="dashboard-item-img">
+            &lt;div class="dashboard-item-info">
+                &lt;h4>${claim.item_name}&lt;/h4>
+                &lt;p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(claim.lost_date)}&lt;/p>
+            &lt;/div>
+            &lt;button class="btn btn-orange btn-sm" data-modal="claimed">View Details&lt;/button>
+        `;
+
+        card.dataset.claimData = JSON.stringify(claim);
+        container.appendChild(card);
+    }
+}
+
+
+/**
+ * Loads items from Item_Data with status "pending submission" submitted by the current
+ * user and renders them in the "pending-submissions-section" container.
+ * Updates the "turnedin-count" badge.
+ * @async
+ * @returns {Promise&lt;void>}
+ */
+async function loadPendingSubmissions() {
+    const itemsRef = collection(db, "Item_Data");
+    const q = query(
+        itemsRef,
+        where("submitter_email", "==", user.email),
+        where("status", "==", "pending submission")
+    );
+
+    const snapshot = await getDocs(q);
+
+    const container = document.getElementById("pending-submissions-section");
+    if (!container) { console.log("ts pmo"); return; }
+
+    // Clear existing cards
+    const existingCards = container.querySelectorAll('.dashboard-item-card');
+    existingCards.forEach(card => card.remove());
+
+    if (snapshot.empty) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'subtitle';
+        emptyMsg.textContent = 'No pending item submissions.';
+        emptyMsg.style.marginTop = '10px';
+        container.appendChild(emptyMsg);
+        return;
+    }
+
+    const tabCount = document.getElementById("turnedin-count");
+    if (tabCount) {
+        tabCount.textContent = snapshot.size;
+    }
+
+    snapshot.docs.forEach(itemDoc => {
+        const item = itemDoc.data();
+
+        const card = document.createElement('div');
+        card.className = 'dashboard-item-card';
+        card.innerHTML = `
+            &lt;img src="${item.image_url || 'assets/placeholders/lost-item1.jpg'}" class="dashboard-item-img">
+            &lt;div class="dashboard-item-info">
+                &lt;h4>${item.item_name || item.category}&lt;/h4>
+                &lt;p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(item.date_found)} &lt;/p>
+                &lt;p class="item-location">Found in ${item.location_found}&lt;/p>
+            &lt;/div>
+            &lt;button class="btn btn-orange btn-sm" data-modal="reported">View Details&lt;/button>
+        `;
+
+        console.log("FULL ITEM DATA:", item);
+        card.dataset.itemData = JSON.stringify(item);
+        container.appendChild(card);
+    });
+
+}
+
+
+/**
+ * Loads items from Item_Data where the current user is the recipient (reciever_id)
+ * and renders up to 5 as cards in the "your-items-section" container.
+ * @async
+ * @returns {Promise&lt;void>}
+ */
+async function loadFoundItems() {
+    const claimsRef = collection(db, "Item_Data");
+
+    // Query: Items where user is the recipient/claimant
+    const q = query(
+        claimsRef,
+        where("reciever_id", "==", user.email)
+    );
+
+
+    const snapshot = await getDocs(q);
+
+    const container = document.getElementById("your-items-section");
+    if (!container) { console.log("ts pmo"); return; }
+
+    // Clear existing cards (keep title and subtitle)
+    const existingCards = container.querySelectorAll('.dashboard-item-card');
+    existingCards.forEach(card => card.remove());
+
+    if (snapshot.empty) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'subtitle';
+        emptyMsg.textContent = 'No available items currently listed.';
+        emptyMsg.style.marginTop = '10px';
+        container.appendChild(emptyMsg);
+        return;
+    }
+
+    // Show only first 5 items
+    const itemsToShow = snapshot.docs.slice(0, 5);
+
+    itemsToShow.forEach(itemDoc => {
+        const item = itemDoc.data();
+
+        const card = document.createElement('div');
+        card.className = 'dashboard-item-card';
+        card.innerHTML = `
+            &lt;img src="${item.image_url || 'assets/placeholders/lost-item1.jpg'}" class="dashboard-item-img">
+            &lt;div class="dashboard-item-info">
+                &lt;h4>${item.item_name || item.category}&lt;/h4>
+                &lt;p class="item-location" style="padding-bottom: 5px;">Submitted on ${formatDate(item.date_found)} &lt;/p>
+                &lt;p class="item-location">Found in ${item.location_found}&lt;/p>
+            &lt;/div>
+            &lt;button class="btn btn-orange btn-sm" data-modal="reported">View Details&lt;/button>
+        `;
+
+        card.dataset.itemData = JSON.stringify(item);
+        container.appendChild(card);
+    });
+}
+
+
+
+
+
+/**
+ * Formats an ISO date string into MM/DD/YYYY format.
+ * @param {string} isoString - An ISO 8601 date string.
+ * @returns {string} The formatted date, or "Unknown date" if the input is falsy.
+ */
+function formatDate(isoString) {
+    if (!isoString) return 'Unknown date';
+    const date = new Date(isoString);
+    return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+}
+
+
+// Initialize when auth is ready
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        loadStudentDashboard();
+    }
+});
+
+
+
+
+
+
+/**
+ * Populates the "reported-details-modal" with data from a found item submission.
+ * Renders item image, name, location, date found, and verification questions/answers.
+ * Exposed on window for use by modal trigger handlers.
+ * @param {Object} itemData - The item document data from Item_Data.
+ * @param {string} itemData.image_url - URL of the item image.
+ * @param {string} itemData.item_name - Display name of the item.
+ * @param {string} itemData.category - Fallback category if item_name is absent.
+ * @param {string} itemData.location_found - Where the item was found.
+ * @param {string} itemData.date_found - ISO date string of when the item was found.
+ * @param {Object} itemData.verification_qs - Map of verification questions to answers.
+ * @param {string} [itemId] - The Firestore document ID of the item (currently unused).
+ */
+
+window.populateReportedModal = function (itemData, itemId) {
+    
+    const modal = document.getElementById("reported-details-modal");
+    if (!modal) return;
+
+    document.getElementById("reported-img").src = itemData.image_url || 'assets/placeholders/lost-item1.jpg';
+    document.getElementById("reported-title").textContent = itemData.item_name || itemData.category || 'Unknown Item';
+    document.getElementById("reported-location").innerHTML = `&lt;img src="assets/icons/location.svg">${itemData.location_found || 'Unknown'}`;
+    document.getElementById("reported-date").innerHTML = `&lt;img src="assets/icons/clock.svg">${formatDate(itemData.date_found)}`;
+
+    // Populate verification questions
+    const questionsContainer = document.getElementById("reported-questions");
+    questionsContainer.innerHTML = "";
+
+    if (itemData.verification_qs &amp;&amp; typeof itemData.verification_qs === 'object') {
+        Object.entries(itemData.verification_qs).forEach(([question, answer], i) => {
+            questionsContainer.innerHTML += `
+            &lt;div class="input-field">
+                &lt;label>Question ${i + 1}: ${question}&lt;/label>
+                &lt;p>${answer}&lt;/p>
+            &lt;/div>
+        `;
+        });
+    } else {
+        questionsContainer.innerHTML = `&lt;p class="subtitle">No verification questions.&lt;/p>`;
+    }
+};
+
+
+
+/**
+ * Populates the "claimed-details-modal" with data from a claim. Fetches the associated
+ * Item_Data document to display location and finder email. Handles both array and
+ * object formats for verification_answers.
+ * Exposed on window for use by modal trigger handlers.
+ * @async
+ * @param {Object} claimData - The claim document data from Claims.
+ * @param {string} claimData.item_image - URL of the item image.
+ * @param {string} claimData.item_name - Display name of the item.
+ * @param {string} claimData.lost_date - ISO date string of the lost date.
+ * @param {string} claimData.claimant_email - Email of the person who filed the claim.
+ * @param {string} claimData.additional_info - Any extra notes on the claim.
+ * @param {string} claimData.item_id - Firestore ID used to look up the parent Item_Data doc.
+ * @param {Object|Array} claimData.verification_answers - Verification Q&amp;A, either as a
+ *     key/value object or array of `{ question, answer }` objects.
+ * @param {string} [claimId] - The Firestore document ID of the claim (currently unused).
+ * @returns {Promise&lt;void>}
+ */
+
+window.populateClaimedModal = async function (claimData, claimId) {
+    const modal = document.getElementById("claimed-details-modal");
+    if (!modal) return;
+
+    document.getElementById("claimed-img").src = claimData.item_image || claimData.image_url || 'assets/placeholders/lost-item1.jpg';
+    document.getElementById("claimed-title").textContent = claimData.item_name || 'Unknown Item';
+    document.getElementById("claimed-date").innerHTML = `&lt;img src="assets/icons/clock.svg">${formatDate(claimData.lost_date || claimData.date_found)}`;
+    document.getElementById("claimed-finder-email").textContent = claimData.claimant_email || claimData.submitter_email || 'N/A';
+    document.getElementById("claimed-additional").textContent = claimData.additional_info || claimData.additional_notes || 'No additional notes.';
+
+    // Fetch location from Item_Data
+    if (claimData.item_id) {
+        try {
+            const itemDoc = await getDoc(doc(db, "Item_Data", claimData.item_id));
+            if (itemDoc.exists()) {
+                const itemData = itemDoc.data();
+                document.getElementById("claimed-location").innerHTML =
+                    `&lt;img src="assets/icons/location.svg">${itemData.location_found || 'N/A'}`;
+                document.getElementById("claimed-finder-email").textContent = itemData.submitter_email || 'N/A';
+            }
+        } catch (err) {
+            console.error("Failed to fetch item data:", err);
+        }
+    }
+
+    // Verification answers
+    const questionsContainer = document.getElementById("claimed-questions");
+    questionsContainer.innerHTML = "";
+
+    if (claimData.verification_answers &amp;&amp; !Array.isArray(claimData.verification_answers)) {
+        Object.entries(claimData.verification_answers).forEach(([question, answer], i) => {
+            questionsContainer.innerHTML += `
+                &lt;div class="input-field">
+                    &lt;label>Question ${i + 1}: ${question}&lt;/label>
+                    &lt;p>${answer}&lt;/p>
+                &lt;/div>
+            `;
+        });
+    } else if (Array.isArray(claimData.verification_answers)) {
+        claimData.verification_answers.forEach((qa, i) => {
+            questionsContainer.innerHTML += `
+                &lt;div class="input-field">
+                    &lt;label>Question ${i + 1}: ${qa.question || 'N/A'}&lt;/label>
+                    &lt;p>${qa.answer || 'N/A'}&lt;/p>
+                &lt;/div>
+            `;
+        });
+    } else {
+        questionsContainer.innerHTML = `&lt;p class="subtitle">No verification questions provided.&lt;/p>`;
+    }
+};
+
+
+/* import { db, auth, collection, query, where, getDocs } from './firebaseModule.js';
+
+// Wait for auth state
+// Wait for auth to be ready, then load data
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        // User is logged in, load their dashboard data
+        loadReadyToClaim(user.uid);
+        loadPendingRetrievalRequests(user.uid);
+        loadPendingSubmissions(user.uid);
+        loadRetrievedItems(user.uid);
+    }
+    // Don't redirect here - let protect-student.js handle it
+});
+
+
+
+
+// Helper function to create dashboard card
+function createDashboardCard({ image, title, tags, details, buttons, itemData, itemId, claimData, claimId }) {
+    const card = document.createElement('div');
+    card.className = 'dashboard-item-card';
+
+    // Store data attributes for modal
+    if (itemData) {
+        card.dataset.itemData = JSON.stringify(itemData);
+        card.dataset.itemId = itemId;
+    }
+    if (claimData) {
+        card.dataset.claimData = JSON.stringify(claimData);
+        card.dataset.claimId = claimId;
+    }
+
+    card.innerHTML = `
+    &lt;img src="${image}" class="dashboard-item-img" alt="${title}">
+    &lt;div class="dashboard-item-info">
+        &lt;h4>${title}&lt;/h4>
+        ${tags ? tags.map(tag => `&lt;span class="tag ${tag.class}">${tag.text}&lt;/span>`).join('') : ''}
+        ${claimData?.claimant_email ? `&lt;p class="item-location" style="padding-bottom: 5px;">Claimed by &lt;span class="tag tag-gray">${claimData.claimant_email}&lt;/span>&lt;/p>` : ''}
+        ${itemData?.receiver_email ? `&lt;p class="item-location" style="padding-bottom: 5px;">Claimed by &lt;span class="tag tag-gray">${itemData.receiver_email}&lt;/span>&lt;/p>` : ''}
+        ${details.map(detail => `&lt;p class="item-location">${detail}&lt;/p>`).join('')}
+    &lt;/div>
+    ${buttons.map(btn => `&lt;button class="btn ${btn.class} btn-sm" data-modal="${btn.modal}">${btn.text}&lt;/button>`).join('')}
+`;
+
+
+    return card;
+}
+
+// Format date helper
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+}
+
+// Format relative date helper
+function formatRelativeDate(dateString) {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now - date);
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return 'today';
+    if (diffDays === 1) return '1 day ago';
+    return `${diffDays} days ago`;
+}
+
+
+
+
+
+// Load items ready to claim (approved claims)
+async function loadReadyToClaim(userId) {
+    console.log("🎯 [READY_TO_CLAIM] Starting loadReadyToClaim...");
+    console.log("🎯 [READY_TO_CLAIM] User ID:", userId);
+    
+    const claimsRef = collection(db, "Item_Data");
+    console.log("🎯 [READY_TO_CLAIM] Collection reference created: Item_Data");
+    
+    const q = query(
+        claimsRef,
+        where("reciever_id", "==", userId),
+        where("status", "==", "claimed and ready to retrieve")
+    );
+    console.log("🎯 [READY_TO_CLAIM] Query created with filters:", {
+        reciever_id: userId,
+        status: "claimed and ready to retrieve"
+    });
+
+    console.log("🎯 [READY_TO_CLAIM] Executing query...");
+    const snapshot = await getDocs(q);
+    console.log("🎯 [READY_TO_CLAIM] Query results:", {
+        totalDocs: snapshot.size,
+        empty: snapshot.empty
+    });
+    
+    // Debug: Log all documents found
+    if (!snapshot.empty) {
+        console.log("🎯 [READY_TO_CLAIM] Documents found:");
+        snapshot.docs.forEach((doc, index) => {
+            const data = doc.data();
+            console.log(`🎯 [READY_TO_CLAIM] Doc ${index + 1}:`, {
+                id: doc.id,
+                item_name: data.item_name,
+                reciever_id: data.reciever_id,
+                receiver_id: data.receiver_id,
+                status: data.status,
+                reviewed_at: data.reviewed_at
+            });
+        });
+    }
+
+    const container = document.getElementById('ready-to-claim-section');
+    console.log("🎯 [READY_TO_CLAIM] Container found:", !!container);
+
+    if (!container) {
+        console.error("❌ [READY_TO_CLAIM] Container 'ready-to-claim-section' not found!");
+        return;
+    }
+
+    // Clear existing cards (keep the heading and subtitle)
+    const existingCards = container.querySelectorAll('.dashboard-item-card');
+    console.log("🎯 [READY_TO_CLAIM] Clearing existing cards:", existingCards.length);
+    existingCards.forEach(card => card.remove());
+
+    if (snapshot.empty) {
+        console.log("[READY_TO_CLAIM] No items found - showing empty message");
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'subtitle';
+        emptyMsg.textContent = 'No items ready for pickup yet.';
+        container.appendChild(emptyMsg);
+        return;
+    }
+
+    console.log("🎯 [READY_TO_CLAIM] Creating cards for", snapshot.size, "items...");
+
+    for (const claimDoc of snapshot.docs) {
+        const claim = claimDoc.data();
+        
+        console.log("📋 [READY_TO_CLAIM] Processing item:", {
+            id: claimDoc.id,
+            item_name: claim.item_name,
+            reviewed_at: claim.reviewed_at,
+            image_url: claim.image_url ? "present" : "missing"
+        });
+
+        // ADD SAFETY CHECKS HERE
+        let approvedDateStr = 'N/A';
+        let pickupDeadlineStr = 'N/A';
+        
+        if (claim.reviewed_at) {
+            try {
+                const approvedDate = new Date(claim.reviewed_at);
+                if (!isNaN(approvedDate.getTime())) {
+                    approvedDateStr = formatDate(claim.reviewed_at);
+                    
+                    const pickupDeadline = new Date(approvedDate);
+                    pickupDeadline.setDate(pickupDeadline.getDate() + 7);
+                    pickupDeadlineStr = formatDate(pickupDeadline.toISOString());
+                }
+            } catch (error) {
+                console.error("📋 [READY_TO_CLAIM] Error parsing date:", error);
+            }
+        }
+        
+        console.log("📋 [READY_TO_CLAIM] Creating card...");
+        const card = createDashboardCard({
+            image: claim.image_url,
+            title: claim.item_name,
+            details: [
+                `Approved by ${claim.approver_email || 'Unknown'} on ${approvedDateStr}`,
+                `Pick up by ${pickupDeadlineStr}`
+            ],
+            buttons: [
+                { text: 'View Details', class: 'btn-orange', modal: 'claimed' }
+            ],
+            claimData: claim,
+            claimId: claimDoc.id
+        });
+
+        console.log("📋 [READY_TO_CLAIM] Card created, appending to container");
+        container.appendChild(card);
+    }
+    
+    console.log("✅ [READY_TO_CLAIM] Function complete!");
+}
+
+// Load pending retrieval requests
+async function loadPendingRetrievalRequests(userId) {
+    console.log("loading pending retrivals...")
+    const claimsRef = collection(db, "Claims");
+    const q = query(
+        claimsRef,
+        where("claimant_id", "==", userId),
+        where("status", "==", "pending")
+    );
+
+    const snapshot = await getDocs(q);
+    const container = document.getElementById('pending-retrieval-section');
+
+    if (!container) return;
+
+    container.querySelectorAll('.dashboard-item-card').forEach(card => card.remove());
+
+    if (snapshot.empty) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'subtitle';
+        emptyMsg.textContent = 'No pending retrieval requests.';
+        emptyMsg.style.marginTop = '10px';
+        container.appendChild(emptyMsg);
+        return;
+    }
+
+    snapshot.docs.forEach(claimDoc => {
+        const claim = claimDoc.data();
+
+        const card = createDashboardCard({
+            image: claim.item_image,
+            title: claim.item_name,
+            details: [`Submitted on ${formatDate(claim.submitted_at)}`],
+            buttons: [{ text: 'View Details', class: 'btn-orange', modal: 'claimed' }],
+            claimData: claim,
+            claimId: claimDoc.id
+        });
+
+        container.appendChild(card);
+    });
+}
+
+// Load pending submissions
+async function loadPendingSubmissions(userId) {
+    const itemsRef = collection(db, "Item_Data");
+    const q = query(
+        itemsRef,
+        where("submitter_id", "==", userId),
+        where("status", "==", "pending submission")
+    );
+
+
+
+    const snapshot = await getDocs(q);
+    const container = document.getElementById('pending-submissions-section');
+
+    if (!container) return;
+
+    container.querySelectorAll('.dashboard-item-card').forEach(card => card.remove());
+
+    if (snapshot.empty) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'subtitle';
+        emptyMsg.textContent = 'No pending item submissions.';
+        emptyMsg.style.marginTop = '10px';
+        container.appendChild(emptyMsg);
+        return;
+    }
+
+    snapshot.docs.forEach(itemDoc => {
+        const item = itemDoc.data();
+
+        const card = createDashboardCard({
+            image: item.image_url,
+            title: item.item_name || item.category,
+            details: [
+                `Submitted on ${formatDate(item.submitted_at)}`,
+                `Found in ${item.location_found}`
+            ],
+            buttons: [{ text: 'View Details', class: 'btn-orange', modal: 'reported' }],
+            itemData: item,
+            itemId: itemDoc.id
+        });
+
+        container.appendChild(card);
+    });
+}
+
+// Load retrieved items
+async function loadRetrievedItems(userId) {
+    const claimsRef = collection(db, "Item_Data");
+
+    // Query 1: Items where user is the submitter
+    const q1 = query(
+        claimsRef,
+        where("submitter_id", "==", userId)
+    );
+
+    // Query 2: Items where user is the recipient/claimant
+    const q2 = query(
+        claimsRef,
+        where("reciever_id", "==", userId)
+    );
+
+    // Execute both queries
+    const [snapshot1, snapshot2] = await Promise.all([
+        getDocs(q1),
+        getDocs(q2)
+    ]);
+
+    const container = document.getElementById('your-items-section');
+
+    if (!container) return;
+
+    container.querySelectorAll('.dashboard-item-card').forEach(card => card.remove());
+
+    // Combine results from both queries
+    const allDocs = [...snapshot1.docs, ...snapshot2.docs];
+
+    if (allDocs.length === 0) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'subtitle';
+        emptyMsg.textContent = 'No items yet.';
+        container.appendChild(emptyMsg);
+        return;
+    }
+
+    // Remove duplicates (in case an item appears in both queries)
+    const uniqueDocs = new Map();
+    allDocs.forEach(doc => {
+        uniqueDocs.set(doc.id, doc);
+    });
+
+    uniqueDocs.forEach((claimDoc) => {
+        const claim = claimDoc.data();
+
+        // Determine if user was submitter or recipient
+        const isSubmitter = claim.submitter_id === userId;
+        const tagText = isSubmitter ? 'Item Submission' : 'Item Retrieval';
+        const tagClass = isSubmitter ? 'tag-blue' : 'tag-orange';
+
+        const card = createDashboardCard({
+            image: claim.image_url,
+            title: claim.item_name,
+            tags: [{ text: tagText, class: tagClass }],
+            details: [`Status: ${claim.status || 'N/A'}`],
+            buttons: [{ text: 'View Details', class: 'btn-orange', modal: 'claimed' }],
+            claimData: claim,
+            claimId: claimDoc.id
+        });
+
+        container.appendChild(card);
+    });
+}
+
+
+
+// VIEW DETAILS POP UP
+
+// Populate the reported item modal
+window.populateReportedModal = function(itemData, itemId) {
+    console.log("Populating reported modal:", itemData);
+    
+    const modal = document.getElementById("reported-details-modal");
+    if (!modal) return;
+    
+    // Update image
+    const img = modal.querySelector('.details-img');
+    if (img) img.src = itemData.image_url || 'assets/placeholders/lost-item1.jpg';
+    
+    // Update title
+    const title = modal.querySelector('h2');
+    if (title) title.textContent = itemData.item_name || itemData.category || 'Unknown Item';
+    
+    // Update tag if exists
+    const tag = modal.querySelector('.tag-orange');
+    if (tag) tag.textContent = 'Item Submission';
+    
+    // Update location and time tags
+    const tags = modal.querySelectorAll('.tag-transparent');
+    if (tags[0]) tags[0].innerHTML = `&lt;img src="assets/icons/location.svg">${itemData.location_found || 'Unknown'}`;
+    if (tags[1]) tags[1].innerHTML = `&lt;img src="assets/icons/clock.svg">${formatDate(itemData.submitted_at) || 'Unknown'}`;
+    
+    // Update submitter info
+    const paragraphs = modal.querySelectorAll('p');
+    paragraphs.forEach(p => {
+        if (p.innerHTML.includes('Student Name:')) {
+            p.innerHTML = `&lt;b>Student Name:&lt;/b> ${itemData.submitter_name || 'N/A'}`;
+        }
+        if (p.innerHTML.includes('Student Email:')) {
+            p.innerHTML = `&lt;b>Student Email:&lt;/b> ${itemData.submitter_email || 'N/A'}`;
+        }
+        if (p.innerHTML.includes('Public description:')) {
+            p.innerHTML = `&lt;b>Public description:&lt;/b> ${itemData.public_description || 'N/A'}`;
+        }
+        if (p.innerHTML.includes('Private description:')) {
+            p.innerHTML = `&lt;b>Private description:&lt;/b> ${itemData.private_description || 'N/A'}`;
+        }
+    });
+    
+    // Update verification questions
+    const verificationSection = Array.from(paragraphs).find(p => p.textContent.includes('Verification Questions'));
+    if (verificationSection &amp;&amp; itemData.verification_questions) {
+        let html = '&lt;p>&lt;b>Verification Questions&lt;/b>&lt;/p>';
+        itemData.verification_questions.forEach((q, index) => {
+            html += `&lt;p>Q${index + 1}: ${q.question || 'N/A'}&lt;/p>`;
+            html += `&lt;p>A${index + 1}: ${q.answer || 'N/A'}&lt;/p>`;
+        });
+        verificationSection.outerHTML = html;
+    }
+};
+
+// Populate the claimed item modal
+window.populateClaimedModal = function(claimData, claimId) {
+    console.log("Populating claimed modal:", claimData);
+    
+    const modal = document.getElementById("claimed-details-modal");
+    if (!modal) return;
+    
+    // Update image
+    const img = modal.querySelector('.details-img');
+    if (img) img.src = claimData.image_url || claimData.item_image || 'assets/placeholders/lost-item1.jpg';
+    
+    // Update title
+    const title = modal.querySelector('h2');
+    if (title) title.textContent = claimData.item_name || 'Unknown Item';
+    
+    // Update all paragraphs
+    const paragraphs = modal.querySelectorAll('p');
+    paragraphs.forEach(p => {
+        if (p.innerHTML.includes('Student Name:')) {
+            p.innerHTML = `&lt;b>Student Name:&lt;/b> ${claimData.claimant_name || claimData.receiver_name || 'N/A'}`;
+        }
+        if (p.innerHTML.includes('Student Email:')) {
+            p.innerHTML = `&lt;b>Student Email:&lt;/b> ${claimData.claimant_email || claimData.receiver_email || 'N/A'}`;
+        }
+        if (p.innerHTML.includes('Lost on:')) {
+            p.innerHTML = `&lt;b>Lost on:&lt;/b> ${formatDate(claimData.submitted_at) || 'N/A'}`;
+        }
+    });
+    
+    // Update verification questions if they exist
+    if (claimData.verification_answers) {
+        const verificationSection = Array.from(paragraphs).find(p => p.textContent.includes('Verification Questions'));
+        if (verificationSection) {
+            let html = '&lt;p>&lt;b>Verification Questions&lt;/b>&lt;/p>';
+            claimData.verification_answers.forEach((qa, index) => {
+                html += `&lt;p>Q${index + 1}: ${qa.question || 'N/A'}&lt;/p>`;
+                html += `&lt;p>A${index + 1}: ${qa.answer || 'N/A'}&lt;/p>`;
+            });
+            verificationSection.outerHTML = html;
+        }
+    }
+    
+    // Update additional information
+    const additionalInfo = Array.from(paragraphs).find(p => p.previousElementSibling?.textContent?.includes('Additional Information'));
+    if (additionalInfo) {
+        additionalInfo.textContent = claimData.additional_notes || 'No additional notes.';
+    }
+};
+*/
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-search.html">search</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:DOMContentLoaded">DOMContentLoaded</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AddUser">AddUser</a></li><li><a href="global.html#app">app</a></li><li><a href="global.html#applySettings">applySettings</a></li><li><a href="global.html#approveClaim">approveClaim</a></li><li><a href="global.html#approveItem">approveItem</a></li><li><a href="global.html#auth">auth</a></li><li><a href="global.html#currentClaim">currentClaim</a></li><li><a href="global.html#currentItem">currentItem</a></li><li><a href="global.html#db">db</a></li><li><a href="global.html#displayComparison">displayComparison</a></li><li><a href="global.html#displayItemDetails">displayItemDetails</a></li><li><a href="global.html#displayVerificationQuestions">displayVerificationQuestions</a></li><li><a href="global.html#firebaseConfig">firebaseConfig</a></li><li><a href="global.html#formatDate">formatDate</a></li><li><a href="global.html#getAllItems">getAllItems</a></li><li><a href="global.html#getItemById">getItemById</a></li><li><a href="global.html#getQuestionValue">getQuestionValue</a></li><li><a href="global.html#initControls">initControls</a></li><li><a href="global.html#letterLabels">letterLabels</a></li><li><a href="global.html#lineLabels">lineLabels</a></li><li><a href="global.html#listenToItems">listenToItems</a></li><li><a href="global.html#loadAdminDashboard">loadAdminDashboard</a></li><li><a href="global.html#loadFoundItems">loadFoundItems</a></li><li><a href="global.html#loadItemDetails">loadItemDetails</a></li><li><a href="global.html#loadPendingRetrievalRequests">loadPendingRetrievalRequests</a></li><li><a href="global.html#loadPendingSubmissions">loadPendingSubmissions</a></li><li><a href="global.html#loadReadyToClaim">loadReadyToClaim</a></li><li><a href="global.html#loadReunitedItems">loadReunitedItems</a></li><li><a href="global.html#loadReviewData">loadReviewData</a></li><li><a href="global.html#loadSettings">loadSettings</a></li><li><a href="global.html#loadStudentDashboard">loadStudentDashboard</a></li><li><a href="global.html#logInEmailButton">logInEmailButton</a></li><li><a href="global.html#logoutBtn">logoutBtn</a></li><li><a href="global.html#markItemRetrieved">markItemRetrieved</a></li><li><a href="global.html#provider">provider</a></li><li><a href="global.html#rejectClaim">rejectClaim</a></li><li><a href="global.html#saveSetting">saveSetting</a></li><li><a href="global.html#setupQuestionDropdown">setupQuestionDropdown</a></li><li><a href="global.html#showConfirm">showConfirm</a></li><li><a href="global.html#showNotif">showNotif</a></li><li><a href="global.html#showReasonPrompt">showReasonPrompt</a></li><li><a href="global.html#storage">storage</a></li><li><a href="global.html#submitClaim">submitClaim</a></li><li><a href="global.html#syncControls">syncControls</a></li><li><a href="global.html#updateSliderUI">updateSliderUI</a></li><li><a href="global.html#updateSpacingUI">updateSpacingUI</a></li><li><a href="global.html#uploadData">uploadData</a></li><li><a href="global.html#uploadImage">uploadImage</a></li><li><a href="global.html#user">user</a></li><li><a href="global.html#userEmailLogIn">userEmailLogIn</a></li><li><a href="global.html#userEmailSignIn">userEmailSignIn</a></li><li><a href="global.html#user_status">user_status</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Tue Apr 21 2026 23:59:37 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
